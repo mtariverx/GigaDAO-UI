@@ -1,7 +1,7 @@
 
 
 const daoAddressMap = {
-gigadao: '3cAPhAmd1Ai84WuwjEDAefvaecPaoJwiS7tY3ifSvC2q',
+    gigadao: '3cAPhAmd1Ai84WuwjEDAefvaecPaoJwiS7tY3ifSvC2q',
     fatdao: 'H4L8HhHxLJ2bV62jmsKzNKb4JakuCYbSFtBM48wSpcyp',
     talldao: '8AiL3hvSQZocZqv2FAdhaJKpAEL8NoBjobe5B1udsWbY',
     kaijureborn: '48L86TNDMw1nAJ868nisjBW16wy5PVVveRo4SPewFFtP',

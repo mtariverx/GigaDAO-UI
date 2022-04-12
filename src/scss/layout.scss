@@ -1,0 +1,71 @@
+.dash_main {
+  display: grid;
+  // grid-template-rows: min-content 1fr;
+  grid-template-rows: 30px 1fr;
+  min-height: 80vh;
+  width: 100%;
+  background-color: #1e2423;
+  font-family: Space Grotesk, -apple-system, BlinkMacSystemFont, Segoe UI,
+    PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica,
+    Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+  
+  & > .dash_header {
+    display: grid;
+    // background-color: #282c34;
+    color: white;
+    font-family: Sans-Serif;
+    text-align: center;
+    justify-content: center;
+  }
+  & > .dash_container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+
+    // color: white;
+    font-family: Sans-Serif;
+    text-align: center;
+    & > .dash_menu {
+      // background-color: #131a35;
+
+      ul {
+        
+        list-style: none;
+        display: grid;
+        margin: 40px 0 0 0;
+        padding-left: 0;
+        li {
+          margin: 5px 10px 5px 10px;
+          // cursor: pointer;
+          // border-radius: 0.8rem;
+          // &:hover {
+          //   background-color: rgba(57, 208, 216, 0.05);
+          // }
+
+          cursor: pointer;
+          // border-radius: 0.8rem;
+          color: white;
+          :link {
+            color: red;
+          }
+
+          &:hover,
+          &.active {
+            color: rgb(233, 217, 217);
+            background-color: rgba(104, 212, 218, 0.05);
+            border-radius: 0.8rem;
+          }
+
+          /* selected link */
+          // &:active {
+          //   color: blue;
+          // }
+        }
+      }
+    }
+    & > .dash_content {
+      border-top-left-radius: 1.25rem;
+      display: grid;
+      background-color: rgb(22, 27, 25);
+    }
+  }
+}

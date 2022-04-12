@@ -31,7 +31,8 @@ async function initProgram(wallet: anchor.Wallet, network: string) {
     return program;
 }
 
-async function stakeNft(wallet: anchor.Wallet, network: string, nftMintPubkey: anchor.web3.PublicKey, senderNftAccount: anchor.web3.PublicKey){
+export async function initializeStakeAndStake(wallet: anchor.Wallet, network: string, nftMintPubkey: anchor.web3.PublicKey, senderNftAccount: anchor.web3.PublicKey){
+
     let program = await initProgram(wallet, network);
 
     // lookup pdas
@@ -62,6 +63,21 @@ async function stakeNft(wallet: anchor.Wallet, network: string, nftMintPubkey: a
             },
         }
     );
+}
+
+export async function stakeNft(wallet: anchor.Wallet, network: string, nftMintPubkey: anchor.web3.PublicKey, senderNftAccount: anchor.web3.PublicKey){
+
+    let program = await initProgram(wallet, network);
+
+    // lookup pdas
+    const [stake_pda] = await PublicKey.findProgramAddress(
+        [wallet.publicKey.toBuffer(), nftMintPubkey.toBuffer(), Buffer.from(STAKE_PDA_SEED)],
+        program.programId
+    );
+    const [nftVault] = await PublicKey.findProgramAddress(
+        [stake_pda.toBuffer(), Buffer.from(anchor.utils.bytes.utf8.encode(NFT_VAULT_PDA_SEED))],
+        program.programId
+    );
 
     await program.rpc.stakeNft(
         {
@@ -79,12 +95,12 @@ async function stakeNft(wallet: anchor.Wallet, network: string, nftMintPubkey: a
     );
 }
 
-async function unstakeNft(){
+export async function unstakeNft(){
+    // TODO IMPLEMENT THIS
 
 }
 
-
-async function connectToStream(wallet: anchor.Wallet, network: string, streamAddress: anchor.web3.PublicKey, nftMintPubkey: anchor.web3.PublicKey){
+export async function initializeConnectionAndConnect(wallet: anchor.Wallet, network: string, streamAddress: anchor.web3.PublicKey, nftMintPubkey: anchor.web3.PublicKey){
     let program = await initProgram(wallet, network);
     const [stake_pda] = await PublicKey.findProgramAddress(
         [wallet.publicKey.toBuffer(), nftMintPubkey.toBuffer(), Buffer.from(STAKE_PDA_SEED)],
@@ -117,6 +133,29 @@ async function connectToStream(wallet: anchor.Wallet, network: string, streamAdd
         }
     );
 
+
+}
+
+
+export async function connectToStream(wallet: anchor.Wallet, network: string, streamAddress: anchor.web3.PublicKey, nftMintPubkey: anchor.web3.PublicKey){
+    let program = await initProgram(wallet, network);
+    const [stake_pda] = await PublicKey.findProgramAddress(
+        [wallet.publicKey.toBuffer(), nftMintPubkey.toBuffer(), Buffer.from(STAKE_PDA_SEED)],
+        program.programId
+    );
+    const [connection_pda] = await PublicKey.findProgramAddress(
+        [stake_pda.toBuffer(), streamAddress.toBuffer(), Buffer.from(CONNECTION_PDA_SEED)],
+        program.programId
+    );
+    const [metadata_pda] = await PublicKey.findProgramAddress(
+        [Buffer.from(METADATA_PREFIX), TOKEN_METADATA_PROGRAM_ID.toBuffer(), nftMintPubkey.toBuffer()],
+        TOKEN_METADATA_PROGRAM_ID
+    );
+    const [tokenPool] = await PublicKey.findProgramAddress(
+        [streamAddress.toBuffer(), Buffer.from(anchor.utils.bytes.utf8.encode(TOKEN_POOL_PDA_SEED))],
+        program.programId
+    );
+
     await program.rpc.connectToStream(
         {
             accounts: {
@@ -135,11 +174,13 @@ async function connectToStream(wallet: anchor.Wallet, network: string, streamAdd
 
 }
 
-async function disconnectFromStream(){
+export async function disconnectFromStream(){
+
+    // TODO Implement this
 
 }
 
-async function claimTokensFromStream(wallet: anchor.Wallet,
+export async function claimTokensFromStream(wallet: anchor.Wallet,
                                      network: string,
                                      streamAddress: anchor.web3.PublicKey,
                                      receiverTokenAccount: anchor.web3.PublicKey,
@@ -192,6 +233,7 @@ async function claimTokensFromStream(wallet: anchor.Wallet,
     );
 
 }
+
 
 
 

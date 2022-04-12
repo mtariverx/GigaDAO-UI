@@ -1,12 +1,12 @@
 import React, {useEffect} from "react";
 import {verifiedDaos} from "../preload/verified-daos";
 import {Dao} from "pic/pic";
-import * as pic from "../pic/sim";
+import {pic} from "../pic/connect";
 import {useOwnerData} from "./owner";
 import {cloneObject} from "../utils/pic-object-utils";
 
 async function fetchStreamData(daos: Array<Dao>): Promise<Array<Dao>> {
-    let newDaos = pic.getDaos(daos);
+    let newDaos = await pic.getDaos(daos);
     return newDaos;
 }
 

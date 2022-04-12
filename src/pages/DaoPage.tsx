@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {useDaoData} from "../providers/daos";
 import {useOwnerData} from "../providers/owner";
-import * as pic from 'pic/pic';
-import {stakeNft, unstakeNft, connectToStream, disconnectFromStream, claimFromStream} from "../pic/sim";
+import {Stream, Dao, Nft, Collection, Connection} from 'pic/pic';
 import {cloneObject} from "../utils/pic-object-utils";
+import {pic} from "../pic/connect";
 
 //TODO implement load connection and stream stats directly from blockchain
 
@@ -16,7 +16,7 @@ export function DaoPage({ dao_id: dao_id }: DaoProps) {
     const {verifiedDaos, dispatch, refreshStreams} = useDaoData();
     const {owner} = useOwnerData();
 
-    const currentDao: pic.Dao = getDaoById(verifiedDaos, dao_id);
+    const currentDao: Dao = getDaoById(verifiedDaos, dao_id);
     let streams = currentDao.streams;
 
     // request a refresh
@@ -47,7 +47,7 @@ export function DaoPage({ dao_id: dao_id }: DaoProps) {
     );
 }
 
-const StreamCardComponent: React.FC<{stream: pic.Stream, dao: pic.Dao, currentNft?: pic.Nft, setCurrentNft}> = (props) => {
+const StreamCardComponent: React.FC<{stream: Stream, dao: Dao, currentNft?: Nft, setCurrentNft}> = (props) => {
 
     const [currentStream, setCurrentStream] = useState(props.stream);
 
@@ -66,7 +66,7 @@ const StreamCardComponent: React.FC<{stream: pic.Stream, dao: pic.Dao, currentNf
         if (props.currentNft.stake?.is_active){
             streamState = StreamStates.STAKED_NFT;
             if (props.currentNft.stake?.connections?.length > 0){
-                let connections: Array<pic.Connection> = props.currentNft.stake.connections;
+                let connections: Array<Connection> = props.currentNft.stake.connections;
                 let activeConnections = connections.filter((conn, _) => conn.is_active);
                 let connectionStreamAddresses = activeConnections.map((conn, _) => conn.stream_address);
                 if (connectionStreamAddresses.includes(currentStream.address)){
@@ -97,31 +97,34 @@ const StreamCardComponent: React.FC<{stream: pic.Stream, dao: pic.Dao, currentNf
 
     // click handlers
     function handleConnect(e){
-        const result = connectToStream(props.currentNft, currentStream);
-        const newStream = cloneObject(result.stream);
-        const newNft = cloneObject(result.nft);
-        setCurrentStream(newStream);
-        props.setCurrentNft(newNft);
+        pic.connectToStream(props.currentNft, currentStream).then((result) => {
+            const newStream = cloneObject(result.stream);
+            const newNft = cloneObject(result.nft);
+            setCurrentStream(newStream);
+            props.setCurrentNft(newNft);
+        })
         e.stopPropagation();
     }
 
     function handleDisconnect(e){
         let currentConnection = getConnection(props.currentNft, currentStream);
-        const result = disconnectFromStream(props.currentNft, currentConnection, currentStream);
-        const newStream = cloneObject(result.stream);
-        const newNft = cloneObject(result.nft);
-        setCurrentStream(newStream);
-        props.setCurrentNft(newNft);
+        pic.disconnectFromStream(props.currentNft, currentConnection, currentStream).then((result) => {
+            const newStream = cloneObject(result.stream);
+            const newNft = cloneObject(result.nft);
+            setCurrentStream(newStream);
+            props.setCurrentNft(newNft);
+        })
         e.stopPropagation();
     }
 
     function handleClaim(e){
         let currentConnection = getConnection(props.currentNft, currentStream);
-        const result = claimFromStream(currentConnection, currentStream);
-        const newStream = cloneObject(result.stream);
-        setCurrentStream(newStream);
-        const newNft = cloneObject(props.currentNft);
-        props.setCurrentNft(newNft);
+        pic.claimFromStream(currentConnection, currentStream).then((result) => {
+            const newStream = cloneObject(result.stream);
+            setCurrentStream(newStream);
+            const newNft = cloneObject(props.currentNft);
+            props.setCurrentNft(newNft);
+        })
         e.stopPropagation();
     }
 
@@ -201,7 +204,7 @@ const StreamCardComponent: React.FC<{stream: pic.Stream, dao: pic.Dao, currentNf
   );
 }
 
-const NftCardComponent: React.FC<{nft: pic.Nft, setSelectedNft}> = (props) => {
+const NftCardComponent: React.FC<{nft: Nft, setSelectedNft}> = (props) => {
 
     const [currentNft, setCurrentNft] = useState(props.nft);
     const isStaked = currentNft.stake && currentNft.stake?.is_active;
@@ -219,16 +222,19 @@ const NftCardComponent: React.FC<{nft: pic.Nft, setSelectedNft}> = (props) => {
     function toggleStaked(e) {
         let nft
         if (isStaked){
+            // try to unstake
             let numActiveConns = getNumActiveConnections(currentNft);
             if (numActiveConns > 0){
                 alert("You must disconnect from all streams before unstaking.")
             } else {
-                nft = cloneObject(unstakeNft(currentNft));
-                setCurrentNft(nft);
+                pic.unstakeNft(currentNft).then((newNft)=>{
+                    setCurrentNft(cloneObject(newNft));
+                })
             }
         } else {
-            nft = cloneObject(stakeNft(currentNft));
-            setCurrentNft(nft);
+            pic.stakeNft(currentNft).then((newNft) => {
+                setCurrentNft(cloneObject(newNft));
+            })
         }
         e.stopPropagation();
     }
@@ -332,7 +338,7 @@ function getEligibleNfts(owner, currentCollectionsAddresses){
 }
 
 function getConnection(currentNft, currentStream) {
-    let connections: Array<pic.Connection> = currentNft.stake.connections;
+    let connections: Array<Connection> = currentNft.stake.connections;
     let activeConnections = connections.filter((conn, _) => conn.is_active);
     let connArr = activeConnections.filter((conn, _) => conn.stream_address === currentStream.address);
     if (connArr.length === 1) {

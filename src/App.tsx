@@ -9,29 +9,31 @@ import { SearchBar } from "components/SearchBar";
 import { VerifiedDAOs } from "./pages/VerifiedDAOs";
 import { ConnectWalletBannerButton } from "./components/ConnectWalletNavButton";
 import { DaoPage } from "./pages/DaoPage";
-
+import AdminDashBoard from "./pages/AdminDashBoard";
 
 function App() {
   return (
     <>
       <ClusterModal />
       <div className="main-content pb-4">
+        {/* <Switch>
+          <Route path="/dashboard" component={AdminDashBoard} />
+        </Switch> */}
         <Navbar />
         <MessageBanner />
         <ClusterStatusBanner />
-        <ConnectWalletBannerButton/>
+        <ConnectWalletBannerButton />
         <SearchBar />
         <Switch>
           <Route exact path={"/"}>
             <VerifiedDAOs />
           </Route>
           <Route
-              exact
-              path={"/dao/:dao_id"}
-              render={({ match }) => (
-                  <DaoPage dao_id={match.params.dao_id} />
-              )}
+            exact
+            path={"/dao/:dao_id"}
+            render={({ match }) => <DaoPage dao_id={match.params.dao_id} />}
           />
+          <Route path="/dashboard" component={AdminDashBoard} />
           <Route
             render={({ location }) => (
               <Redirect to={{ ...location, pathname: "/" }} />

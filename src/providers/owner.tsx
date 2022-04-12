@@ -1,6 +1,6 @@
 import React from "react";
 import {Owner} from "pic/pic";
-import * as pic from "../pic/sim";
+import {pic} from "../pic/connect";
 
 type Action = {type: string, newOwnerData: Owner}
 type Dispatch = (action: Action) => void;
@@ -33,8 +33,7 @@ function ownerDataReducer(state: State, action: Action){
 }
 
 async function callConnectOwner(dispatch, owner){
-    // TODO will need to await this for live mode
-    let newOwner = pic.connectOwner(owner);
+    let newOwner = await pic.connectOwner(owner);
     dispatch({type: 'connect', newOwnerData: newOwner})
 }
 
