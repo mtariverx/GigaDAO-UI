@@ -3,17 +3,22 @@ import { LabelInput, LabelCheckbox } from "components/common/LabelInput";
 import { useState } from "react";
 import "./style.scss";
 import "../../scss/content.scss";
+// import "../../scss/navitem.scss";
+
 import * as pic from "../../pic/pic";
 import { Keypair, PublicKey } from "@solana/web3.js";
-import {setGovernance, getGovernance} from "../../pic/sim";
+import { setGovernance, getGovernance } from "../../pic/sim";
 
 // import React, { Component } from "react";
 import Select from "react-select";
 
 const options = [
-  { value:  pic.ProposalType.UPDATE_MULTISIG, label: "UPDATE_MULTISIG" },
-  { value:  pic.ProposalType.DEACTIVATE_STREAM, label: "DEACTIVATE_STREAM" },
-  { value:  pic.ProposalType.WITHDRAW_FROM_STREAM, label: "WITHDRAW_FROM_STREAM" },
+  { value: pic.ProposalType.UPDATE_MULTISIG, label: "UPDATE_MULTISIG" },
+  { value: pic.ProposalType.DEACTIVATE_STREAM, label: "DEACTIVATE_STREAM" },
+  {
+    value: pic.ProposalType.WITHDRAW_FROM_STREAM,
+    label: "WITHDRAW_FROM_STREAM",
+  },
 ];
 
 const customStyles = {
@@ -22,6 +27,7 @@ const customStyles = {
     color: state.isSelected ? "white" : "black",
   }),
 };
+
 const CreateDao = () => {
   //describe the arguments of DAO
   // config
@@ -30,9 +36,7 @@ const CreateDao = () => {
   // proposal state
   const [proposal_signers, setProposalSigners] = useState<boolean[]>([false]);
   const [proposal_is_active, setProposalIsActive] = useState<boolean>(null);
-  const [proposal_type, setProposalType] = useState(
-    null
-  );
+  const [proposal_type, setProposalType] = useState(null);
   // update multisig proposal params
   const [proposed_councillors, setProposedCouncillors] = useState<string[]>([
     "",
@@ -54,7 +58,6 @@ const CreateDao = () => {
   // stream state
   const [num_streams, setNumSreams] = useState<number>(0);
 
-  
   const changeCouncillors = (index: number) => (value: string) => {
     const temp = [...councillors];
     temp[index] = value;
@@ -105,37 +108,44 @@ const CreateDao = () => {
   };
 
   const onSave = (): void => {
-    const councillors_publickey = councillors.map((councillor) => 
-      new PublicKey(councillor),
+    const councillors_publickey = councillors.map(
+      (councillor) => new PublicKey(councillor)
     );
-   
-    const proposal_type_enum=proposal_type.value;
+
+    const proposal_type_enum = proposal_type.value;
     const proposed_councillors_publickey = proposed_councillors.map(
       (proposed_councillor) => new PublicKey(proposed_councillor)
     );
     //const proposed_approval_threshold
-    const proposed_deactivation_stream_publickey=new PublicKey(proposed_deactivation_stream);
+    const proposed_deactivation_stream_publickey = new PublicKey(
+      proposed_deactivation_stream
+    );
     //const proposed_withdrawal_amount
-    const proposed_withdrawal_receiver_owner_publickey=new PublicKey(proposed_withdrawal_receiver_owner);
-    const proposed_withdrawal_stream_publickey=new PublicKey(proposed_deactivation_stream);
+    const proposed_withdrawal_receiver_owner_publickey = new PublicKey(
+      proposed_withdrawal_receiver_owner
+    );
+    const proposed_withdrawal_stream_publickey = new PublicKey(
+      proposed_deactivation_stream
+    );
     //const num_streams
-    let governance:pic.Governance={
-      councillors:councillors_publickey,
-      approval_threshold:approval_threshold,
+    let governance: pic.Governance = {
+      councillors: councillors_publickey,
+      approval_threshold: approval_threshold,
       proposed_signers: proposal_signers,
       proposal_is_active: proposal_is_active,
-      proposal_type:proposal_type_enum,
-      proposed_councillors:proposed_councillors_publickey,
-      proposed_approval_threshold:proposed_approval_threshold,
-      proposed_deactivation_stream:proposed_deactivation_stream_publickey,
-      proposed_withdrawal_amount:proposed_withdrawal_amount,
-      proposed_withdrawal_receiver:proposed_withdrawal_receiver_owner_publickey,
-      proposed_withdrawal_stream:proposed_withdrawal_stream_publickey,
-      num_streams:num_streams,
-    }
+      proposal_type: proposal_type_enum,
+      proposed_councillors: proposed_councillors_publickey,
+      proposed_approval_threshold: proposed_approval_threshold,
+      proposed_deactivation_stream: proposed_deactivation_stream_publickey,
+      proposed_withdrawal_amount: proposed_withdrawal_amount,
+      proposed_withdrawal_receiver:
+        proposed_withdrawal_receiver_owner_publickey,
+      proposed_withdrawal_stream: proposed_withdrawal_stream_publickey,
+      num_streams: num_streams,
+    };
     setGovernance(governance);
   };
-    
+
   return (
     <div className="content">
       <div className="content-left">
@@ -156,6 +166,9 @@ const CreateDao = () => {
                 <div className="add-stream" onClick={onAddCouncillors}>
                   <PlusIcon /> Add a councillor
                 </div>
+                {/* <div className="input-recyclebin">
+                  <img src={"/icons/entry-icon-farms.svg"} />
+                </div> */}
               </div>
               <LabelInput
                 value={approval_threshold}
@@ -165,7 +178,9 @@ const CreateDao = () => {
               {proposal_signers.map((item, index) => (
                 <LabelCheckbox
                   value={item}
-                  title={index === 0 || item===undefined? "Proposal Signers" : ""}
+                  title={
+                    index === 0 || item === undefined ? "Proposal Signers" : ""
+                  }
                   onChange={changeProposalSigners(index)}
                   key={index}
                 />
@@ -190,12 +205,11 @@ const CreateDao = () => {
                 <div className="input-title">Proposal Type</div>
                 <div className="input-select">
                   <Select
-                  defaultValue={proposal_type}
+                    defaultValue={proposal_type}
                     options={options}
                     styles={customStyles}
                     onChange={setProposalType}
                   />
-                 
                 </div>
               </div>
 
@@ -249,7 +263,9 @@ const CreateDao = () => {
                 <button className="btn" onClick={onCancel}>
                   Cancel
                 </button>
-                <button className="btn" onClick={onSave}>Save</button>
+                <button className="btn" onClick={onSave}>
+                  Save
+                </button>
               </div>
             </div>
           </div>

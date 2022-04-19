@@ -2,16 +2,15 @@
   display: grid;
   // grid-template-rows: min-content 1fr;
   grid-template-rows: 30px 1fr;
-  min-height: 80vh;
+  min-height: 79.95vh;
   width: 100%;
   background-color: #1e2423;
   font-family: Space Grotesk, -apple-system, BlinkMacSystemFont, Segoe UI,
     PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica,
     Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
-  
+
   & > .dash_header {
     display: grid;
-    // background-color: #282c34;
     color: white;
     font-family: Sans-Serif;
     text-align: center;
@@ -25,40 +24,28 @@
     font-family: Sans-Serif;
     text-align: center;
     & > .dash_menu {
+      // min-height: 80vh;
       // background-color: #131a35;
 
       ul {
-        
         list-style: none;
         display: grid;
-        margin: 40px 0 0 0;
+        margin: 0 0 0 0;
         padding-left: 0;
         li {
           margin: 5px 10px 5px 10px;
-          // cursor: pointer;
-          // border-radius: 0.8rem;
-          // &:hover {
-          //   background-color: rgba(57, 208, 216, 0.05);
-          // }
-
+          color: #4fff5a;
           cursor: pointer;
-          // border-radius: 0.8rem;
-          color: white;
           :link {
             color: red;
           }
 
           &:hover,
           &.active {
-            color: rgb(233, 217, 217);
+            color: #85f58d;
             background-color: rgba(104, 212, 218, 0.05);
             border-radius: 0.8rem;
           }
-
-          /* selected link */
-          // &:active {
-          //   color: blue;
-          // }
         }
       }
     }
@@ -67,5 +54,16 @@
       display: grid;
       background-color: rgb(22, 27, 25);
     }
+  }
+  .footer {
+    display: flex;
+    grid-template-columns: min-content min-content;
+    width: 100%;
+    height: 50px;
+    background-color: rgb(170, 185, 221);
+    color: black;
+    justify-content: space-around;
+    font-size: 20px;
+    align-items: center;
   }
 }

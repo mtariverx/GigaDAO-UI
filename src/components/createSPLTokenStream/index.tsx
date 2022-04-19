@@ -3,9 +3,8 @@ import { PlusIcon } from "components/common/icons/plus";
 import { LabelInput } from "components/common/LabelInput";
 import "./style.scss";
 import "../../scss/content.scss";
-
+import { Keypair, PublicKey } from "@solana/web3.js";
 const CreateSPLTokenStream = () => {
-
   const [dao_address, setDaoAddress] = useState("");
   const [token_mint_address, setTonkenMintAddress] = useState("");
   const [token_pool_address, setTokenPoolAddress] = useState("");
@@ -20,10 +19,37 @@ const CreateSPLTokenStream = () => {
   const [total_claimed, setTotalClaimed] = useState(0);
   const [last_update_timestamp, setLastUpdateTimestamp] = useState(0);
 
-  {
-    console.log(is_simulation);
-    console.log(is_active);
-  }
+  // {
+  //   console.log(is_simulation);
+  //   console.log(is_active);
+  // }
+  const onCancel = (): void => {
+    setDaoAddress("");
+    setTonkenMintAddress("");
+    setTokenPoolAddress("");
+    setVerifiedCreatorAddress([""]);
+    setStreamRate(0);
+    setSimulation(false);
+    setActive(false);
+    setNumConnections(0);
+    setTotalStreamed(0);
+    setTotalClaimed(0);
+    setLastUpdateTimestamp(0);
+  };
+  const onSave = (): void => {
+    const dao_address_pubkey=new PublicKey(dao_address);
+    const token_mint_address_pubkey = new PublicKey(token_mint_address);
+    const token_pool_address_pubkey=new PublicKey(token_pool_address);
+    const verified_creator_addresses_pubkey = verified_creator_addresses.map((address)=>[new PublicKey(address)]);
+    //const stream_rate
+    //const is_simulation
+    //const is_active
+    //const num_connections
+    //const total_streamed
+    //const total_claimed
+    //const last_update_timestamp
+
+  };
   const changeVerifiedCreatorAddress = (index: number) => (value: string) => {
     const temp = [...verified_creator_addresses];
     temp[index] = value;
@@ -41,7 +67,7 @@ const CreateSPLTokenStream = () => {
     setVerifiedCreatorAddress(temp);
   };
   return (
-    <div className="content">
+    <div className="content-spltokenstream">
       <div className="content-left">
         <div className="content-outer-box">
           <div className="content-input-box">
@@ -125,8 +151,10 @@ const CreateSPLTokenStream = () => {
                 onChange={setLastUpdateTimestamp}
               />
               <div className="content-btn-group">
-                <button className="btn">Cancel</button>
-                <button className="btn">Save</button>
+                <button className="btn" onClick={onCancel}>
+                  Cancel
+                </button>
+                <button className="btn" onClick={onSave}>Save</button>
               </div>
             </div>
           </div>

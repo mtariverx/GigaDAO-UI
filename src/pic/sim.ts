@@ -11,6 +11,7 @@ import {
 import { verifiedDaos } from "../preload/verified-daos";
 import { daoAddressMap } from "./sim_data/dao-collection-map";
 
+let governance_store: pic.Governance = null;
 // randomizers
 let selectRandom = (arr: Array<any>) =>
   arr[Math.floor(Math.random() * arr.length)];
@@ -201,7 +202,6 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
 };
 // gets the latest Governance data directly from the blockchain
 let refreshGovernance: pic.RefreshGovernance = async (dao: pic.Dao) => {
-
   const governance: pic.Governance = {
     councillors: [dao.address],
     approval_threshold: 3,
@@ -238,7 +238,7 @@ let initializeStream: pic.InitializeStream = async (
   dao: pic.Dao,
   stream: pic.Stream
 ) => {
-  if(dao.address){
+  if (dao.address) {
     stream.dao_address = dao.address; //add ado address into streams' dao address.
   }
   if (dao.streams) {
@@ -252,36 +252,45 @@ let reactivateStream: pic.ReactivateStream = async (
   dao: pic.Dao,
   stream: pic.Stream
 ) => {
-    stream.dao_address = dao.address; //add ado address into streams' dao address.
-    stream.is_active=true;
-    if (dao.streams) {
-      dao.streams.push(stream);
-    }
+  stream.dao_address = dao.address; //add ado address into streams' dao address.
+  stream.is_active = true;
+  if (dao.streams) {
+    dao.streams.push(stream);
+  }
   return { dao, stream };
 };
 
 // all relevant args should be included in the governance object of the dao passed into this call
 let proposeDaoCommand: pic.ProposeDaoCommand = async (dao: pic.Dao) => {
-  const governance: pic.Governance = {
-    councillors: [dao.address],
-    approval_threshold: 3,
-    proposed_signers: [true],
-    proposal_is_active: true,
-    proposal_type: pic.ProposalType.DEACTIVATE_STREAM,
-    proposed_councillors: [dao.address],
-    proposed_approval_threshold: 2,
-    proposed_deactivation_stream: dao.address,
-    proposed_withdrawal_amount: 10,
-    proposed_withdrawal_receiver: dao.address,
-    proposed_withdrawal_stream: new PublicKey(""),
-    num_streams: 1,
-  };
-  dao.governance = governance;
-
+  const governance = dao.governance;
+//   const proposal_type
+  if (governance) {
+    governance.proposal_is_active = true;
+  }
   return dao;
 };
 
 let approveDaoCommand: pic.ApproveDaoCommand = async (dao: pic.Dao) => {
+//   const governance: pic.Governance = {
+//     councillors: [dao.address],
+//     approval_threshold: 3,
+//     proposed_signers: [true],
+//     proposal_is_active: true,
+//     proposal_type: pic.ProposalType.DEACTIVATE_STREAM,
+//     proposed_councillors: [dao.address],
+//     proposed_approval_threshold: 2,
+//     proposed_deactivation_stream: dao.address,
+//     proposed_withdrawal_amount: 10,
+//     proposed_withdrawal_receiver: dao.address,
+//     proposed_withdrawal_stream: new PublicKey(""),
+//     num_streams: 1,
+//   };
+//   dao.governance = governance;
+
+  return dao;
+};
+
+let executeDaoCommand: pic.ExecuteDaoCommand = async (dao: pic.Dao) => {
   const governance: pic.Governance = {
     councillors: [dao.address],
     approval_threshold: 3,
@@ -300,23 +309,23 @@ let approveDaoCommand: pic.ApproveDaoCommand = async (dao: pic.Dao) => {
   return dao;
 };
 
-let executeDaoCommand: pic.ExecuteDaoCommand = async (dao: pic.Dao) => {
-    const governance: pic.Governance = {
-        councillors: [dao.address],
-        approval_threshold: 3,
-        proposed_signers: [true],
-        proposal_is_active: true,
-        proposal_type: pic.ProposalType.DEACTIVATE_STREAM,
-        proposed_councillors: [dao.address],
-        proposed_approval_threshold: 2,
-        proposed_deactivation_stream: dao.address,
-        proposed_withdrawal_amount: 10,
-        proposed_withdrawal_receiver: dao.address,
-        proposed_withdrawal_stream: new PublicKey(""),
-        num_streams: 1,
-      };
-      dao.governance = governance;
-  return dao;
+let setGovernance: pic.SetGovernance = async (governance: pic.Governance) => {
+  governance_store = governance;
+  console.log(governance_store.councillors);
+  console.log(governance_store.approval_threshold);
+  console.log(governance_store.proposed_signers);
+  console.log(governance_store.proposal_is_active);
+  console.log(governance_store.proposal_type);
+  console.log(governance_store.proposed_councillors);
+  console.log(governance_store.proposed_approval_threshold);
+  console.log(governance_store.proposed_deactivation_stream);
+  console.log(governance_store.proposed_withdrawal_amount);
+  console.log(governance_store.proposed_withdrawal_receiver);
+  console.log(governance_store.proposed_withdrawal_stream);
+  console.log(governance_store.num_streams);
+};
+let getGovernance: pic.GetGovernance = async () => {
+  return governance_store;
 };
 
 export {
@@ -338,3 +347,4 @@ export {
   approveDaoCommand,
   executeDaoCommand,
 };
+export { setGovernance, getGovernance };
