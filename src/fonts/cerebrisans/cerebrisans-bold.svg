@@ -9,7 +9,7 @@ Copyright (c)2016. Cerebri Sans is a trademark of Alfredo Marco Pradil. All righ
 <defs>
 <font id="CerebriSans-Bold" horiz-adv-x="0" >
   <font-face 
-    font-family="Cerebri Sans"
+    font-family="Liberation Mono";
     font-weight="700"
     font-stretch="normal"
     units-per-em="2048"

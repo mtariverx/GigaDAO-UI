@@ -1,0 +1,88 @@
+.mainlayout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  // height: 100vh;
+  // width: 100%;
+
+  & > .left-menu {
+    display: grid;
+    grid-template-rows: 1fr 200px;
+    background-color: rgb(29, 35, 34);
+    justify-content: space-around;
+
+    & > .menu-list {
+      border-bottom: 2px solid #4fff5a;
+      & > .menu-giga-logo {
+        // display:inline-block;
+        width: 100%;
+        text-align: center;
+        margin: 50px 0px 50px 0px;
+
+        & > img {
+          width: 160;
+        }
+      }
+      & > ul {
+        list-style: none;
+        margin: 0 10px 0 10px;
+        padding-left: 0;
+        li {
+          margin: 0px 10px 0px 10px;
+          color: #4fff5a;
+          cursor: pointer;
+          :link {
+            color: red;
+          }
+
+          &:hover,
+          &.active {
+            color: #85f58d;
+            background-color: rgba(104, 212, 218, 0.05);
+            border-radius: 0.8rem;
+          }
+        }
+      }
+    }
+    & > .menu-info {
+      // display:grid;
+      padding-top: 50px;
+      padding-left: 30px;
+      width: 12rem;
+      text-align: left;
+      font-size: 20px;
+      & > .menu-info-item {
+        display: grid;
+        grid-template-columns: min-content 1fr;
+        gap: 0.4em;
+        img {
+          width: 18px;
+          height: 18px;
+        }
+      }
+      & > .menu-info-social {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        justify-content: space-around;
+        padding-top:10px;
+        gap: 0.7em;
+        // width: min-content;
+        height: min-content;
+        & > .social-icon {
+          text-align: center;
+          // height: min-content;
+          background-color: rgb(28, 77, 58);
+          padding: 5px;
+          border-radius: 0.5rem;
+          img {
+            width: 25px;
+            height: 25px;
+          }
+        }
+      }
+    }
+  }
+
+  & > .right-content-mainboard {
+    display: grid;
+  }
+}

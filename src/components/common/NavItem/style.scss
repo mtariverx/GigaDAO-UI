@@ -1,0 +1,27 @@
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin-top: 2px;
+  .nav-item-icon {
+    --tw-gradient-from: rgba(57, 208, 216, 0.2);
+    --tw-gradient-stops: var(--tw-gradient-from),
+      var(--tw-gradient-to, rgb(57 208 216/0));
+    background-image: linear-gradient(
+      to bottom right,
+      var(--tw-gradient-stops)
+    );
+    padding: 5px;
+    border-radius: 0.5rem;
+    & > img {
+      display: block;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  & > .nav-item-text {
+    margin-left: 15px;
+    font-size: 16px;
+  }
+}
