@@ -1,28 +1,38 @@
 .item-wrapper {
   margin: 5px;
   display: grid;
-  grid-template-columns: 200px 1fr 30px;
+  grid-template-columns: 200px 1fr;
   align-items: center;
   gap: 15px;
+  &.plus-button {
+    display: grid;
+    grid-template-columns: 200px 1fr min-content;
+  }
   & > .title {
     text-align: right;
     color: #1dd79b;
+    font-size:18px;
   }
-  &>.input-recyclebin {
-    display:grid;
-    visibility:hidden;
-    --tw-gradient-from: rgba(57,208,216,0.2);
-    --tw-gradient-stops: var(--tw-gradient-from),var(--tw-gradient-to,rgb(57 208 216/0));
-    background-image: linear-gradient(to bottom right,var(--tw-gradient-stops));
+  & > .input-side-btn {
+    cursor: pointer;
+    display: grid;
+    --tw-gradient-from: rgba(57, 208, 216, 0.2);
+    --tw-gradient-stops: var(--tw-gradient-from),
+      var(--tw-gradient-to, rgb(57 208 216/0));
+    background-image: linear-gradient(
+      to bottom right,
+      var(--tw-gradient-stops)
+    );
     padding: 5px;
     border-radius: 0.5rem;
+    color: white;
     & > img {
-      display: block;
+      // display: block;
       width: 20px;
       height: 20px;
     }
     &:hover {
-      visibility:show;
+      visibility: show;
     }
   }
   & > input {
@@ -40,7 +50,12 @@
     &:focus {
       background-color: rgb(25, 30, 30);
     }
-    
+  }
+  input.num{
+    width:4rem;
+  }
+  input:focus {
+    outline: none !important;
   }
   .input-title {
     text-align: right;
@@ -54,7 +69,7 @@
     text-align: left;
     margin-top: 5px;
     margin-bottom: 5px;
-   }
+  }
   .add-stream {
     color: #1dd79b;
     &:hover {
@@ -62,8 +77,20 @@
     }
   }
   .plus-button {
-
     margin-left: 40%;
   }
-  
+  & > .show-collections {
+    padding: 0.2rem;
+    border-radius: 5px;
+    overflow: auto;
+    height: 10rem;
+    background-color: rgb(22, 27, 25);
+    & > .item {
+      vertical-align: top;
+    }
+  }
+  & > .show_num {
+    display: grid;
+    grid-template-columns: 200px 50px;
+  }
 }

@@ -1,0 +1,26 @@
+.NewDAO-container {
+  background-color: rgb(35, 39, 34);
+  padding: 20px;
+  padding-bottom: 30px;
+  border-radius: 10px;
+  display: grid;
+  grid-template-rows: min-content 1fr;
+  & > .container-title {
+    padding-top: 20px;
+    padding-left: 30px;
+    font-size: 20px;
+  }
+  & > .container-body {
+    display: grid;
+    grid-template-columns: 1fr 30%;
+    & > .DAO-content {
+      display: grid;  
+    }
+    & > .DAO-initialize {
+      display: flex;
+      padding-bottom: 30px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+  }
+}

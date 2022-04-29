@@ -263,7 +263,7 @@ let reactivateStream: pic.ReactivateStream = async (
 // all relevant args should be included in the governance object of the dao passed into this call
 let proposeDaoCommand: pic.ProposeDaoCommand = async (dao: pic.Dao) => {
   const governance = dao.governance;
-//   const proposal_type
+  //   const proposal_type
   if (governance) {
     governance.proposal_is_active = true;
   }
@@ -271,21 +271,21 @@ let proposeDaoCommand: pic.ProposeDaoCommand = async (dao: pic.Dao) => {
 };
 
 let approveDaoCommand: pic.ApproveDaoCommand = async (dao: pic.Dao) => {
-//   const governance: pic.Governance = {
-//     councillors: [dao.address],
-//     approval_threshold: 3,
-//     proposed_signers: [true],
-//     proposal_is_active: true,
-//     proposal_type: pic.ProposalType.DEACTIVATE_STREAM,
-//     proposed_councillors: [dao.address],
-//     proposed_approval_threshold: 2,
-//     proposed_deactivation_stream: dao.address,
-//     proposed_withdrawal_amount: 10,
-//     proposed_withdrawal_receiver: dao.address,
-//     proposed_withdrawal_stream: new PublicKey(""),
-//     num_streams: 1,
-//   };
-//   dao.governance = governance;
+  //   const governance: pic.Governance = {
+  //     councillors: [dao.address],
+  //     approval_threshold: 3,
+  //     proposed_signers: [true],
+  //     proposal_is_active: true,
+  //     proposal_type: pic.ProposalType.DEACTIVATE_STREAM,
+  //     proposed_councillors: [dao.address],
+  //     proposed_approval_threshold: 2,
+  //     proposed_deactivation_stream: dao.address,
+  //     proposed_withdrawal_amount: 10,
+  //     proposed_withdrawal_receiver: dao.address,
+  //     proposed_withdrawal_stream: new PublicKey(""),
+  //     num_streams: 1,
+  //   };
+  //   dao.governance = governance;
 
   return dao;
 };

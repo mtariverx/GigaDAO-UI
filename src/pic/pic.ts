@@ -108,6 +108,7 @@ export type ApproveDaoCommand = (dao: Dao) => Promise<Dao>;
 export type ExecuteDaoCommand = (dao: Dao) => Promise<Dao>;
 
 //KAIMING's self TODO list
+export type CreateNewDAO=()=>Promise<Dao>;//create a new DAO 
 
 export type SetGovernance = (governance: Governance) => Promise<void>;
 export type GetGovernance = () => Promise<Governance>;

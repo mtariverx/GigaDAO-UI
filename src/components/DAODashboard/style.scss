@@ -1,0 +1,321 @@
+.dashboard-content {
+  background-color: rgb(22, 27, 25);
+  display: grid;
+  grid-template-rows: min-content 1fr;
+  & > .top-nav {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    align-items: center;
+    justify-items: left;
+    // padding:30px;
+    & > .dash-title {
+      padding-left: 60px;
+      padding-right: 30px;  
+      font-size: 44px;
+    }
+    & > .top-nav-right {
+      display: grid;
+      grid-template-columns: 4fr 4fr min-content;
+      padding: 10px;
+      padding-right:30px;
+      align-items: center;
+      & > .nav-dao-search {
+        padding: 0.5rem 0.75rem;
+
+        align-items: center;
+        input[type="text"] {
+          padding: 0.5rem;
+          background-color: rgb(25, 39, 34);
+          font-size: 18px;
+          border-radius: 10px;
+          border: none;
+        }
+      }
+      & > .nav-dao-profile {
+        width: 48px;
+        height: 48px;
+        margin: 5px;
+        img {
+          width: 25px;
+          height: 25px;
+        }
+        background-color: rgb(25, 39, 34);
+
+        border-radius: 0.375rem;
+        border: none;
+      }
+    }
+  }
+  & > .dashboard-main-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    padding-right: 30px;
+    & > .content-left {
+      padding-left: 50px;
+      padding-right: 30px;
+      display: grid;
+      grid-template-rows: min-content 1fr 0.7fr 0.7fr;
+      gap: 20px;
+      & > .address-refresh_btn {
+        display: grid;
+        gap:10px;
+        grid-template-columns: 50px 1fr 50px 0.5fr;
+        align-items: center;
+        font-size: 16px;
+        & > .select-memeberDAO {
+          position: relative;
+          display: flex;
+          height: 3em;
+          border-radius: 0.25em;
+          overflow: hidden;
+          font-family: "Cerebri Sans";
+          border-radius: 8px;
+          select {
+            /* Reset Select */
+            appearance: none;
+            outline: 0;
+            border: 0;
+            box-shadow: none;
+            /* Personalize */
+            flex: 1;
+            padding: 0 1em;
+            color: #fff;
+            background-color: rgb(35, 39, 34); //var(--darkgray);
+            background-image: none;
+            cursor: pointer;
+          }
+          /* Remove IE arrow */
+          select::-ms-expand {
+            display: none;
+          }
+
+          /* Arrow */
+          &::after {
+            content: "\25BC";
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 1em;
+            color: rgb(157, 129, 15);
+            background-color: rgb(45, 39, 34);
+            transition: 0.25s all ease;
+            pointer-events: none;
+            // border-radius: 10px;
+          }
+          /* Transition */
+          &:hover::after {
+            color: #f39c12;
+          }
+        }
+        & > .refresh_btn {
+          width: 48px;
+          height: 48px;
+          margin: 5px;
+          img {
+            width: 25px;
+            height: 25px;
+          }
+          background-color: rgb(25, 39, 34);
+
+          border-radius: 0.375rem;
+          border: none;
+        }
+      }
+      & > .member-token {
+        display: grid;
+        grid-template-rows: 40px 1fr;
+        & > .dash-items {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          & > .item-each {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            // background-color: rgb(34, 189, 34);
+            background-color: rgb(28, 32, 34);
+            &:hover,
+            &.active {
+              background-color: rgb(35, 39, 34);
+            }
+          }
+        }
+        & > .dash-details {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+
+          & > .dash-details-items {
+            background-color: rgb(35, 39, 34);
+            padding: 20px;
+            border-bottom-left-radius: 10px;
+            & > .item-pair {
+              display: grid;
+
+              height: min-content;
+              grid-template-columns: 1fr 1fr;
+            }
+          }
+          & > .dash-details-graph {
+            padding: 10px;
+            border-bottom-right-radius: 10px;
+            background-color: rgb(35, 39, 34);
+          }
+        }
+      }
+      .dashboard-card {
+        &:focus {
+          background-color: rgb(25, 30, 30);
+        }
+        display: flex;
+        font-size: 40px;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border-radius: 10px;
+        background-size: cover;
+        border: none;
+      }
+      & > .tokenpool-proposal {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        & > .tokenpool-streams {
+          &:hover {
+            background-image: linear-gradient(
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.7)
+              ),
+              url("../../img/background-images/stream-1.jpg");
+            color: rgb(142, 235, 119);
+          }
+          background-image: linear-gradient(
+              rgba(0, 0, 0, 0.7),
+              rgba(0, 0, 0, 0.7)
+            ),
+            url("../../img/background-images/stream-1.jpg");
+        }
+        & > .new-proposal {
+          background-image: linear-gradient(
+              rgba(0, 0, 0, 0.7),
+              rgba(0, 0, 0, 0.7)
+            ),
+            url("../../img/background-images/proposal-1.jpg");
+          &:hover {
+            background-image: linear-gradient(
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.7)
+              ),
+              url("../../img/background-images/proposal-1.jpg");
+            color: rgb(142, 235, 119);
+          }
+        }
+      }
+      & > .voting-social {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        & > .dao-voting {
+          background-image: linear-gradient(
+              rgba(0, 0, 0, 0.7),
+              rgba(0, 0, 0, 0.7)
+            ),
+            url("../../img/background-images/voting-1.png");
+          &:hover {
+            background-image: linear-gradient(
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.7)
+              ),
+              url("../../img/background-images/voting-1.png");
+            color: rgb(142, 235, 119);
+          }
+        }
+        & > .dao-social {
+          background-image: linear-gradient(
+              rgba(0, 0, 0, 0.7),
+              rgba(0, 0, 0, 0.7)
+            ),
+            url("../../img/background-images/social-1.jpg");
+          &:hover {
+            background-image: linear-gradient(
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.7)
+              ),
+              url("../../img/background-images/social-1.jpg");
+            color: rgb(142, 235, 119);
+          }
+        }
+      }
+    }
+    & > .content-right {
+      background-color: rgb(29, 35, 34);
+      border-radius: 1rem;
+      padding: 20px;
+
+      & > .proposal-setting {
+        display: grid;
+        grid-template-rows: 1fr min-content min-content 350px min-content;
+        & > .proposal-active {
+          padding: 20px;
+          font-size: 30px;
+          text-align: left;
+        }
+        & > .proposal-description {
+          display: grid;
+          grid-template-rows: 1fr 1fr 1f 1fr 1fr;
+          gap: 5px;
+          & > .descrption-item-value {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            & > .descrption-item {
+              text-align: left;
+            }
+            & > .descrption-value {
+              display: grid;
+              grid-template-columns: min-content 1fr;
+              // text-align: left;
+              justify-content: left;
+              align-items: center;
+            }
+          }
+        }
+        & > .proposal-councillors {
+          padding-top: 30px;
+          font-size: 30px;
+        }
+        & > .proposal-councillor-pubkeys {
+          padding-left: 20px;
+          padding-right: 20px;
+          font-size: 16px;
+          color: black;
+          background-color: rgb(222, 227, 225);
+          border-radius: 5px;
+          overflow: auto;
+          & > .councillor-pubkey-pair {
+            display: grid;
+            grid-template-columns: 1fr min-content;
+            & > .text-pubkey {
+              padding: 3px;
+              text-align: left;
+              // height: min-content;
+            }
+            & > .vote-state {
+              padding: 3px;
+              text-align: right;
+              // height: min-content;
+            }
+          }
+
+        }
+        & > .proposal-btn-group {
+          display: grid;
+          grid-template-columns: min-content min-content;
+          margin-top: 20px;
+          padding: 10px;
+          justify-content: space-around;
+        }
+      }
+    }
+  }
+}
