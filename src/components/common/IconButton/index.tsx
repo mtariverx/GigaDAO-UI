@@ -1,4 +1,9 @@
 import "./style.scss";
+type props_button={
+  icon_img: string;
+  is_background:boolean;
+  onClick:()=>void;
+}
 
 const IconButton = (props) => {
   const { icon_img, is_background} = props;

@@ -4,14 +4,18 @@ import "./style.scss";
 import "../common/LabelInput/style.scss";
 import Profile from "img/icons/profile.png";
 
-const NewStream = () => {
+import * as pic from "../../pic/pic";
+import * as simPic from "../../pic/sim";
+import { PublicKey } from "@solana/web3.js";
+
+const NewStream = (props) => {
   const [is_stream, setStream] = useState(1);
-  const [pool_name, setPoolName] = useState("");
-  const [address, setAddress] = useState("");
-  const [dao_address, setDaoAddress] = useState("");
-  const [collections, setCollections] = useState<string[]>([""]);
+  const [pool_name, setPoolName] = useState<string>();
+  const [address, setAddress] = useState<string>();
+  const [dao_address, setDaoAddress] = useState<string>();
+  const [collections, setCollections] = useState<string[]>([]);
   const [num_connections, setNumCollections] = useState(0);
-  const [collect, setCollect] = useState("");
+  const [collect, setCollect] = useState<string>();
   const changeCollections = (index: number) => (value: string) => {
     const temp = [...collections];
     temp[index] = value;
@@ -20,9 +24,31 @@ const NewStream = () => {
   const onAddCollections = (): void => {
     const temp = [...collections];
     temp.push(collect);
+    setCollect("");
     setCollections(temp);
   };
-  console.log("num=",num_connections);
+  console.log("collections=", collections);
+  const onClickCreateNewStreamBtn = async () => {
+    let new_stream = {
+      name: pool_name,
+      address: new PublicKey(address),
+      dao_address: new PublicKey(dao_address),
+      collections: collections.map((collect) => {
+        let collection={
+          address : new PublicKey(collect),
+        }
+       
+        return collection;
+      }),
+      num_collections:num_connections,
+    };
+    
+    const { dao, stream } = await simPic.initializeStream(
+      props.dao,
+      new_stream
+    ); //initializeStream
+  };
+  console.log("num=", num_connections);
   return (
     <div className="new-stream">
       <div className="stream-pool-tabs">
@@ -77,18 +103,31 @@ const NewStream = () => {
             <div className="item-wrapper">
               <div></div>
               <div className="show-collections">
-                {collections.map((item, index) => (
-                  <div className="item">{item}</div>
-                ))}
+                {collections!=undefined
+                  ? collections.map((item, index) => (
+                      <div className="item">{item}</div>
+                    ))
+                  : ""}
               </div>
             </div>
             <div className="item-wrapper">
               <div className="title">Num_collections</div>
-              <input value ={num_connections} className="num" onChange={(evt) => setNumCollections(parseInt(evt.target.value || "0"))} />
+              <input
+                value={num_connections}
+                className="num"
+                onChange={(evt) =>
+                  setNumCollections(parseInt(evt.target.value || "0"))
+                }
+              />
             </div>
           </div>
           <div className="stream-initial-btn">
-            <div className="initilize-stream-btn">InitializeStream</div>
+            <div
+              className="initilize-stream-btn"
+              onClick={onClickCreateNewStreamBtn}
+            >
+              InitializeStream
+            </div>
           </div>
         </div>
       ) : (

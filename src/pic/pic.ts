@@ -41,20 +41,21 @@ export type Dao = {
   is_member: boolean;
 };
 export type Stream = {
-  address: PublicKey;
-  dao_address: PublicKey;
-  collections: Array<Collection>;
-  num_connections: number;
-  is_active: boolean;
-  name: string;
-  token_image_url: string;
-  daily_stream_rate: number;
-  total_earned: number;
-  total_claimed: number;
-  current_pool_amount: number;
-  token_ticker: string;
-  last_update_timestamp: number;
+  address?: PublicKey;
+  dao_address?: PublicKey;
+  collections?: Array<Collection>;
+  num_connections?: number;
+  is_active?: boolean;
+  name?: string;
+  token_image_url?: string;
+  daily_stream_rate?: number;
+  total_earned?: number;
+  total_claimed?: number;
+  current_pool_amount?: number;
+  token_ticker?: string;
+  last_update_timestamp?: number;
 };
+
 export type Governance = {
   councillors: Array<PublicKey>;
   approval_threshold: number;
@@ -100,20 +101,33 @@ export enum ProposalType {
 
 export type GetMemberDaos = (owner: Owner) => Promise<Array<Dao>>; // retrieves list of daos that owner is a councillor of, but does not lookup Governance data
 export type RefreshGovernance = (dao: Dao) => Promise<Dao>; // gets the latest Governance data directly from the blockchain
-export type InitializeDao = (dao: Dao) => Promise<Dao>;
-export type InitializeStream = (dao: Dao, stream: Stream) => Promise<{ dao: Dao; stream: Stream }>;
-export type ReactivateStream = (dao: Dao, stream: Stream) => Promise<{ dao: Dao; stream: Stream }>;
+export type InitializeDao = (dao: Dao) => Promise<Dao>; //create new Dao
+export type InitializeStream = (
+  dao: Dao,
+  stream: Stream
+) => Promise<{ dao: Dao; stream: Stream }>;
+export type ReactivateStream = (
+  dao: Dao,
+  stream: Stream
+) => Promise<{ dao: Dao; stream: Stream }>;
 export type ProposeDaoCommand = (dao: Dao) => Promise<Dao>; // all relevant args should be included in the governance object of the dao passed into this call
 export type ApproveDaoCommand = (dao: Dao) => Promise<Dao>;
 export type ExecuteDaoCommand = (dao: Dao) => Promise<Dao>;
 
 //KAIMING's self TODO list
-export type CreateNewDAO=()=>Promise<Dao>;//create a new DAO 
+export type social_type={
+  website: string;
+  twitter: string;
+  discord: string;
+  instagram: string;
+  linktree: string;
+  medium: string;
+}
+export type SaveSocial=(social: social_type)=>Promise<social_type>
 
 export type SetGovernance = (governance: Governance) => Promise<void>;
 export type GetGovernance = () => Promise<Governance>;
 //DAO structure in smart contract is the same with Governance here
-export type CreateDAO = (governance: Governance) => Promise<void>;
 //define SPLTokenStream
 export type SPLTokenStream = {
   dao_address: PublicKey;

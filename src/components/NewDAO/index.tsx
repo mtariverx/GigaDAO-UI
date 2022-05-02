@@ -3,14 +3,39 @@ import "../common/LabelInput/style.scss";
 import { useState } from "react";
 import Button from "components/common/Button";
 import Profile from "img/icons/profile.png";
+import * as pic from "../../pic/pic";
+import * as simPic from "../../pic/sim";
+import { PublicKey } from "@solana/web3.js";
 
 const NewDAO = (props) => {
-  const [dao_id, setDaoId] = useState("");
-  const [dao_disp_name, setDaoDispName] = useState("");
-  const [dao_disp_img, setDaoDispImg] = useState("");
-  const [councillors, setCouncillors] = useState([""]);
-  const [one_councillor, setOneCouncillor] = useState("");
+  const [dao_id, setDaoId] = useState<string>();
+  const [dao_disp_name, setDaoDispName] = useState<string>();
+  const [dao_disp_img, setDaoDispImg] = useState<string>();
+  const [councillors, setCouncillors] = useState<string[]>([]);
+  const [one_councillor, setOneCouncillor] = useState<string>();
   const [approval_threshold, setApprovalThresold] = useState(0);
+
+  const onClickCreateNewDAOBtn = async () => {
+    let new_dao: pic.Dao;
+    let governance: pic.Governance;
+
+    new_dao.dao_id = dao_id;
+    new_dao.display_name = dao_disp_name;
+    new_dao.image_url = dao_disp_img;
+    new_dao.num_nfts = 0;
+    new_dao.is_member = false;
+    if (councillors) {
+      const councillors_pubkey = councillors.map(
+        (councillor) => new PublicKey(councillor)
+      );
+      governance.councillors = councillors_pubkey;
+    }
+
+    governance.approval_threshold = approval_threshold;
+    new_dao.governance = governance;
+
+    new_dao = await simPic.initializeDao(new_dao); //initializeDao
+  };
 
   const onAddCouncillors = (): void => {
     const temp = [...councillors];

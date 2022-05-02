@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./style.scss";
 import MemberGraph from "components/common/MemberGraph";
 import Refresh from "img/icons/refresh_1.png";
@@ -11,19 +11,110 @@ import IconButton from "components/common/IconButton";
 import NewDAO from "components/NewDAO";
 import Button from "components/common/Button";
 
+import * as pic from "../../pic/pic";
+import * as simPic from "../../pic/sim";
+import { Keypair, PublicKey } from "@solana/web3.js";
+
 const DAODashboard: React.FC = (props) => {
-  const memberDAOs = [
-    { value: "23a92039jrlafh9832h", label: "23a92039jrlafh9832h" },
-    { value: "7643ww34gssg456sd63", label: "7643ww34gssg456s63" },
-    { value: "sf8qaefafjsdnbcb32h", label: "sf8qaefafjsdnbcb32h" },
-  ];
+  const new_owner: pic.Owner = { address: Keypair.generate().publicKey };
+  const [member_daos, setMemberDAOs] = useState<Array<pic.Dao>>([]);
+  const [member_dao_ids, setMemberDaoIds] = useState<string[]>([]);
   const [dashitem, setDashItem] = useState(0);
-  const [memberDAO, setMemberDAO] = useState(memberDAOs[0].value);
+  const [selected_member_dao, setSelectedMemberDAO] = useState<pic.Dao>();
   const [show_modal, setShowModal] = useState(-1);
+  type counc_sign_pair = {
+    councillor: PublicKey;
+    signer: boolean;
+  };
+  const [counc_sign, setCounc_Sign] = useState<counc_sign_pair[]>([]);
+
+  useEffect(() => {
+    console.log("useEffect async");
+    (async () => {
+      let member_daos_promise = await simPic.getMemberDaos(new_owner);
+      let mdis: Array<string> = [];
+      let m_daos: Array<pic.Dao> = [];
+      m_daos = member_daos_promise;
+      setMemberDAOs(m_daos);
+      mdis = m_daos.map((dao) => dao.dao_id);
+      setMemberDaoIds(mdis);
+      setSelectedMemberDAO(m_daos[0]); //only first
+      console.log("--m_daos[0]=", m_daos[0]);
+      let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
+      // console.log("yes");
+      // if (m_daos[0].governance.proposed_councillors) {
+      //   console.log("yes");
+      //   m_daos[0].governance.proposed_councillors.forEach(function (
+      //     councillor,
+      //     index
+      //   ) {
+      //     console.log("councillor=",councillor);
+      //     let tmp: counc_sign_pair = {
+      //       councillor: councillor,
+      //       signer: selected_member_dao.governance.proposed_signers[index],
+      //     };
+      //     tmp_counc_sign_arr.push(tmp);
+      //   });
+      //   setCounc_Sign(tmp_counc_sign_arr);
+      // }
+    })();
+    console.log("useEffect[]-end");
+  }, []);
+  // useEffect(()=>{
+  //   let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
+  //   console.log("yes");
+  //   if (selected_member_dao.governance.proposed_councillors) {
+  //     console.log("yes");
+  //     selected_member_dao.governance.proposed_councillors.forEach(function (
+  //       councillor,
+  //       index
+  //     ) {
+  //       let tmp: counc_sign_pair = {
+  //         councillor: councillor,
+  //         signer: selected_member_dao.governance.proposed_signers[index],
+  //       };
+  //       tmp_counc_sign_arr.push(tmp);
+  //     });
+  //     setCounc_Sign(tmp_counc_sign_arr);
+  //   }
+  // },[selected_member_dao]);
+  useEffect(() => {
+    console.log("useEffect");
+    console.log("member_dao_ids=", member_dao_ids);
+    console.log("member_daos=", member_daos);
+    console.log("--selected dao=", selected_member_dao);
+  });
+
+  let dao: pic.Dao;
 
   const onChangeSelectMemberDAO = (event) => {
-    setMemberDAO(event.target.value);
+    let dao_id = event.target.value;
+    setMemberDao(dao_id);
   };
+
+  const setMemberDao = (dao_id: string) => {
+    for (const dao of member_daos) {
+      if (dao.dao_id == dao_id) {
+        setSelectedMemberDAO(dao);
+        console.log("------++-", dao);
+      }
+    }
+  };
+  const onClickApproveProposeBtn = async () => {
+    const wallet_address = Keypair.generate().publicKey;
+    if (dao.governance) {
+      const proposed_councillors = dao.governance.proposed_councillors;
+      let index = proposed_councillors.indexOf(wallet_address);
+      if (index != -1) {
+        let proposed_signers = dao.governance.proposed_signers;
+        proposed_signers.splice(index, 1, true);
+      }
+    }
+
+    const _dao = await simPic.approveDaoCommand(dao);
+  };
+
+  const onClickExecuteProposeBtn = () => {};
 
   return (
     <div className="dashboard-content">
@@ -36,9 +127,9 @@ const DAODashboard: React.FC = (props) => {
           </div>
           {/* <button className="dash-connection-btn">Connection</button> */}
           <Button is_btn_common={false} btn_title="Connection" />
-          <button className="nav-dao-profile">
-            <img src={Profile} />
-          </button>
+          <div className="nav-dao-profile">
+            <IconButton icon_img={Profile} is_background={false} />
+          </div>
         </div>
       </div>
       <div className="dashboard-main-content">
@@ -49,16 +140,19 @@ const DAODashboard: React.FC = (props) => {
             </div>
             <div className="select-memeberDAO">
               <select onChange={onChangeSelectMemberDAO}>
-                {memberDAOs.map(({ value, label }) => (
+                {member_dao_ids.map((value) => (
                   <option key={value} value={value}>
-                    {label}
+                    {value}
                   </option>
                 ))}
               </select>
             </div>
-            <button className="refresh_btn">
+            {/* <div className="refresh_btn">
               <img src={Refresh} />
-            </button>
+            </div> */}
+            <div>
+              <IconButton icon_img={Refresh} is_background={false} />
+            </div>
           </div>
           <div className="member-token">
             <div className="dash-items">
@@ -170,12 +264,13 @@ const DAODashboard: React.FC = (props) => {
               </div>
             </div>
             <div className="proposal-councillors">Councillors</div>
-
             <div className="proposal-councillor-pubkeys">
-              <div className="councillor-pubkey-pair">
-                <div className="text-pubkey">234234afq32ffeqw34fqafqwe</div>
-                <div className="vote-state">Aproved</div>
-              </div>
+              {counc_sign.map((item) => (
+                <div className="councillor-pubkey-pair">
+                  <div className="text-pubkey">item.councilor</div>
+                  <div className="vote-state">item.signer</div>
+                </div>
+              ))}
               <div className="councillor-pubkey-pair">
                 <div className="text-pubkey">234234afq32ffeqw34fqafqwe</div>
                 <div className="vote-state">Aproved</div>
@@ -201,21 +296,21 @@ const DAODashboard: React.FC = (props) => {
       </div>
       {show_modal == 0 ? (
         <DAODetailModal>
-          <NewDAO />
+          <NewDAO dao={selected_member_dao} />
         </DAODetailModal>
       ) : (
         ""
       )}
       {show_modal == 1 ? (
         <DAODetailModal>
-          <NewStream />
+          <NewStream dao={selected_member_dao} />
         </DAODetailModal>
       ) : (
         ""
       )}
       {show_modal == 2 ? (
         <DAODetailModal>
-          <NewProposal />
+          <NewProposal dao={selected_member_dao} />
         </DAODetailModal>
       ) : (
         ""

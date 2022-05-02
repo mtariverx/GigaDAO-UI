@@ -10,6 +10,7 @@ import {
 } from "./sim_data/sample-streams";
 import { verifiedDaos } from "../preload/verified-daos";
 import { daoAddressMap } from "./sim_data/dao-collection-map";
+import { getOwner } from "./live_utils/mirror_helpers";
 
 let governance_store: pic.Governance = null;
 // randomizers
@@ -36,7 +37,7 @@ let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
     const collection_address = new PublicKey(daoAddressMap[daoId]);
     const dao_collection = { address: collection_address };
     collections.push(dao_collection);
-    const data = daoMap[daoId];
+    const data = daoMap[daoId]; //getting NFTs
     if (data === undefined) {
     } else {
       for (const nftData of data) {
@@ -183,23 +184,32 @@ let claimFromStream: pic.ClaimFromStream = async (
 //kaiming
 // retrieves list of daos that owner is a councillor of, but does not lookup Governance data
 let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
-  const daos: Array<pic.Dao> = [];
-  const owner_address = owner.address;
-  if (owner.daos) {
-    const owner_daos = owner.daos;
-    for (const dao of owner_daos) {
-      if (dao.governance) {
-        const councillors = dao.governance.councillors;
-        for (const councillor of councillors) {
-          if (owner_address == councillor) {
-            daos.push(dao);
-          }
-        }
-      }
-    }
+  // let newOwner: pic.Owner = {address: publicKey};
+  const newOwner: pic.Owner = await connectOwner(owner);
+  let daos: Array<pic.Dao> = newOwner.daos;
+    const governance: pic.Governance = {
+      // councillors: [Keypair.generate().publicKey],
+      councillors: [owner.address],
+      proposed_councillors: [owner.address],
+      approval_threshold:0,
+      proposed_signers:[true],
+      proposal_is_active:true,
+      proposal_type: pic.ProposalType.UPDATE_MULTISIG,
+
+      // proposed_deactivation_stream: Keypair.generate().publicKey,
+      proposed_withdrawal_receiver: Keypair.generate().publicKey,
+      // proposed_withdrawal_stream: Keypair.generate().publicKey,
+      num_streams:0,
+      
+    };
+    
+  for (let dao of daos) {
+    dao.governance = governance;
   }
+  console.log("getMemberDaos=", daos);
   return daos;
 };
+
 // gets the latest Governance data directly from the blockchain
 let refreshGovernance: pic.RefreshGovernance = async (dao: pic.Dao) => {
   const governance: pic.Governance = {
@@ -217,20 +227,12 @@ let refreshGovernance: pic.RefreshGovernance = async (dao: pic.Dao) => {
     num_streams: 1,
   };
   dao.governance = governance;
-
+  console.log("refreshGovernance=", dao);
   return dao;
 };
 //remove all properties besides 4 properties*
 let initializeDao: pic.InitializeDao = async (dao: pic.Dao) => {
-  if (dao.address) {
-    dao.address = undefined;
-  }
-  if (dao.governance) {
-    dao.governance = undefined;
-  }
-  if (dao.streams) {
-    dao.streams = undefined;
-  }
+  console.log("initializeDao=", dao);
   return dao;
 };
 //dao has the argument stream and the stream has dao address
@@ -238,16 +240,21 @@ let initializeStream: pic.InitializeStream = async (
   dao: pic.Dao,
   stream: pic.Stream
 ) => {
-  if (dao.address) {
-    stream.dao_address = dao.address; //add ado address into streams' dao address.
-  }
-  if (dao.streams) {
-    dao.streams.push(stream);
-  }
+  stream.token_image_url = sampleTokenStream1.token_image_url;
+  stream.daily_stream_rate = sampleTokenStream1.daily_stream_rate;
+  stream.total_earned = sampleTokenStream1.earned_amount;
+  stream.total_claimed = sampleTokenStream1.claimed_amount;
+  stream.current_pool_amount = sampleTokenStream1.pool_reserve_amount;
+  stream.token_ticker = sampleTokenStream1.token_ticker;
+  stream.last_update_timestamp = Math.floor(Date.now() / 1000);
+  console.log("initializeStream(dao)=", dao);
+  console.log("initializeStream(stream)=", stream);
+  dao.streams = [];
+  dao.streams.push(stream);
   return { dao, stream };
 };
 //dao has the argument stream and the stream has dao address
-//strea.is_active=true
+//stream.is_active=true
 let reactivateStream: pic.ReactivateStream = async (
   dao: pic.Dao,
   stream: pic.Stream
@@ -262,51 +269,28 @@ let reactivateStream: pic.ReactivateStream = async (
 
 // all relevant args should be included in the governance object of the dao passed into this call
 let proposeDaoCommand: pic.ProposeDaoCommand = async (dao: pic.Dao) => {
-  const governance = dao.governance;
-  //   const proposal_type
-  if (governance) {
-    governance.proposal_is_active = true;
-  }
+  console.log("proposeDaoCommand=", dao);
   return dao;
 };
 
 let approveDaoCommand: pic.ApproveDaoCommand = async (dao: pic.Dao) => {
-  //   const governance: pic.Governance = {
-  //     councillors: [dao.address],
-  //     approval_threshold: 3,
-  //     proposed_signers: [true],
-  //     proposal_is_active: true,
-  //     proposal_type: pic.ProposalType.DEACTIVATE_STREAM,
-  //     proposed_councillors: [dao.address],
-  //     proposed_approval_threshold: 2,
-  //     proposed_deactivation_stream: dao.address,
-  //     proposed_withdrawal_amount: 10,
-  //     proposed_withdrawal_receiver: dao.address,
-  //     proposed_withdrawal_stream: new PublicKey(""),
-  //     num_streams: 1,
-  //   };
-  //   dao.governance = governance;
+  // if(dao.governance){
+  //   return dao;
+  // }
 
+  // let _signers=dao.governance.proposed_signers;
+
+  console.log("approveDaoCommand=", dao);
   return dao;
 };
 
 let executeDaoCommand: pic.ExecuteDaoCommand = async (dao: pic.Dao) => {
-  const governance: pic.Governance = {
-    councillors: [dao.address],
-    approval_threshold: 3,
-    proposed_signers: [true],
-    proposal_is_active: true,
-    proposal_type: pic.ProposalType.DEACTIVATE_STREAM,
-    proposed_councillors: [dao.address],
-    proposed_approval_threshold: 2,
-    proposed_deactivation_stream: dao.address,
-    proposed_withdrawal_amount: 10,
-    proposed_withdrawal_receiver: dao.address,
-    proposed_withdrawal_stream: new PublicKey(""),
-    num_streams: 1,
-  };
-  dao.governance = governance;
+  console.log("executeDaoCommand=", dao);
   return dao;
+};
+const saveSocial: pic.SaveSocial = async (social: pic.social_type) => {
+  console.log("save social=", social);
+  return social;
 };
 
 let setGovernance: pic.SetGovernance = async (governance: pic.Governance) => {

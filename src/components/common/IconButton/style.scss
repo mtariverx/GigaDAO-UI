@@ -13,10 +13,15 @@
   border: none;
   cursor: pointer;
 }
-.btn-fill{
+.btn-fill {
   @include icon-button($btn-bgcolor-fill);
+  &:hover {
+    background-color: $btn-bgcolor-fill-hover;
+  }
 }
-.btn-unfill{
+.btn-unfill {
   @include icon-button($btn-bgcolor-unfill);
+  &:hover {
+    background-color: $btn-bgcolor-unfill-hover;
+  }
 }
-

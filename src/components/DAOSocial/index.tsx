@@ -1,6 +1,8 @@
 import "./style.scss";
 import "../common/LabelInput/style.scss";
 import { useState } from "react";
+import * as pic from "../../pic/pic";
+import * as simPic from "../../pic/sim";
 import Button from "components/common/Button";
 const DAOSocial = () => {
   const [website, setWebsite] = useState("");
@@ -9,6 +11,19 @@ const DAOSocial = () => {
   const [instagram, setInstagram] = useState("");
   const [linktree, setLinktree] = useState("");
   const [medium, setMedium] = useState("");
+
+  const onClickSaveSocial = async() => {
+    console.log("onClickSaveSocial");
+    const social: pic.social_type = {
+      website:website,
+      twitter:twitter,
+      discord:discord,
+      instagram:instagram,
+      linktree:linktree,
+      medium:medium,
+    };
+    // const _social=await simPic.saveSocial(social);
+  };
   return (
     <div className="DAOSocial-container">
       <div className="container-title">DAO Social</div>
@@ -64,7 +79,11 @@ const DAOSocial = () => {
         </div>
         <div className="social-save">
           {/* <div className="social-save-btn">Save Changes</div> */}
-          <Button is_btn_common={true} btn_title="Save Changes" />
+          <Button
+            is_btn_common={true}
+            btn_title="Save Changes"
+            onClick={onClickSaveSocial}
+          />
         </div>
       </div>
     </div>

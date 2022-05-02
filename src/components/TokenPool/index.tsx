@@ -6,7 +6,6 @@ import "../../scss/content.scss";
 
 import * as pic from "../../pic/pic";
 import { Keypair, PublicKey } from "@solana/web3.js";
-import { setGovernance, getGovernance } from "../../pic/sim";
 
 const CreateTokenPool = () => {
   const [pool_name, setPoolName] = useState("");
