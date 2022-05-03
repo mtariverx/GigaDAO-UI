@@ -14,14 +14,14 @@
   cursor: pointer;
 }
 .btn-fill {
-  @include icon-button($btn-bgcolor-fill);
+  @include icon-button($iconbtn-bgcolor-fill);
   &:hover {
-    background-color: $btn-bgcolor-fill-hover;
+    background-color: $iconbtn-bgcolor-fill-hover;
   }
 }
 .btn-unfill {
-  @include icon-button($btn-bgcolor-unfill);
+  @include icon-button($iconbtn-bgcolor-unfill);
   &:hover {
-    background-color: $btn-bgcolor-unfill-hover;
+    background-color: $iconbtn-bgcolor-unfill-hover;
   }
 }

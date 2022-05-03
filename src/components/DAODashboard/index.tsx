@@ -3,6 +3,8 @@ import "./style.scss";
 import MemberGraph from "components/common/MemberGraph";
 import Refresh from "img/icons/refresh_1.png";
 import Profile from "img/icons/profile.png";
+import Gigs_log from "img/icons/small_gigs_token_logo.png";
+
 import DAODetailModal from "components/DAODetailModal";
 import NewStream from "components/NewStream";
 import NewProposal from "components/NewProposal";
@@ -22,12 +24,17 @@ const DAODashboard: React.FC = (props) => {
   const [dashitem, setDashItem] = useState(0);
   const [selected_member_dao, setSelectedMemberDAO] = useState<pic.Dao>();
   const [show_modal, setShowModal] = useState(-1);
+
   type counc_sign_pair = {
     councillor: PublicKey;
     signer: boolean;
   };
   const [counc_sign, setCounc_Sign] = useState<counc_sign_pair[]>([]);
-
+  const getShortKey = (long_key: string) => {
+    const str: string = long_key.slice(0, 7) + "..." + long_key.slice(-7);
+    console.log("long key=", long_key);
+    return str;
+  };
   useEffect(() => {
     console.log("useEffect async");
     (async () => {
@@ -38,76 +45,63 @@ const DAODashboard: React.FC = (props) => {
       setMemberDAOs(m_daos);
       mdis = m_daos.map((dao) => dao.dao_id);
       setMemberDaoIds(mdis);
-      setSelectedMemberDAO(m_daos[0]); //only first
-      console.log("--m_daos[0]=", m_daos[0]);
-      let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
-      // console.log("yes");
-      // if (m_daos[0].governance.proposed_councillors) {
-      //   console.log("yes");
-      //   m_daos[0].governance.proposed_councillors.forEach(function (
-      //     councillor,
-      //     index
-      //   ) {
-      //     console.log("councillor=",councillor);
-      //     let tmp: counc_sign_pair = {
-      //       councillor: councillor,
-      //       signer: selected_member_dao.governance.proposed_signers[index],
-      //     };
-      //     tmp_counc_sign_arr.push(tmp);
-      //   });
-      //   setCounc_Sign(tmp_counc_sign_arr);
-      // }
+      setSelectedMemberDAO({ ...m_daos[0] }); //only first
+      setCouncillorSignerPair({ ...m_daos[0] });
     })();
-    console.log("useEffect[]-end");
   }, []);
-  // useEffect(()=>{
-  //   let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
-  //   console.log("yes");
-  //   if (selected_member_dao.governance.proposed_councillors) {
-  //     console.log("yes");
-  //     selected_member_dao.governance.proposed_councillors.forEach(function (
-  //       councillor,
-  //       index
-  //     ) {
-  //       let tmp: counc_sign_pair = {
-  //         councillor: councillor,
-  //         signer: selected_member_dao.governance.proposed_signers[index],
-  //       };
-  //       tmp_counc_sign_arr.push(tmp);
-  //     });
-  //     setCounc_Sign(tmp_counc_sign_arr);
-  //   }
-  // },[selected_member_dao]);
   useEffect(() => {
-    console.log("useEffect");
-    console.log("member_dao_ids=", member_dao_ids);
-    console.log("member_daos=", member_daos);
-    console.log("--selected dao=", selected_member_dao);
-  });
+    if (selected_member_dao != undefined) {
+      setCouncillorSignerPair(selected_member_dao);
+    }
+
+  }, [selected_member_dao]);
+
+  const setCouncillorSignerPair = (dao: pic.Dao) => {
+    let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
+    console.log("yes1");
+    if (dao.governance.proposed_councillors) {
+      dao.governance.proposed_councillors.forEach(function (councillor, index) {
+        let tmp: counc_sign_pair = {
+          councillor: councillor,
+          signer: dao.governance.proposed_signers[index],
+        };
+        tmp_counc_sign_arr.push(tmp);
+      });
+      setCounc_Sign(tmp_counc_sign_arr);
+    }
+  };
+
+  useEffect(() => {});
 
   let dao: pic.Dao;
 
   const onChangeSelectMemberDAO = (event) => {
     let dao_id = event.target.value;
     setMemberDao(dao_id);
+    setCouncillorSignerPair({ ...selected_member_dao });
   };
 
   const setMemberDao = (dao_id: string) => {
     for (const dao of member_daos) {
       if (dao.dao_id == dao_id) {
-        setSelectedMemberDAO(dao);
-        console.log("------++-", dao);
+        setSelectedMemberDAO({ ...dao });
       }
     }
   };
   const onClickApproveProposeBtn = async () => {
-    const wallet_address = Keypair.generate().publicKey;
+    console.log("--selected dao=", selected_member_dao);
+    const wallet_address = "CRWMVg3k7JGuxFMMADRQTdBSNtB6LNWakEJDUeG8k2KN";
+    const dao: pic.Dao = selected_member_dao;
     if (dao.governance) {
       const proposed_councillors = dao.governance.proposed_councillors;
-      let index = proposed_councillors.indexOf(wallet_address);
+      let councillors = proposed_councillors.map((item) => item.toString());
+      let index = councillors.indexOf(wallet_address);
+      console.log("index==", index);
       if (index != -1) {
         let proposed_signers = dao.governance.proposed_signers;
         proposed_signers.splice(index, 1, true);
+        dao.governance.proposed_signers = proposed_signers;
+        setSelectedMemberDAO({ ...dao });
       }
     }
 
@@ -125,7 +119,6 @@ const DAODashboard: React.FC = (props) => {
           <div className="nav-dao-search">
             <input type="text" placeholder="DAO Search.." name="search" />
           </div>
-          {/* <button className="dash-connection-btn">Connection</button> */}
           <Button is_btn_common={false} btn_title="Connection" />
           <div className="nav-dao-profile">
             <IconButton icon_img={Profile} is_background={false} />
@@ -147,9 +140,6 @@ const DAODashboard: React.FC = (props) => {
                 ))}
               </select>
             </div>
-            {/* <div className="refresh_btn">
-              <img src={Refresh} />
-            </div> */}
             <div>
               <IconButton icon_img={Refresh} is_background={false} />
             </div>
@@ -247,15 +237,17 @@ const DAODashboard: React.FC = (props) => {
               <div className="descrption-item-value">
                 <div className="descrption-item">Token</div>
                 <div className="descrption-value">
-                  <div>
-                    <img src="/icons/entry-icon-farms.svg" />
-                  </div>
+                  
+                  {/* <IconButton icon_img={Gigs_log} is_background={false} /> */}
                   <div>GIGS</div>
+                  <div className="div-img">
+                    <img src={Gigs_log} />
+                  </div>
                 </div>
               </div>
               <div className="descrption-item-value">
                 <div className="descrption-item">Withdrawal Address</div>
-                <div className="descrption-value">ifk439kkfifsdkio320ux</div>
+                <div className="descrption-value">{selected_member_dao!=undefined?getShortKey(selected_member_dao.governance.proposed_withdrawal_receiver.toString()):""}</div>
               </div>
               <div>Description</div>
               <div>
@@ -267,56 +259,52 @@ const DAODashboard: React.FC = (props) => {
             <div className="proposal-councillor-pubkeys">
               {counc_sign.map((item) => (
                 <div className="councillor-pubkey-pair">
-                  <div className="text-pubkey">item.councilor</div>
-                  <div className="vote-state">item.signer</div>
+                  <div className="text-pubkey">
+                    {getShortKey(item.councillor.toString())}
+                  </div>
+                  <div className="vote-state">
+                    {item.signer ? "Approved" : "-"}
+                  </div>
                 </div>
               ))}
-              <div className="councillor-pubkey-pair">
-                <div className="text-pubkey">234234afq32ffeqw34fqafqwe</div>
-                <div className="vote-state">Aproved</div>
-              </div>
-              <div className="councillor-pubkey-pair">
-                <div className="text-pubkey">234234afq32ffeqw34fqafqwe</div>
-                <div className="vote-state">Aproved</div>
-              </div>
-              <div className="councillor-pubkey-pair">
-                <div className="text-pubkey">234234afq32ffeqw34fqafqwe</div>
-                <div className="vote-state">-</div>
-              </div>
             </div>
 
             <div className="proposal-btn-group">
               {/* <button className="btn">Approve</button>
               <button className="btn">Execute</button> */}
-              <Button is_btn_common={true} btn_title="Approve" />
+              <Button
+                is_btn_common={true}
+                btn_title="Approve"
+                onClick={onClickApproveProposeBtn}
+              />
               <Button is_btn_common={true} btn_title="Execute" />
             </div>
           </div>
         </div>
       </div>
       {show_modal == 0 ? (
-        <DAODetailModal>
+        <DAODetailModal onClick={()=>setShowModal(-1)}>
           <NewDAO dao={selected_member_dao} />
         </DAODetailModal>
       ) : (
         ""
       )}
       {show_modal == 1 ? (
-        <DAODetailModal>
+        <DAODetailModal onClick={()=>setShowModal(-1)}>
           <NewStream dao={selected_member_dao} />
         </DAODetailModal>
       ) : (
         ""
       )}
       {show_modal == 2 ? (
-        <DAODetailModal>
+        <DAODetailModal onClick={()=>setShowModal(-1)}>
           <NewProposal dao={selected_member_dao} />
         </DAODetailModal>
       ) : (
         ""
       )}
       {show_modal == 4 ? (
-        <DAODetailModal>
+        <DAODetailModal onClick={()=>setShowModal(-1)}>
           <DAOSocial />
         </DAODetailModal>
       ) : (

@@ -55,7 +55,21 @@ export type Stream = {
   token_ticker?: string;
   last_update_timestamp?: number;
 };
-
+// export type Stream = {
+//   address: PublicKey;
+//   dao_address: PublicKey;
+//   collections: Array<Collection>;
+//   num_connections: number;
+//   is_active: boolean;
+//   name: string;
+//   token_image_url: string;
+//   daily_stream_rate: number;
+//   total_earned: number;
+//   total_claimed: number;
+//   current_pool_amount: number;
+//   token_ticker: string;
+//   last_update_timestamp: number;
+// };
 export type Governance = {
   councillors: Array<PublicKey>;
   approval_threshold: number;
@@ -124,6 +138,7 @@ export type social_type={
   medium: string;
 }
 export type SaveSocial=(social: social_type)=>Promise<social_type>
+
 
 export type SetGovernance = (governance: Governance) => Promise<void>;
 export type GetGovernance = () => Promise<Governance>;

@@ -120,7 +120,7 @@ const NewProposal = (props) => {
                   <div>
                     <div className="item-wrapper plus-button">
                       <div className="title">Councillors</div>
-                      <input
+                      <input 
                         value={one_councillor}
                         onChange={(evt) => setOneCouncillor(evt.target.value)}
                       />
@@ -140,7 +140,7 @@ const NewProposal = (props) => {
                     </div>
                     <div className="item-wrapper">
                       <div className="title">Approval Threshold</div>
-                      <input
+                      <input required
                         value={approval_threshold}
                         onChange={(evt) =>
                           setApprovalThresold(parseInt(evt.target.value || "0"))
@@ -152,7 +152,7 @@ const NewProposal = (props) => {
                   <div>
                     <div className="item-wrapper">
                       <div className="title">Stream Publick Key</div>
-                      <input
+                      <input required
                         value={stream_pubkey}
                         onChange={(evt) => setStreamPubkey(evt.target.value)}
                       />
@@ -162,7 +162,7 @@ const NewProposal = (props) => {
                   <div>
                     <div className="item-wrapper">
                       <div className="title">Amount</div>
-                      <input
+                      <input required
                         value={amount}
                         onChange={(evt) =>
                           setAmount(parseInt(evt.target.value || "0"))
@@ -171,7 +171,7 @@ const NewProposal = (props) => {
                     </div>
                     <div className="item-wrapper">
                       <div className="title">Proposed Withdrawal Receiver</div>
-                      <input
+                      <input required
                         value={proposed_withdrawal_receiver}
                         onChange={(evt) =>
                           setProposedWithdrawalReceiver(evt.target.value)
@@ -180,7 +180,7 @@ const NewProposal = (props) => {
                     </div>
                     <div className="item-wrapper">
                       <div className="title">Proposed Withdrawal Stream</div>
-                      <input
+                      <input required
                         value={proposed_withdrawal_stream}
                         onChange={(evt) =>
                           setProposedWithdrawalStream(evt.target.value)
@@ -193,14 +193,12 @@ const NewProposal = (props) => {
                 )}
               </div>
             </div>
-            {/* <div className="content-lower"> */}
           </div>
 
           <div className="proposal-content-save">
-            {/* <div className="save-proposal-btn">Save Changes</div> */}
             <Button
               is_btn_common={true}
-              btn_title="Initialize Stream"
+              btn_title="Save Changes"
               onClick={onClickSavePorposeBtn}
             />
           </div>

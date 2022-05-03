@@ -29,6 +29,7 @@ const MainLayout = (props) => {
           <ul>
             <li className={`${content_page_index == 1 ? "active" : ""}`}>
               <NavItem
+                key="1"
                 icon="/icons/entry-icon-nft.svg"
                 text="NFT Staking"
                 onClick={() => setContentPageIndex(1)}
@@ -37,6 +38,7 @@ const MainLayout = (props) => {
 
             <li className={`${content_page_index == 2 ? "active" : ""}`}>
               <NavItem
+              key="2"
                 icon="/icons/entry-icon-farms.svg"
                 text="DAO Dashboard"
                 onClick={() => setContentPageIndex(2)}

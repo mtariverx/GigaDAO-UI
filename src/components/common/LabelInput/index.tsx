@@ -12,7 +12,7 @@ export const LabelInput: React.FC<Props_input> = (props) => {
   return (
     <div className="item-wrapper">
       <div className="title"> {title} </div>
-      <input onChange={onChange} value={value} className="dao-input" />
+      <input onChange={onChange} value={value} className="dao-input" required/>
     </div>
   );
 };
@@ -31,7 +31,7 @@ export const LabelCheckbox: React.FC<Props_checkbox> = (props) => {
     <div className="item-wrapper">
       <div className="input-title"> {title} </div>
       <div className="input-checkbox">
-        <input type="checkbox" onChange={onChange} value={value} />
+        <input type="checkbox" onChange={onChange} value={value} required/>
       </div>
     </div>
   );

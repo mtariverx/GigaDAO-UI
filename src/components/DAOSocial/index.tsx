@@ -34,14 +34,14 @@ const DAOSocial = () => {
               <div className="title">Website</div>
               <input
                 value={website}
-                onChange={(evt) => setWebsite(evt.target.value)}
+                onChange={(evt) => setWebsite(evt.target.value)} required
               />
             </div>
             <div className="item-wrapper plus-button">
               <div className="title">Twitter</div>
               <input
                 value={twitter}
-                onChange={(evt) => setTwitter(evt.target.value)}
+                onChange={(evt) => setTwitter(evt.target.value)} required
               />
               <Button is_btn_common={true} btn_title="Link" />
             </div>
@@ -49,7 +49,7 @@ const DAOSocial = () => {
               <div className="title">Discord</div>
               <input
                 value={discord}
-                onChange={(evt) => setDiscord(evt.target.value)}
+                onChange={(evt) => setDiscord(evt.target.value)} required
               />
               <Button is_btn_common={true} btn_title="Link" />
             </div>
@@ -57,7 +57,7 @@ const DAOSocial = () => {
               <div className="title">Instagram</div>
               <input
                 value={instagram}
-                onChange={(evt) => setInstagram(evt.target.value)}
+                onChange={(evt) => setInstagram(evt.target.value)} required
               />
               <Button is_btn_common={true} btn_title="Link" />
             </div>
@@ -65,14 +65,14 @@ const DAOSocial = () => {
               <div className="title">Linktree</div>
               <input
                 value={linktree}
-                onChange={(evt) => setLinktree(evt.target.value)}
+                onChange={(evt) => setLinktree(evt.target.value)} required
               />
             </div>
             <div className="item-wrapper">
               <div className="title">Medium</div>
               <input
                 value={medium}
-                onChange={(evt) => setMedium(evt.target.value)}
+                onChange={(evt) => setMedium(evt.target.value)} required
               />
             </div>
           </div>

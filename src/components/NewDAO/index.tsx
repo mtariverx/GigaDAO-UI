@@ -51,28 +51,28 @@ const NewDAO = (props) => {
             <div className="title">DAO ID</div>
             <input
               value={dao_id}
-              onChange={(evt) => setDaoId(evt.target.value)}
+              onChange={(evt) => setDaoId(evt.target.value)} required
             />
           </div>
           <div className="item-wrapper">
             <div className="title">Address</div>
             <input
               value={dao_disp_name}
-              onChange={(evt) => setDaoDispName(evt.target.value)}
+              onChange={(evt) => setDaoDispName(evt.target.value)} required
             />
           </div>
           <div className="item-wrapper">
             <div className="title">Address</div>
             <input
               value={dao_disp_img}
-              onChange={(evt) => setDaoDispImg(evt.target.value)}
+              onChange={(evt) => setDaoDispImg(evt.target.value)} required
             />
           </div>
           <div className="item-wrapper plus-button">
             <div className="title">Councillors</div>
             <input
               value={one_councillor}
-              onChange={(evt) => setOneCouncillor(evt.target.value)}
+              onChange={(evt) => setOneCouncillor(evt.target.value)} required
             />
             <div className="input-side-btn">
               <img src={Profile} onClick={onAddCouncillors} />
@@ -90,7 +90,7 @@ const NewDAO = (props) => {
             <div className="title">Approval Threshold</div>
             <input
               value={approval_threshold}
-              className="num"
+              className="num" required
               onChange={(evt) =>
                 setApprovalThresold(parseInt(evt.target.value || "0"))
               }

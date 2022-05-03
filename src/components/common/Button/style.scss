@@ -1,3 +1,4 @@
+@import "../../../scss/DAOVariable.scss";
 @mixin button-basic($color, $bg-color) {
   display: inline;
   width: max-content;
@@ -23,13 +24,13 @@
 
 }
 .btn-connection {
-  @include button-basic(white, rgb(113, 64, 225));
+  @include button-basic($text-color-common, $btn-bgcolor-common);
   &:hover {
     background-color:rgb(163, 74, 245);
   }
 }
 .btn-common {
-  @include button-basic(white, rgb(30, 241, 111));
+  @include button-basic($text-color-common, $btn-bgcolor-common);
   &:hover {
     background-color:rgb(80, 241, 151);
   }

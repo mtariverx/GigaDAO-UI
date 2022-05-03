@@ -187,25 +187,24 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
   // let newOwner: pic.Owner = {address: publicKey};
   const newOwner: pic.Owner = await connectOwner(owner);
   let daos: Array<pic.Dao> = newOwner.daos;
+  for (let dao of daos) {
     const governance: pic.Governance = {
-      // councillors: [Keypair.generate().publicKey],
-      councillors: [owner.address],
-      proposed_councillors: [owner.address],
-      approval_threshold:0,
-      proposed_signers:[true],
-      proposal_is_active:true,
+      councillors: [owner.address, Keypair.generate().publicKey,new PublicKey("CRWMVg3k7JGuxFMMADRQTdBSNtB6LNWakEJDUeG8k2KN")],
+      proposed_councillors: [owner.address, Keypair.generate().publicKey,new PublicKey("CRWMVg3k7JGuxFMMADRQTdBSNtB6LNWakEJDUeG8k2KN")],
+      approval_threshold: 0,
+      proposed_signers: [true, false, false],
+      proposal_is_active: true,
       proposal_type: pic.ProposalType.UPDATE_MULTISIG,
-
+  
       // proposed_deactivation_stream: Keypair.generate().publicKey,
       proposed_withdrawal_receiver: Keypair.generate().publicKey,
       // proposed_withdrawal_stream: Keypair.generate().publicKey,
-      num_streams:0,
-      
+      num_streams: 0,
     };
-    
-  for (let dao of daos) {
     dao.governance = governance;
   }
+  daos=await getDaos(daos);
+
   console.log("getMemberDaos=", daos);
   return daos;
 };
@@ -249,7 +248,10 @@ let initializeStream: pic.InitializeStream = async (
   stream.last_update_timestamp = Math.floor(Date.now() / 1000);
   console.log("initializeStream(dao)=", dao);
   console.log("initializeStream(stream)=", stream);
-  dao.streams = [];
+  if(dao.streams!=undefined){
+    dao.streams = [];
+  }
+  
   dao.streams.push(stream);
   return { dao, stream };
 };
