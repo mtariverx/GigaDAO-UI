@@ -27,18 +27,21 @@ const MainLayout = (props) => {
             />
           </div>
           <ul>
+            {/* now invisible */}
             <li className={`${content_page_index == 1 ? "active" : ""}`}>
-              <NavItem
-                key="1"
-                icon="/icons/entry-icon-nft.svg"
-                text="NFT Staking"
-                onClick={() => setContentPageIndex(1)}
-              />
+              <a href="https://staking.gigadao.io/" target="_blank">
+                <NavItem
+                  key="1"
+                  icon="/icons/entry-icon-nft.svg"
+                  text="NFT Staking"
+                  onClick={() => setContentPageIndex(2)}
+                />
+              </a>
             </li>
 
             <li className={`${content_page_index == 2 ? "active" : ""}`}>
               <NavItem
-              key="2"
+                key="2"
                 icon="/icons/entry-icon-farms.svg"
                 text="DAO Dashboard"
                 onClick={() => setContentPageIndex(2)}
@@ -47,7 +50,7 @@ const MainLayout = (props) => {
           </ul>
         </div>
         <div className="menu-info">
-          <div className="menu-info-item">
+          {/* <div className="menu-info-item">
             <div>
               <img src={AboutUs} />
             </div>
@@ -58,7 +61,7 @@ const MainLayout = (props) => {
               <img src={Whitepaper} />
             </div>
             <div>Whitepaper</div>
-          </div>
+          </div> */}
           <div className="menu-info-social">
             <div className="social-icon">
               <img src={Discord} />
@@ -79,7 +82,7 @@ const MainLayout = (props) => {
         {content_page_index == 2 ? (
           <DAODashboard />
         ) : content_page_index == 1 ? (
-          <NFTStakingBoard />
+          ""
         ) : (
           ""
         )}

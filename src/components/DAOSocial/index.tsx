@@ -4,7 +4,7 @@ import { useState } from "react";
 import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
 import Button from "components/common/Button";
-const DAOSocial = () => {
+const DAOSocial = (props) => {
   const [website, setWebsite] = useState("");
   const [twitter, setTwitter] = useState("");
   const [discord, setDiscord] = useState("");
@@ -22,6 +22,7 @@ const DAOSocial = () => {
       linktree:linktree,
       medium:medium,
     };
+    props.onClose();
     // const _social=await simPic.saveSocial(social);
   };
   return (
@@ -29,7 +30,6 @@ const DAOSocial = () => {
       <div className="container-title">DAO Social</div>
       <div className="container-body">
         <div className="social-content">
-          <div className="social-content-body">
             <div className="item-wrapper">
               <div className="title">Website</div>
               <input
@@ -75,7 +75,6 @@ const DAOSocial = () => {
                 onChange={(evt) => setMedium(evt.target.value)} required
               />
             </div>
-          </div>
         </div>
         <div className="social-save">
           {/* <div className="social-save-btn">Save Changes</div> */}

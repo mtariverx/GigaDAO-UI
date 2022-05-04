@@ -1,3 +1,4 @@
+@import "../../scss/DAOVariable.scss";
 .modal-window {
   position: fixed;
   background-color: rgba(255, 255, 255, 0.25);
@@ -19,12 +20,13 @@
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 2em;
-    background-color: rgb(22, 27, 25);
-    color: white;
+    background-color: $bg-color-layer1;
+    color: $text-color-common;
     display: grid;
     grid-template-rows: min-content 1fr;
     & > .back-dashboard {
-      width: min-content;
+      padding:5px 5px 10px 5px;
+      width: max-content;
       display: grid;
       color: #fff;
       font-size: 18px;
@@ -33,7 +35,7 @@
       cursor: pointer;
       &:hover {
         color: #aaa;
-        
+
       }
     }
   }

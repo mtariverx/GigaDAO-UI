@@ -2,7 +2,7 @@ import { PlusIcon } from "components/common/icons/plus";
 import { useEffect, useState } from "react";
 import "./style.scss";
 import "../common/LabelInput/style.scss";
-import Profile from "img/icons/profile.png";
+import Plus_fill from "img/icons/plus_symbol_fill.png";
 
 import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
@@ -44,7 +44,6 @@ const NewStream = (props) => {
   }, []);
 
   const setStreamCompArr = () => {
-    console.log("-hi-");
     const remain_rows = dao
       ? dao.streams.length >= 4
         ? 0
@@ -79,6 +78,7 @@ const NewStream = (props) => {
     ); //initializeStream
     // console.log("new stream btn=",dao);ok
     setSelectedDao({ ...dao }); //setting dao with streams
+    props.onClose();//close btn
   };
 
   const streams = dao.streams;
@@ -135,7 +135,7 @@ const NewStream = (props) => {
                 onChange={(evt) => setCollect(evt.target.value)}
               />
               <div className="input-side-btn">
-                <img src={Profile} onClick={onAddCollections} />
+                <img src={Plus_fill} onClick={onAddCollections} />
               </div>
             </div>
             <div className="item-wrapper">

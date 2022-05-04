@@ -1,5 +1,6 @@
+@import "../../scss/DAOVariable.scss";
 .dashboard-content {
-  background-color: rgb(22, 27, 25);
+  background-color: $bg-color-layer1;
   display: grid;
   grid-template-rows: min-content 1fr;
   & > .top-nav {
@@ -16,16 +17,16 @@
     & > .top-nav-right {
       display: grid;
       grid-template-columns: 4fr 4fr min-content;
-      padding: 10px;
+      padding-top: 20px;
       padding-right: 30px;
       align-items: center;
       & > .nav-dao-search {
-        padding: 0.5rem 0.75rem;
+        // padding: 0.5rem 0.75rem;
 
         align-items: center;
         input[type="text"] {
           padding: 0.5rem;
-          background-color: rgb(25, 39, 34);
+          background-color: $bg-color-layer2;
           font-size: 18px;
           border-radius: 10px;
           border: none;
@@ -82,7 +83,7 @@
             flex: 1;
             padding: 0 1em;
             color: #fff;
-            background-color: rgb(35, 39, 34); //var(--darkgray);
+            background-color: $bg-color-layer2; //var(--darkgray);
             background-image: none;
             cursor: pointer;
           }
@@ -98,14 +99,14 @@
             top: 0;
             right: 0;
             padding: 1em;
-            color: rgb(157, 129, 15);
-            background-color: rgb(45, 39, 34);
+            color: $bg-color-layer1;
+            background-color: $bg-color-layer2; //rgb(45, 39, 34);
             transition: 0.25s all ease;
             pointer-events: none;
           }
           /* Transition */
           &:hover::after {
-            color: #f39c12;
+            color: rgb(21,241,149);
           }
         }
       }
@@ -121,10 +122,12 @@
             justify-content: center;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
-            background-color: rgb(28, 32, 34);
+            background-color: rgb(30, 35, 36, 0.7);
+            color: rgb(255, 255, 255, 0.7);
             &:hover,
             &.active {
-              background-color: rgb(35, 39, 34);
+              background-color: $bg-color-layer2; // rgb(35, 39, 34);
+              color: $text-color-common;
             }
           }
         }
@@ -133,7 +136,7 @@
           grid-template-columns: 1fr 1fr;
 
           & > .dash-details-items {
-            background-color: rgb(35, 39, 34);
+            background-color: $bg-color-layer2;
             padding: 20px;
             border-bottom-left-radius: 10px;
             & > .item-pair {
@@ -146,14 +149,14 @@
           & > .dash-details-graph {
             padding: 10px;
             border-bottom-right-radius: 10px;
-            background-color: rgb(35, 39, 34);
+            background-color: $bg-color-layer2;
           }
         }
       }
       .dashboard-card {
-        &:focus {
-          background-color: rgb(25, 30, 30);
-        }
+        // &:focus {
+        //   background-color: rgb(25, 30, 30);
+        // }
         display: flex;
         font-size: 40px;
         justify-content: center;
@@ -174,7 +177,7 @@
                 rgba(0, 0, 0, 0.7)
               ),
               url("../../img/background-images/stream-1.jpg");
-            color: rgb(142, 235, 119);
+            color: $text-color-common-hover;
           }
           background-image: linear-gradient(
               rgba(0, 0, 0, 0.7),
@@ -194,7 +197,7 @@
                 rgba(0, 0, 0, 0.7)
               ),
               url("../../img/background-images/proposal-1.jpg");
-            color: rgb(142, 235, 119);
+            color: $text-color-common-hover;
           }
         }
       }
@@ -214,7 +217,7 @@
                 rgba(0, 0, 0, 0.7)
               ),
               url("../../img/background-images/voting-1.png");
-            color: rgb(142, 235, 119);
+            color: $text-color-common-hover;
           }
         }
         & > .dao-social {
@@ -229,39 +232,47 @@
                 rgba(0, 0, 0, 0.7)
               ),
               url("../../img/background-images/social-1.jpg");
-            color: rgb(142, 235, 119);
+            color: $text-color-common-hover;
           }
         }
       }
     }
     & > .content-right {
-      background-color: rgb(29, 35, 34);
+      background-color: $bg-color-layer2;
       border-radius: 1rem;
-      padding: 20px;
+      padding-top: 20px;
+      padding-bottom: 20px;
       margin-bottom: 20px;
+      padding-left: 40px;
+      padding-right: 40px;
       & > .proposal-setting {
         display: grid;
-        grid-template-rows: 1fr min-content min-content 350px min-content;
+        grid-template-rows: 1fr 150px min-content 350px min-content;
         & > .proposal-active {
-          padding: 20px;
+          padding-top: 20px;
           font-size: 30px;
           text-align: left;
         }
         & > .proposal-description {
           display: grid;
-          grid-template-rows: 1fr 1fr 1f 1fr 1fr;
+          // grid-template-rows: 1fr 1fr 1f 1fr 1fr;
+          padding-left: 20px;
           gap: 5px;
-          & > .descrption-item-value {
+          max-height: 150px;
+          & > .description-item-value {
             display: grid;
             grid-template-columns: 1fr 1.5fr;
-            & > .descrption-item {
-              text-align: left;
+            text-align: left;
+            align-items: center;
+            & > .description-item {
+              // text-align: left;
+              // align-items: center;
             }
-            & > .descrption-value {
+            & > .description-value {
               display: grid;
               grid-template-columns: min-content 1fr;
-              justify-content: left;
-              align-items: center;
+              // justify-content: left;
+              // align-items: center;
             }
           }
         }
@@ -273,9 +284,9 @@
           padding-left: 20px;
           padding-right: 20px;
           font-size: 16px;
-          color: black;
-          background-color: rgb(222, 227, 225);
-          border-radius: 5px;
+          color: $text-color-common;
+          background-color: $bg-color-layer2;
+          // border-radius: 5px;
           overflow: auto;
           & > .councillor-pubkey-pair {
             display: grid;

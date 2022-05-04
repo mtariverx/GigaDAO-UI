@@ -1,12 +1,16 @@
-$iconbtn-bgcolor-fill: 15f195;
-$iconbtn-bgcolor-fill-hover: 1af2a5;
-$iconbtn-bgcolor-unfill: rgb(25, 39, 34);
-$iconbtn-bgcolor-unfill-hover: rgb(55, 69, 54);
+$iconbtn-bgcolor-fill: #15f195;
+$iconbtn-bgcolor-fill-hover: #1af2a5;
+$iconbtn-bgcolor-unfill: #1e2324;
+$iconbtn-bgcolor-unfill-hover: #2e3334;
 
-$background-color-layer1: rgb(22, 27, 25);//161b19;
-$background-color-layer2: rgb(30, 35, 36);//1e2324;
-$btn-bgcolor-common: rgb(20, 241, 149);//14f195;
-$text-color-common: rgb(255,255,255);//ffffff;
+$bg-color-layer1: #161b19; //rgb(22, 27, 25)
+$bg-color-layer1-hover: rgb(22, 27, 25, 0.7);
+$bg-color-layer2: #1e2324; //rgb(30, 35, 36) same
+$bg-color-layer2-hover: rgb(30, 35, 36, 0.7);
+$btn-bgcolor-common: #14f195;
+$btn-bgcolor-common-hover: rgb(20, 241, 149, 0.7);
+$text-color-common: #ffffff;
+$text-color-common-hover: rgb(255, 255, 255, 0.7);
 
 $font-sizes: (
   "small": 12px,

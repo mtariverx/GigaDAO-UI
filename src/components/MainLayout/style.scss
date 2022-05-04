@@ -1,15 +1,17 @@
+@import "../../scss/DAOVariable.scss";
 .mainlayout {
   display: grid;
   grid-template-columns: 300px 1fr;
+  background-color: $bg-color-layer1;
   // height: 100vh;
   // width: 100%;
 
   & > .left-menu {
     display: grid;
     grid-template-rows: 1fr 200px;
-    background-color: rgb(29, 35, 34);
+    background-color: $bg-color-layer2;
     justify-content: space-around;
-    height:100vh;
+    height: 100vh;
     & > .menu-list {
       border-bottom: 2px solid #4fff5a;
       & > .menu-giga-logo {
@@ -28,7 +30,8 @@
         padding-left: 0;
         li {
           margin: 0px 10px 0px 10px;
-          color: #4fff5a;
+          // color: #4fff5a;
+          color: $text-color-common;
           cursor: pointer;
           :link {
             color: red;
@@ -39,6 +42,7 @@
             color: #85f58d;
             background-color: rgba(104, 212, 218, 0.05);
             border-radius: 0.8rem;
+            color: $text-color-common-hover;
           }
         }
       }
@@ -63,7 +67,7 @@
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         justify-content: space-around;
-        padding-top:10px;
+        padding-top: 10px;
         gap: 0.7em;
         // width: min-content;
         height: min-content;

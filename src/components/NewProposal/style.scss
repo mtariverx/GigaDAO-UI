@@ -1,6 +1,7 @@
+@import "../../scss/DAOVariable.scss";
 .new-proposal-container {
   display: grid;
-  background-color: rgb(35, 39, 34);
+  background-color: $bg-color-layer2;
   border-radius: 5px;
   padding: 1rem;
   grid-template-rows: min-content 1fr;
@@ -22,6 +23,7 @@
         .item-group-hidden {
           visibility: hidden;
         }
+        
         & > .label-select-group {
           display: grid;
           grid-template-columns: 200px 1fr;
@@ -33,7 +35,7 @@
             align-items: center;
             justify-content: right;
             font-size: 18px;
-            color: #1dd79b;
+            color: $text-color-common;
           }
           & > .select-proposal-type {
             margin-left: 15px;
@@ -54,7 +56,7 @@
               flex: 1;
               padding: 0 1em;
               color: #fff;
-              background-color: rgb(22, 27, 25);
+              background-color: $bg-color-layer1;
               background-image: none;
               cursor: pointer;
               border: none;
@@ -71,19 +73,23 @@
               top: 0;
               right: 0;
               padding: 1em;
-              color: rgb(157, 129, 15);
-              background-color: rgb(45, 49, 44);
+              color: $bg-color-layer2;
+              background-color: $bg-color-layer1;
               transition: 0.25s all ease;
               pointer-events: none;
               // border-radius: 10px;
             }
             /* Transition */
             &:hover::after {
-              color: #f39c12;
+              color: rgb(21,241,149);
             }
           }
         }
-        // 
+        &>.proposal-item-group {
+          display:grid;
+          // padding: 5px;
+          // gap: 5px;
+        } 
       }
     }
 

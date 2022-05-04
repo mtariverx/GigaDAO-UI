@@ -1,3 +1,4 @@
+@import "../../scss/DAOVariable.scss";
 .new-stream {
   display: grid;
   grid-template-rows: min-content 1fr;
@@ -7,25 +8,26 @@
     & > .tab-title {
       font-size: 18px;
       height: 2.5rem;
-      background-color: rgb(28, 32, 34);
+      background-color: $bg-color-layer2-hover;
       border-top-left-radius: 0.5rem;
       border-top-right-radius: 0.5rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
       &:hover,
       &.active {
-        background-color: rgb(35, 39, 34);
+        background-color: $bg-color-layer2;
       }
     }
   }
   .content-title {
-    padding-top: 20px;
+    padding: 20px;
     padding-left: 30px;
     font-size: 20px;
   }
   & > .pool-stream-table {
-    background-color: rgb(35, 39, 34);
+    background-color: $bg-color-layer2;
     display: grid;
     grid-template-rows: min-content 1fr 1fr;
     gap: 10px;
@@ -50,9 +52,7 @@
           overflow: scroll;
           font-weight: 100;
           font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-          // font-family: var(--bs-body-font-family);
         }
-      
         table,
         th,
         td {
@@ -68,19 +68,19 @@
           padding-left: 5px;
           padding-right: 5px;
 
-          background-color: rgb(22, 25, 27);
+          background-color: $bg-color-layer1;
         }
       }
     }
   }
   & > .stream-pool-content {
-    background-color: rgb(35, 39, 34);
+    background-color: $bg-color-layer2;
     display: grid;
     grid-template-columns: 1fr 30%;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     & > .stream-content {
-      display: grid;
+      // display: grid;
     }
     & > .stream-initial-btn {
       display: flex;

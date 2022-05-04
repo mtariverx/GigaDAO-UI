@@ -2,7 +2,7 @@ import "./style.scss";
 import { useEffect, useState } from "react";
 import "../common/LabelInput/style.scss";
 import Button from "components/common/Button";
-import Profile from "img/icons/profile.png";
+import Plus_fill from "img/icons/plus_symbol_fill.png";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
@@ -34,6 +34,15 @@ const NewProposal = (props) => {
   console.log("proposed_withdrawal_stream=", proposed_withdrawal_stream);
   const [proposal_type, setProposalType] = useState(-1);
   const [show_addresses, setShowAddresses] = useState<boolean>(false);
+  
+  useEffect(() => {
+    if (proposal_type == -1) {
+      setShowAddresses(false);
+    } else {
+      setShowAddresses(true);
+    }
+  }, [proposal_type]);
+  
   const onAddCouncillors = (): void => {
     const temp = [...councillors];
     temp.push(one_councillor);
@@ -44,13 +53,7 @@ const NewProposal = (props) => {
   const onSelectProposalType = (event) => {
     setProposalType(event.target.value);
   };
-  useEffect(() => {
-    if (proposal_type == -1) {
-      setShowAddresses(false);
-    } else {
-      setShowAddresses(true);
-    }
-  }, [proposal_type]);
+
 
   const onClickSavePorposeBtn = async () => {
     console.log("onClickSavePorposeBtn");
@@ -95,6 +98,7 @@ const NewProposal = (props) => {
     props.dao.governance = governance;
 
     const dao = await simPic.proposeDaoCommand(props.dao); //proposeDaoCommand
+    props.onClose();//close btn
   };
   return (
     <div>
@@ -117,7 +121,7 @@ const NewProposal = (props) => {
               </div>
               <div className={`${!show_addresses ? "item-group-hidden" : ""}`}>
                 {proposal_type == pic.ProposalType.UPDATE_MULTISIG ? (
-                  <div>
+                  <div className="proposal-item-group">
                     <div className="item-wrapper plus-button">
                       <div className="title">Councillors</div>
                       <input 
@@ -125,7 +129,7 @@ const NewProposal = (props) => {
                         onChange={(evt) => setOneCouncillor(evt.target.value)}
                       />
                       <div className="input-side-btn">
-                        <img src={Profile} onClick={onAddCouncillors} />
+                        <img src={Plus_fill} onClick={onAddCouncillors} />
                       </div>
                     </div>
                     <div className="item-wrapper">
@@ -170,7 +174,7 @@ const NewProposal = (props) => {
                       />
                     </div>
                     <div className="item-wrapper">
-                      <div className="title">Proposed Withdrawal Receiver</div>
+                      <div className="title">Withdrawal Receiver</div>
                       <input required
                         value={proposed_withdrawal_receiver}
                         onChange={(evt) =>
@@ -179,7 +183,7 @@ const NewProposal = (props) => {
                       />
                     </div>
                     <div className="item-wrapper">
-                      <div className="title">Proposed Withdrawal Stream</div>
+                      <div className="title">Withdrawal Stream</div>
                       <input required
                         value={proposed_withdrawal_stream}
                         onChange={(evt) =>

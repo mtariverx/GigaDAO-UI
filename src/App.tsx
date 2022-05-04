@@ -14,30 +14,32 @@ function App() {
   return (
     <>
       <ClusterModal />
-      <div className="main-content pb-4">
-        <Switch>
-          <Route path="/maindashboard" component={MainDashBoard} />
-          <Navbar />
+      <div className="main-content">
+        {/* <Switch> */}
+         
+          {/* <Navbar />
           <MessageBanner />
           <ClusterStatusBanner />
           <ConnectWalletBannerButton />
-          <SearchBar />
-          {/* <Switch> */}
-            <Route exact path={"/"}>
+          <SearchBar /> */}
+          <Switch>
+          {/* <Route path="/maindashboard" component={MainDashBoard} /> */}
+          <Route path="/" component={MainDashBoard} />
+            {/* <Route exact path={"/"}>
               <VerifiedDAOs />
             </Route>
             <Route
               exact
               path={"/dao/:dao_id"}
               render={({ match }) => <DaoPage dao_id={match.params.dao_id} />}
-            />
+            /> */}
             <Route
               render={({ location }) => (
                 <Redirect to={{ ...location, pathname: "/" }} />
               )}
             />
-          {/* </Switch> */}
-        </Switch>
+          </Switch>
+        {/* </Switch> */}
       </div>
     </>
   );

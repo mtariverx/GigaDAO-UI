@@ -3,6 +3,7 @@ import "./style.scss";
 import MemberGraph from "components/common/MemberGraph";
 import Refresh from "img/icons/refresh_1.png";
 import Profile from "img/icons/profile.png";
+import Plus_fill from "img/icons/plus_symbol_fill.png";
 import Gigs_log from "img/icons/small_gigs_token_logo.png";
 
 import DAODetailModal from "components/DAODetailModal";
@@ -30,6 +31,10 @@ const DAODashboard: React.FC = (props) => {
     signer: boolean;
   };
   const [counc_sign, setCounc_Sign] = useState<counc_sign_pair[]>([]);
+  const [active_proposal_info, setActiveProposalInfo] = useState<Array<any[]>>(
+    []
+  );
+
   const getShortKey = (long_key: string) => {
     const str: string = long_key.slice(0, 7) + "..." + long_key.slice(-7);
     console.log("long key=", long_key);
@@ -47,13 +52,14 @@ const DAODashboard: React.FC = (props) => {
       setMemberDaoIds(mdis);
       setSelectedMemberDAO({ ...m_daos[0] }); //only first
       setCouncillorSignerPair({ ...m_daos[0] });
+      getActiveProposalInfo({ ...m_daos[0] });
     })();
   }, []);
   useEffect(() => {
     if (selected_member_dao != undefined) {
       setCouncillorSignerPair(selected_member_dao);
+      getActiveProposalInfo(selected_member_dao);
     }
-
   }, [selected_member_dao]);
 
   const setCouncillorSignerPair = (dao: pic.Dao) => {
@@ -87,6 +93,39 @@ const DAODashboard: React.FC = (props) => {
         setSelectedMemberDAO({ ...dao });
       }
     }
+  };
+
+  const getActiveProposalInfo = (dao: pic.Dao) => {
+    const governance = dao.governance;
+    let tmp: any = [];
+    if (governance.proposal_type == pic.ProposalType.DEACTIVATE_STREAM) {
+      tmp = [
+        ["Proposal Type", "DEACTIVEATE_STREAM"],
+        [
+          "Stream Public Key",
+          getShortKey(governance.proposed_withdrawal_stream.toString()),
+        ],
+      ];
+    } else if (
+      governance.proposal_type == pic.ProposalType.WITHDRAW_FROM_STREAM
+    ) {
+      tmp = [
+        ["Proposal Type", "WITHDRAW FROM STREAM"],
+        ["Amount", `${governance.proposed_withdrawal_amount}`],
+        [
+          "Proposed Withdraw Receiver",
+          getShortKey(governance.proposed_withdrawal_receiver.toString()),
+        ],
+        [
+          "Proposed Withdraw Stream",
+          getShortKey(governance.proposed_withdrawal_stream.toString()),
+        ],
+      ];
+    } else if (governance.proposal_type == pic.ProposalType.UPDATE_MULTISIG) {
+      tmp = [["Proposal Type", "UPDATE_MULTISIG"]];
+    }
+    console.log("active proposal=", tmp);
+    setActiveProposalInfo(tmp);
   };
   const onClickApproveProposeBtn = async () => {
     console.log("--selected dao=", selected_member_dao);
@@ -129,7 +168,7 @@ const DAODashboard: React.FC = (props) => {
         <div className="content-left">
           <div className="address-refresh_btn">
             <div onClick={() => setShowModal(0)}>
-              <IconButton icon_img={Profile} is_background={false} />
+              <IconButton icon_img={Plus_fill} is_background={false} />
             </div>
             <div className="select-memeberDAO">
               <select onChange={onChangeSelectMemberDAO}>
@@ -230,25 +269,27 @@ const DAODashboard: React.FC = (props) => {
           <div className="proposal-setting">
             <div className="proposal-active">Active proposal</div>
             <div className="proposal-description">
-              <div className="descrption-item-value">
-                <div className="descrption-item">Amount</div>
-                <div className="descrption-value">1,000,000</div>
+              {/* <div className="description-item-value">
+                <div className="description-item">Amount</div>
+                <div className="description-value">1,000,000</div>
               </div>
-              <div className="descrption-item-value">
-                <div className="descrption-item">Token</div>
-                <div className="descrption-value">
-                  
-                  {/* <IconButton icon_img={Gigs_log} is_background={false} /> */}
+              <div className="description-item-value">
+                <div className="description-item">Token</div>
+                <div className="description-value">
                   <div>GIGS</div>
                   <div className="div-img">
                     <img src={Gigs_log} />
                   </div>
                 </div>
-              </div>
-              <div className="descrption-item-value">
-                <div className="descrption-item">Withdrawal Address</div>
-                <div className="descrption-value">{selected_member_dao!=undefined?getShortKey(selected_member_dao.governance.proposed_withdrawal_receiver.toString()):""}</div>
-              </div>
+              </div> */}
+              {active_proposal_info.map((item_pair) => {
+                return (
+                  <div className="description-item-value">
+                    <div className="description-item">{item_pair[0]}</div>
+                    <div className="description-value">{item_pair[1]}</div>
+                  </div>
+                );
+              })}
               <div>Description</div>
               <div>
                 Moving GIGS to a new token pool for a new stream for our
@@ -270,8 +311,7 @@ const DAODashboard: React.FC = (props) => {
             </div>
 
             <div className="proposal-btn-group">
-              {/* <button className="btn">Approve</button>
-              <button className="btn">Execute</button> */}
+              {/* <button className="btn">Execute</button> */}
               <Button
                 is_btn_common={true}
                 btn_title="Approve"
@@ -283,29 +323,35 @@ const DAODashboard: React.FC = (props) => {
         </div>
       </div>
       {show_modal == 0 ? (
-        <DAODetailModal onClick={()=>setShowModal(-1)}>
-          <NewDAO dao={selected_member_dao} />
+        <DAODetailModal onClick={() => setShowModal(-1)}>
+          <NewDAO dao={selected_member_dao} onClose={() => setShowModal(-1)} />
         </DAODetailModal>
       ) : (
         ""
       )}
       {show_modal == 1 ? (
-        <DAODetailModal onClick={()=>setShowModal(-1)}>
-          <NewStream dao={selected_member_dao} />
+        <DAODetailModal onClick={() => setShowModal(-1)}>
+          <NewStream
+            dao={selected_member_dao}
+            onClose={() => setShowModal(-1)}
+          />
         </DAODetailModal>
       ) : (
         ""
       )}
       {show_modal == 2 ? (
-        <DAODetailModal onClick={()=>setShowModal(-1)}>
-          <NewProposal dao={selected_member_dao} />
+        <DAODetailModal onClick={() => setShowModal(-1)}>
+          <NewProposal
+            dao={selected_member_dao}
+            onClose={() => setShowModal(-1)}
+          />
         </DAODetailModal>
       ) : (
         ""
       )}
       {show_modal == 4 ? (
-        <DAODetailModal onClick={()=>setShowModal(-1)}>
-          <DAOSocial />
+        <DAODetailModal onClick={() => setShowModal(-1)}>
+          <DAOSocial onClose={() => setShowModal(-1)} />
         </DAODetailModal>
       ) : (
         ""

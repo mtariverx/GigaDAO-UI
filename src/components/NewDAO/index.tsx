@@ -35,6 +35,7 @@ const NewDAO = (props) => {
     new_dao.governance = governance;
 
     new_dao = await simPic.initializeDao(new_dao); //initializeDao
+    props.onClose();//close btn
   };
 
   const onAddCouncillors = (): void => {

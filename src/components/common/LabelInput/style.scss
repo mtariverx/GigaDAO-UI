@@ -1,5 +1,6 @@
+@import "../../../scss/DAOVariable.scss";
 .item-wrapper {
-  margin: 5px;
+   margin: 5px;
   display: grid;
   grid-template-columns: 200px 1fr;
   align-items: center;
@@ -10,45 +11,41 @@
   }
   & > .title {
     text-align: right;
-    color: #1dd79b;
+    color:$text-color-common;// #1dd79b;
     font-size:18px;
   }
   & > .input-side-btn {
     cursor: pointer;
     display: grid;
-    --tw-gradient-from: rgba(57, 208, 216, 0.2);
-    --tw-gradient-stops: var(--tw-gradient-from),
-      var(--tw-gradient-to, rgb(57 208 216/0));
+    // --tw-gradient-stops: var(--tw-gradient-from),
+    // var(--tw-gradient-to, rgb(57 208 216/0));
     background-image: linear-gradient(
       to bottom right,
       var(--tw-gradient-stops)
     );
+    background-color: $bg-color-layer1;
     padding: 5px;
     border-radius: 0.5rem;
     color: white;
     & > img {
-      // display: block;
       width: 20px;
       height: 20px;
     }
     &:hover {
       visibility: show;
-      background-color: rgb(55, 69, 54);
+      background-color: $bg-color-layer1-hover;
     }
   }
   & > input {
     width: 100%;
     border: none;
     padding: 0.5rem;
-    background-color: rgb(22, 27, 25);
+    background-color: $bg-color-layer1;
     border-radius: 8px;
-    color: white;
+    color: $text-color-common;
     font-size: 16px;
 
-    &:hover {
-      background-color: rgb(25, 30, 30);
-    }
-    &:focus {
+    &:focus, hover {
       background-color: rgb(25, 30, 30);
     }
   }
@@ -60,7 +57,7 @@
   }
   .input-title {
     text-align: right;
-    color: #1dd79b;
+    color: $text-color-common;
   }
   .input-checkbox {
     text-align: left;
@@ -72,7 +69,7 @@
     margin-bottom: 5px;
   }
   .add-stream {
-    color: #1dd79b;
+    color: $text-color-common;
     &:hover {
       cursor: pointer;
     }
