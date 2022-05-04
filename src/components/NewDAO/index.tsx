@@ -2,7 +2,7 @@ import "./style.scss";
 import "../common/LabelInput/style.scss";
 import { useState } from "react";
 import Button from "components/common/Button";
-import Profile from "img/icons/profile.png";
+import Plus_fill from "img/icons/plus_symbol_fill.png";
 import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
 import { PublicKey } from "@solana/web3.js";
@@ -76,7 +76,7 @@ const NewDAO = (props) => {
               onChange={(evt) => setOneCouncillor(evt.target.value)} required
             />
             <div className="input-side-btn">
-              <img src={Profile} onClick={onAddCouncillors} />
+              <img src={Plus_fill} onClick={onAddCouncillors} />
             </div>
           </div>
           <div className="item-wrapper">
