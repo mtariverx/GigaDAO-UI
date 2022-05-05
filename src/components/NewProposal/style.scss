@@ -13,7 +13,7 @@
   & > .new-proposal-content {
     // background-color: rgb(35, 39, 34);
     display: grid;
-    grid-template-columns: 1fr 30%;
+    grid-template-columns: 1fr 20%;
     padding-bottom: 30px;
     min-height: 28rem;
     & > .proposal-content {
@@ -34,14 +34,14 @@
             padding-left: 30px;
             align-items: center;
             justify-content: right;
-            font-size: 18px;
+            font-size: 16px;
             color: $text-color-common;
           }
           & > .select-proposal-type {
             margin-left: 15px;
             position: relative;
             display: flex;
-            height: 3em;
+            height: 42px;
             border-radius: 0.25em;
             overflow: hidden;
             font-family: "Cerebri Sans";
@@ -54,7 +54,7 @@
               box-shadow: none;
               /* Personalize */
               flex: 1;
-              padding: 0 1em;
+              padding: 0.8em;
               color: #fff;
               background-color: $bg-color-layer1;
               background-image: none;
@@ -72,16 +72,16 @@
               position: absolute;
               top: 0;
               right: 0;
-              padding: 1em;
-              color: $bg-color-layer2;
-              background-color: $bg-color-layer1;
+              padding: 0.8em;
+              color: $select-arrow-color;
+              background-color: $select-arrow-bg-color;
               transition: 0.25s all ease;
               pointer-events: none;
               // border-radius: 10px;
             }
             /* Transition */
             &:hover::after {
-              color: rgb(21,241,149);
+              color: rgb(21,241,149 ,0.5);
             }
           }
         }

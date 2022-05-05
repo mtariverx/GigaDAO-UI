@@ -11,6 +11,7 @@ import Web from "img/icons/web.png";
 
 import Github from "img/icons/github.png";
 import NFTStakingBoard from "../NFTStakingBoard";
+import Giga_logo from "../../img/icons/gigadao-full-brand-cropped.png";
 const MainLayout = (props) => {
   const content_page = [<DAODashboard />];
   const [content_page_index, setContentPageIndex] = useState(2);
@@ -21,7 +22,7 @@ const MainLayout = (props) => {
         <div className="menu-list">
           <div className="menu-giga-logo">
             <img
-              src="/static/media/gigadao-full-brand-cropped.a590d8a4.png"
+              src={Giga_logo}
               width="160"
               alt="Solana Explorer"
             />

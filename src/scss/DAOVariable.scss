@@ -7,11 +7,16 @@ $bg-color-layer1: #161b19; //rgb(22, 27, 25)
 $bg-color-layer1-hover: rgb(22, 27, 25, 0.7);
 $bg-color-layer2: #1e2324; //rgb(30, 35, 36) same
 $bg-color-layer2-hover: rgb(30, 35, 36, 0.7);
+
 $btn-bgcolor-common: #14f195;
 $btn-bgcolor-common-hover: rgb(20, 241, 149, 0.7);
+$btn-bgcolor-green-text: #161b19;
+$btn-bgcolor-green-text-hover: rgb(22, 27, 25, 0.7);
 $text-color-common: #ffffff;
 $text-color-common-hover: rgb(255, 255, 255, 0.7);
 
+$select-arrow-color: rgb(21,241,149);
+$select-arrow-bg-color: rgb(65, 46, 46);
 $font-sizes: (
   "small": 12px,
   "normal": 18px,

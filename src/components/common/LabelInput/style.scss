@@ -15,10 +15,14 @@
     font-size:18px;
   }
   & > .input-side-btn {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    height: 40px;
+    width :40px;
     cursor: pointer;
     display: grid;
-    // --tw-gradient-stops: var(--tw-gradient-from),
-    // var(--tw-gradient-to, rgb(57 208 216/0));
+
     background-image: linear-gradient(
       to bottom right,
       var(--tw-gradient-stops)

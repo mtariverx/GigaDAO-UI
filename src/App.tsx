@@ -23,16 +23,16 @@ function App() {
           <ConnectWalletBannerButton />
           <SearchBar /> */}
           <Switch>
-          {/* <Route path="/maindashboard" component={MainDashBoard} /> */}
-          <Route path="/" component={MainDashBoard} />
-            {/* <Route exact path={"/"}>
+          {/* <Route path="/" component={MainDashBoard} /> */}
+          <Route path="/maindashboard" component={MainDashBoard} />
+            <Route exact path={"/"}>
               <VerifiedDAOs />
             </Route>
             <Route
               exact
               path={"/dao/:dao_id"}
               render={({ match }) => <DaoPage dao_id={match.params.dao_id} />}
-            /> */}
+            />
             <Route
               render={({ location }) => (
                 <Redirect to={{ ...location, pathname: "/" }} />

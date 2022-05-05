@@ -37,11 +37,9 @@ const DAODashboard: React.FC = (props) => {
 
   const getShortKey = (long_key: string) => {
     const str: string = long_key.slice(0, 7) + "..." + long_key.slice(-7);
-    console.log("long key=", long_key);
     return str;
   };
   useEffect(() => {
-    console.log("useEffect async");
     (async () => {
       let member_daos_promise = await simPic.getMemberDaos(new_owner);
       let mdis: Array<string> = [];
@@ -64,7 +62,6 @@ const DAODashboard: React.FC = (props) => {
 
   const setCouncillorSignerPair = (dao: pic.Dao) => {
     let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
-    console.log("yes1");
     if (dao.governance.proposed_councillors) {
       dao.governance.proposed_councillors.forEach(function (councillor, index) {
         let tmp: counc_sign_pair = {
@@ -124,18 +121,15 @@ const DAODashboard: React.FC = (props) => {
     } else if (governance.proposal_type == pic.ProposalType.UPDATE_MULTISIG) {
       tmp = [["Proposal Type", "UPDATE_MULTISIG"]];
     }
-    console.log("active proposal=", tmp);
     setActiveProposalInfo(tmp);
   };
   const onClickApproveProposeBtn = async () => {
-    console.log("--selected dao=", selected_member_dao);
     const wallet_address = "CRWMVg3k7JGuxFMMADRQTdBSNtB6LNWakEJDUeG8k2KN";
     const dao: pic.Dao = selected_member_dao;
     if (dao.governance) {
       const proposed_councillors = dao.governance.proposed_councillors;
       let councillors = proposed_councillors.map((item) => item.toString());
       let index = councillors.indexOf(wallet_address);
-      console.log("index==", index);
       if (index != -1) {
         let proposed_signers = dao.governance.proposed_signers;
         proposed_signers.splice(index, 1, true);
@@ -151,121 +145,115 @@ const DAODashboard: React.FC = (props) => {
 
   return (
     <div className="dashboard-content">
-      {/* <div className="right-content"> */}
-      <div className="top-nav">
+      <div className="content-left">
         <div className="dash-title">DAO Dashboard</div>
-        <div className="top-nav-right">
-          <div className="nav-dao-search">
-            <input type="text" placeholder="DAO Search.." name="search" />
+        <div className="address-refresh_btn">
+          <div onClick={() => setShowModal(0)}>
+            <IconButton icon_img={Plus_fill} is_background={false} />
           </div>
-          <Button is_btn_common={false} btn_title="Connection" />
-          <div className="nav-dao-profile">
-            <IconButton icon_img={Profile} is_background={false} />
+          <div className="select-memeberDAO">
+            <select onChange={onChangeSelectMemberDAO}>
+              {member_dao_ids.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <IconButton icon_img={Refresh} is_background={false} />
           </div>
         </div>
-      </div>
-      <div className="dashboard-main-content">
-        <div className="content-left">
-          <div className="address-refresh_btn">
-            <div onClick={() => setShowModal(0)}>
-              <IconButton icon_img={Plus_fill} is_background={false} />
-            </div>
-            <div className="select-memeberDAO">
-              <select onChange={onChangeSelectMemberDAO}>
-                {member_dao_ids.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <IconButton icon_img={Refresh} is_background={false} />
-            </div>
-          </div>
-          <div className="member-token">
-            <div className="dash-items">
-              <div
-                className={`item-each ${dashitem == 0 ? "active" : ""}`}
-                onClick={() => setDashItem(0)}
-              >
-                Members
-              </div>
-              <div
-                className={`item-each ${dashitem == 1 ? "active" : ""}`}
-                onClick={() => setDashItem(1)}
-              >
-                Token Pools
-              </div>
-              <div
-                className={`item-each ${dashitem == 2 ? "active" : ""}`}
-                onClick={() => setDashItem(2)}
-              >
-                Token Streams
-              </div>
-              <div
-                className={`item-each ${dashitem == 3 ? "active" : ""}`}
-                onClick={() => setDashItem(3)}
-              >
-                Voting
-              </div>
-              <div
-                className={`item-each ${dashitem == 4 ? "active" : ""}`}
-                onClick={() => setDashItem(4)}
-              >
-                More...
-              </div>
-            </div>
-            <div className="dash-details">
-              <div className="dash-details-items">
-                <div className="item-pair">
-                  <div>Unique Wallets</div>
-                  <div>4,302</div>
-                </div>
-                <div className="item-pair">
-                  <div>Total Staked</div>
-                  <div>5,999</div>
-                </div>
-                <div className="item-pair">
-                  <div>Total Connected</div>
-                  <div>5,999</div>
-                </div>
-              </div>
-              <div className="dash-details-graph">
-                <MemberGraph />
-              </div>
-            </div>
-          </div>
-          <div className="tokenpool-proposal">
+        <div className="member-token">
+          <div className="dash-items">
             <div
-              className="dashboard-card tokenpool-streams "
-              onClick={() => setShowModal(1)}
+              className={`item-each ${dashitem == 0 ? "active" : ""}`}
+              onClick={() => setDashItem(0)}
             >
-              Token Pools <br />& Streams
+              Members
             </div>
             <div
-              className="dashboard-card new-proposal"
-              onClick={() => setShowModal(2)}
+              className={`item-each ${dashitem == 1 ? "active" : ""}`}
+              onClick={() => setDashItem(1)}
             >
-              New Proposal
+              Token Pools
             </div>
-          </div>
-          <div className="voting-social">
             <div
-              className="dashboard-card dao-voting"
-              onClick={() => setShowModal(3)}
+              className={`item-each ${dashitem == 2 ? "active" : ""}`}
+              onClick={() => setDashItem(2)}
+            >
+              Token Streams
+            </div>
+            <div
+              className={`item-each ${dashitem == 3 ? "active" : ""}`}
+              onClick={() => setDashItem(3)}
             >
               Voting
             </div>
             <div
-              className="dashboard-card dao-social"
-              onClick={() => setShowModal(4)}
+              className={`item-each ${dashitem == 4 ? "active" : ""}`}
+              onClick={() => setDashItem(4)}
             >
-              DAO Social
+              More...
             </div>
           </div>
+          <div className="dash-details">
+            <div className="dash-details-items">
+              <div className="item-pair">
+                {/* <div>Unique Wallets</div>
+                  <div>4,302</div> */}
+              </div>
+              <div className="item-pair">
+                {/* <div>Total Staked</div>
+                  <div>5,999</div> */}
+              </div>
+              <div className="item-pair">
+                {/* <div>Total Connected</div>
+                  <div>5,999</div> */}
+              </div>
+            </div>
+            <div className="dash-details-graph">{/* <MemberGraph /> */}</div>
+          </div>
         </div>
-        <div className="content-right">
+        <div className="tokenpool-proposal">
+          <div
+            className="dashboard-card tokenpool-streams "
+            onClick={() => setShowModal(1)}
+          >
+            Token Pools <br />& Streams
+          </div>
+          <div
+            className="dashboard-card new-proposal"
+            onClick={() => setShowModal(2)}
+          >
+            New Proposal
+          </div>
+        </div>
+        <div className="voting-social">
+          <div
+            className="dashboard-card dao-voting"
+            onClick={() => setShowModal(3)}
+          >
+            Voting
+          </div>
+          <div
+            className="dashboard-card dao-social"
+            onClick={() => setShowModal(4)}
+          >
+            DAO Social
+          </div>
+        </div>
+      </div>
+
+      <div className="content-right">
+        <div className="top-nav-right">
+          <div className="nav-dao-search">
+            <input type="text" placeholder="DAO Search.." name="search" />
+          </div>
+          <Button btn_type="connection" btn_title="Connection" />
+          <IconButton icon_img={Profile} is_background={false} />
+        </div>
+        <div className="active-proposal">
           <div className="proposal-setting">
             <div className="proposal-active">Active proposal</div>
             <div className="proposal-description">
@@ -313,11 +301,11 @@ const DAODashboard: React.FC = (props) => {
             <div className="proposal-btn-group">
               {/* <button className="btn">Execute</button> */}
               <Button
-                is_btn_common={true}
+                btn_type="common"
                 btn_title="Approve"
                 onClick={onClickApproveProposeBtn}
               />
-              <Button is_btn_common={true} btn_title="Execute" />
+              <Button btn_type="common" btn_title="Execute" />
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
 import { PublicKey } from "@solana/web3.js";
 import Button from "components/common/Button";
+import { validateSolanaAddress } from "components/CommonCalls";
 
 const NewStream = (props) => {
   const { dao } = props;
@@ -24,24 +25,27 @@ const NewStream = (props) => {
     []
   );
 
+  useEffect(() => {
+    setSelectedDao({ ...dao });
+    setStreamCompArr();
+  }, []);
+
   const table_rows = 4;
   const changeCollections = (index: number) => (value: string) => {
     const temp = [...collections];
     temp[index] = value;
     setCollections(temp);
   };
-  const onAddCollections = (): void => {
+  const onAddCollections = async() => {
     const temp = [...collections];
-    temp.push(collect);
+    let flag=await validateSolanaAddress(collect);
+    if(flag){
+      temp.push(collect);
+      setCollections(temp);  
+    }
     setCollect("");
-    setCollections(temp);
+    
   };
-
-  useEffect(() => {
-    console.log("useeffect-dao-", dao);
-    setSelectedDao({ ...dao });
-    setStreamCompArr();
-  }, []);
 
   const setStreamCompArr = () => {
     const remain_rows = dao
@@ -49,41 +53,46 @@ const NewStream = (props) => {
         ? 0
         : table_rows - dao.streams.length
       : 0;
-    console.log("remain_rows=", remain_rows);
     let tmp_stream: string[] = [];
     for (let i = 0; i < remain_rows; i++) {
       tmp_stream.push("tmp_stream");
     }
-    console.log("tmp=", tmp_stream);
     setStreamCompensateArr(tmp_stream);
   };
+
   const onClickCreateNewStreamBtn = async () => {
-    let new_stream = {
-      name: pool_name,
-      address: new PublicKey(address),
-      dao_address: new PublicKey(dao_address),
-      collections: collections.map((collect) => {
-        let collection = {
-          address: new PublicKey(collect),
-        };
+    if(await validateSolanaAddress(address)==false){
+      setAddress("");
+    }
+    if(await validateSolanaAddress(dao_address)==false){
+      setDaoAddress("");
+    }
 
-        return collection;
-      }),
-      num_collections: num_connections,
-    };
+    if (pool_name && await validateSolanaAddress(address) && await validateSolanaAddress(dao_address) && collections.length > 0) {
+      let new_stream = {
+        name: pool_name,
+        address: new PublicKey(address),
+        dao_address: new PublicKey(dao_address),
+        collections: collections.map((collect) => {
+          let collection = {
+            address: new PublicKey(collect),
+          };
 
-    const { dao, stream } = await simPic.initializeStream(
-      props.dao,
-      new_stream
-    ); //initializeStream
-    // console.log("new stream btn=",dao);ok
-    setSelectedDao({ ...dao }); //setting dao with streams
-    props.onClose();//close btn
+          return collection;
+        }),
+        num_collections: num_connections,
+      };
+
+      const { dao, stream } = await simPic.initializeStream(
+        props.dao,
+        new_stream
+      ); //initializeStream
+      setSelectedDao({ ...dao }); //setting dao with streams
+      props.onClose(); //close btn
+    }
   };
 
   const streams = dao.streams;
-  console.log("stream===", streams);
-  console.log("num=", num_connections);
   return (
     <div className="new-stream">
       <div className="stream-pool-tabs">
@@ -161,7 +170,7 @@ const NewStream = (props) => {
           </div>
           <div className="stream-initial-btn">
             <Button
-              is_btn_common={true}
+              btn_type="common"
               btn_title="Initialize Stream"
               onClick={onClickCreateNewStreamBtn}
             />
@@ -182,7 +191,6 @@ const NewStream = (props) => {
                 </tr>
                 {selected_dao
                   ? selected_dao.streams.map((stream) => {
-                      console.log("--selected dao map--", stream.name);
                       return (
                         <tr>
                           <td>{stream.name}</td>
@@ -195,7 +203,6 @@ const NewStream = (props) => {
                   : ""}
                 {}
                 {stream_compensate_arr.map((item) => {
-                  console.log("--selected dao map--", item);
                   return (
                     <tr>
                       <td></td>
@@ -233,7 +240,6 @@ const NewStream = (props) => {
                     })
                   : ""}
                 {stream_compensate_arr.map((item) => {
-                  console.log("--selected dao map--", item);
                   return (
                     <tr>
                       <td></td>

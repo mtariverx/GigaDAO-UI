@@ -226,12 +226,10 @@ let refreshGovernance: pic.RefreshGovernance = async (dao: pic.Dao) => {
     num_streams: 1,
   };
   dao.governance = governance;
-  console.log("refreshGovernance=", dao);
   return dao;
 };
 //remove all properties besides 4 properties*
 let initializeDao: pic.InitializeDao = async (dao: pic.Dao) => {
-  console.log("initializeDao=", dao);
   return dao;
 };
 //dao has the argument stream and the stream has dao address
@@ -246,8 +244,6 @@ let initializeStream: pic.InitializeStream = async (
   stream.current_pool_amount = sampleTokenStream1.pool_reserve_amount;
   stream.token_ticker = sampleTokenStream1.token_ticker;
   stream.last_update_timestamp = Math.floor(Date.now() / 1000);
-  console.log("initializeStream(dao)=", dao);
-  console.log("initializeStream(stream)=", stream);
   if(dao.streams!=undefined){
     dao.streams = [];
   }
@@ -271,7 +267,6 @@ let reactivateStream: pic.ReactivateStream = async (
 
 // all relevant args should be included in the governance object of the dao passed into this call
 let proposeDaoCommand: pic.ProposeDaoCommand = async (dao: pic.Dao) => {
-  console.log("proposeDaoCommand=", dao);
   return dao;
 };
 
@@ -282,33 +277,18 @@ let approveDaoCommand: pic.ApproveDaoCommand = async (dao: pic.Dao) => {
 
   // let _signers=dao.governance.proposed_signers;
 
-  console.log("approveDaoCommand=", dao);
   return dao;
 };
 
 let executeDaoCommand: pic.ExecuteDaoCommand = async (dao: pic.Dao) => {
-  console.log("executeDaoCommand=", dao);
   return dao;
 };
 const saveSocial: pic.SaveSocial = async (social: pic.social_type) => {
-  console.log("save social=", social);
   return social;
 };
 
 let setGovernance: pic.SetGovernance = async (governance: pic.Governance) => {
   governance_store = governance;
-  console.log(governance_store.councillors);
-  console.log(governance_store.approval_threshold);
-  console.log(governance_store.proposed_signers);
-  console.log(governance_store.proposal_is_active);
-  console.log(governance_store.proposal_type);
-  console.log(governance_store.proposed_councillors);
-  console.log(governance_store.proposed_approval_threshold);
-  console.log(governance_store.proposed_deactivation_stream);
-  console.log(governance_store.proposed_withdrawal_amount);
-  console.log(governance_store.proposed_withdrawal_receiver);
-  console.log(governance_store.proposed_withdrawal_stream);
-  console.log(governance_store.num_streams);
 };
 let getGovernance: pic.GetGovernance = async () => {
   return governance_store;

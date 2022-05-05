@@ -70,6 +70,7 @@ export type Stream = {
 //   token_ticker: string;
 //   last_update_timestamp: number;
 // };
+
 export type Governance = {
   councillors: Array<PublicKey>;
   approval_threshold: number;
@@ -133,9 +134,6 @@ export type social_type={
   website: string;
   twitter: string;
   discord: string;
-  instagram: string;
-  linktree: string;
-  medium: string;
 }
 export type SaveSocial=(social: social_type)=>Promise<social_type>
 

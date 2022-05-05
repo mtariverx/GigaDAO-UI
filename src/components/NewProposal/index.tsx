@@ -6,6 +6,7 @@ import Plus_fill from "img/icons/plus_symbol_fill.png";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
+import { validateSolanaAddress } from "components/CommonCalls";
 
 const NewProposal = (props) => {
   const proposal_options = [
@@ -26,15 +27,10 @@ const NewProposal = (props) => {
     useState<string>();
   const [proposed_withdrawal_stream, setProposedWithdrawalStream] =
     useState<string>();
-  console.log("-propos new proposal dao--", props.dao);
-  console.log("threshould=", approval_threshold);
-  console.log("stream_pubkey=", stream_pubkey);
-  console.log("amount=", amount);
-  console.log("proposed_withdrawal_receiver=", proposed_withdrawal_receiver);
-  console.log("proposed_withdrawal_stream=", proposed_withdrawal_stream);
+
   const [proposal_type, setProposalType] = useState(-1);
   const [show_addresses, setShowAddresses] = useState<boolean>(false);
-  
+
   useEffect(() => {
     if (proposal_type == -1) {
       setShowAddresses(false);
@@ -42,63 +38,85 @@ const NewProposal = (props) => {
       setShowAddresses(true);
     }
   }, [proposal_type]);
-  
-  const onAddCouncillors = (): void => {
+
+  const onAddCouncillors = async () => {
     const temp = [...councillors];
-    temp.push(one_councillor);
-    setCouncillors(temp);
+    let flag = await validateSolanaAddress(one_councillor);
+    if (flag) {
+      temp.push(one_councillor);
+      setCouncillors(temp);
+    }
     setOneCouncillor("");
   };
 
   const onSelectProposalType = (event) => {
     setProposalType(event.target.value);
+    setCouncillors([]);
+    setApprovalThresold(0);
+    setStreamPubkey("");
+    setAmount(0);
+    setProposedWithdrawalReceiver("");
+    setProposedWithdrawalStream("");
   };
 
-
   const onClickSavePorposeBtn = async () => {
-    console.log("onClickSavePorposeBtn");
-    const governance: pic.Governance = {
-      councillors: [Keypair.generate().publicKey],
-      approval_threshold:0,
-      proposed_signers:[true],
-      proposal_is_active:true,
-      proposal_type: pic.ProposalType.UPDATE_MULTISIG,
-
-      // proposed_deactivation_stream: Keypair.generate().publicKey,
-      proposed_withdrawal_receiver: Keypair.generate().publicKey,
-      // proposed_withdrawal_stream: Keypair.generate().publicKey,
-      num_streams:0,
-    };
-
-    if (councillors && councillors.length > 0) {
-      let councillors_pubkey = councillors.map(
-        (councillor) => new PublicKey(councillor)
-      );
-      let proposed_signers: Array<boolean>=[];
-      for (let i = 0; i < councillors.length; i++) {
-        // proposed_signers.push(false);
-        governance.proposed_signers.push(false);
-      }
-      governance.councillors = councillors_pubkey;
-      governance.proposed_signers = proposed_signers;
+    if ((await validateSolanaAddress(stream_pubkey)) == false) {
+      setStreamPubkey("");
     }
-    governance.proposal_is_active = true;
-    governance.approval_threshold = approval_threshold;
-    if (stream_pubkey)
-      governance.proposed_deactivation_stream = new PublicKey(stream_pubkey);
-    governance.proposed_withdrawal_amount = amount;
-    if (proposed_withdrawal_receiver)
-      governance.proposed_withdrawal_receiver = new PublicKey(
-        proposed_withdrawal_receiver
-      );
-    if (proposed_withdrawal_stream)
-      governance.proposed_withdrawal_stream = new PublicKey(
-        proposed_withdrawal_stream
-      );
-    props.dao.governance = governance;
+    if ((await validateSolanaAddress(proposed_withdrawal_receiver)) == false) {
+      setProposedWithdrawalReceiver("");
+    }
+    if ((await validateSolanaAddress(proposed_withdrawal_stream)) == false) {
+      setProposedWithdrawalStream("");
+    }
+    if (
+      councillors.length > 0 ||
+       await validateSolanaAddress(stream_pubkey)||
+      (await validateSolanaAddress(proposed_withdrawal_receiver) &&
+        await validateSolanaAddress(proposed_withdrawal_stream))
+    ) {
+      const governance: pic.Governance = {
+        councillors: [Keypair.generate().publicKey],
+        approval_threshold: 0,
+        proposed_signers: [true],
+        proposal_is_active: true,
+        proposal_type: pic.ProposalType.UPDATE_MULTISIG,
 
-    const dao = await simPic.proposeDaoCommand(props.dao); //proposeDaoCommand
-    props.onClose();//close btn
+        proposed_deactivation_stream: Keypair.generate().publicKey,
+        proposed_withdrawal_receiver: Keypair.generate().publicKey,
+        proposed_withdrawal_stream: Keypair.generate().publicKey,
+        num_streams: 0,
+      };
+
+      if (councillors && councillors.length > 0) {
+        let councillors_pubkey = councillors.map(
+          (councillor) => new PublicKey(councillor)
+        );
+        let proposed_signers: Array<boolean> = [];
+        for (let i = 0; i < councillors.length; i++) {
+          governance.proposed_signers.push(false);
+        }
+        governance.councillors = councillors_pubkey;
+        governance.proposed_signers = proposed_signers;
+      }
+      governance.proposal_is_active = true;
+      governance.approval_threshold = approval_threshold;
+      if (stream_pubkey)
+        governance.proposed_deactivation_stream = new PublicKey(stream_pubkey);
+      governance.proposed_withdrawal_amount = amount;
+      if (proposed_withdrawal_receiver)
+        governance.proposed_withdrawal_receiver = new PublicKey(
+          proposed_withdrawal_receiver
+        );
+      if (proposed_withdrawal_stream)
+        governance.proposed_withdrawal_stream = new PublicKey(
+          proposed_withdrawal_stream
+        );
+      props.dao.governance = governance;
+
+      const dao = await simPic.proposeDaoCommand(props.dao); //proposeDaoCommand
+      props.onClose(); //close btn
+    }
   };
   return (
     <div>
@@ -124,7 +142,8 @@ const NewProposal = (props) => {
                   <div className="proposal-item-group">
                     <div className="item-wrapper plus-button">
                       <div className="title">Councillors</div>
-                      <input 
+                      <input
+                        key="0"
                         value={one_councillor}
                         onChange={(evt) => setOneCouncillor(evt.target.value)}
                       />
@@ -144,7 +163,9 @@ const NewProposal = (props) => {
                     </div>
                     <div className="item-wrapper">
                       <div className="title">Approval Threshold</div>
-                      <input required
+                      <input
+                        required
+                        key="1"
                         value={approval_threshold}
                         onChange={(evt) =>
                           setApprovalThresold(parseInt(evt.target.value || "0"))
@@ -156,7 +177,9 @@ const NewProposal = (props) => {
                   <div>
                     <div className="item-wrapper">
                       <div className="title">Stream Publick Key</div>
-                      <input required
+                      <input
+                        required
+                        key="2"
                         value={stream_pubkey}
                         onChange={(evt) => setStreamPubkey(evt.target.value)}
                       />
@@ -166,7 +189,9 @@ const NewProposal = (props) => {
                   <div>
                     <div className="item-wrapper">
                       <div className="title">Amount</div>
-                      <input required
+                      <input
+                        required
+                        key="3"
                         value={amount}
                         onChange={(evt) =>
                           setAmount(parseInt(evt.target.value || "0"))
@@ -175,7 +200,9 @@ const NewProposal = (props) => {
                     </div>
                     <div className="item-wrapper">
                       <div className="title">Withdrawal Receiver</div>
-                      <input required
+                      <input
+                        required
+                        key="4"
                         value={proposed_withdrawal_receiver}
                         onChange={(evt) =>
                           setProposedWithdrawalReceiver(evt.target.value)
@@ -184,7 +211,9 @@ const NewProposal = (props) => {
                     </div>
                     <div className="item-wrapper">
                       <div className="title">Withdrawal Stream</div>
-                      <input required
+                      <input
+                        required
+                        key="5"
                         value={proposed_withdrawal_stream}
                         onChange={(evt) =>
                           setProposedWithdrawalStream(evt.target.value)
@@ -201,7 +230,7 @@ const NewProposal = (props) => {
 
           <div className="proposal-content-save">
             <Button
-              is_btn_common={true}
+              btn_type="common"
               btn_title="Save Changes"
               onClick={onClickSavePorposeBtn}
             />
