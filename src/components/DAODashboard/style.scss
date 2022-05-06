@@ -26,7 +26,7 @@
       gap: 10px;
       grid-template-columns: 50px 1fr 50px 0.5fr;
       align-items: center;
-      font-size: 16px;
+      font-size: 18px;
       & > .select-memeberDAO {
         position: relative;
         display: flex;
@@ -63,9 +63,9 @@
           position: absolute;
           top: 0;
           right: 0;
-          padding: 0.8em;
-          color: $select-arrow-color; //$bg-color-layer1;
-          background-color: $select-arrow-bg-color; //$bg-color-layer2; //rgb(45, 39, 34);
+          padding: 0.7em;
+          color: $bg-color-layer1;
+          background-color: $bg-color-layer2; //rgb(45, 39, 34);
           transition: 0.25s all ease;
           pointer-events: none;
         }

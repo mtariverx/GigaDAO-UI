@@ -54,7 +54,7 @@
               box-shadow: none;
               /* Personalize */
               flex: 1;
-              padding: 0.8em;
+              padding: 0 0.8em;
               color: #fff;
               background-color: $bg-color-layer1;
               background-image: none;
@@ -73,8 +73,8 @@
               top: 0;
               right: 0;
               padding: 0.8em;
-              color: $select-arrow-color;
-              background-color: $select-arrow-bg-color;
+              color: $bg-color-layer2;
+              background-color: $bg-color-layer1;
               transition: 0.25s all ease;
               pointer-events: none;
               // border-radius: 10px;

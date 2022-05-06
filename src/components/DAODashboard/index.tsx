@@ -202,6 +202,7 @@ const DAODashboard: React.FC = (props) => {
               <div className="item-pair">
                 {/* <div>Unique Wallets</div>
                   <div>4,302</div> */}
+                  Tracking Data coming soon!
               </div>
               <div className="item-pair">
                 {/* <div>Total Staked</div>
