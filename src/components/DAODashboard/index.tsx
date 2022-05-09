@@ -13,6 +13,7 @@ import DAOSocial from "components/DAOSocial";
 import IconButton from "components/common/IconButton";
 import NewDAO from "components/NewDAO";
 import Button from "components/common/Button";
+
 import { ConnectWalletNavButton } from "../ConnectWalletNavButton";
 
 import * as pic from "../../pic/pic";
@@ -254,26 +255,14 @@ const DAODashboard: React.FC = (props) => {
           </div>
           {/* <Button btn_type="connection" btn_title="Connection" /> */}
           <ConnectWalletNavButton/>
+
           <IconButton icon_img={Profile} is_background={false} />
         </div>
         <div className="active-proposal">
           <div className="proposal-setting">
             <div className="proposal-active">Active proposal</div>
             <div className="proposal-description">
-              {/* <div className="description-item-value">
-                <div className="description-item">Amount</div>
-                <div className="description-value">1,000,000</div>
-              </div>
-              <div className="description-item-value">
-                <div className="description-item">Token</div>
-                <div className="description-value">
-                  <div>GIGS</div>
-                  <div className="div-img">
-                    <img src={Gigs_log} />
-                  </div>
-                </div>
-              </div> */}
-              {active_proposal_info.map((item_pair) => {
+                 {active_proposal_info.map((item_pair) => {
                 return (
                   <div className="description-item-value">
                     <div className="description-item">{item_pair[0]}</div>
