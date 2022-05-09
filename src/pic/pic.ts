@@ -2,74 +2,18 @@
 import { PublicKey } from "@solana/web3.js";
 
 // saps
-export type Owner = {
-  address?: PublicKey;
-  daos?: Array<Dao>;
-  collections?: Array<Collection>;
-  nfts?: Array<Nft>;
-};
-export type Nft = {
-  address: PublicKey;
-  owner_address: PublicKey;
-  name: string;
-  image_url: string;
-  collection: Collection;
-  stake?: Stake;
-};
-export type Collection = { address: PublicKey };
-export type Stake = {
-  address: PublicKey;
-  is_active: boolean;
-  connections?: Array<Connection>;
-};
-export type Connection = {
-  address: PublicKey;
-  stream_address: PublicKey;
-  total_earned: number;
-  total_claimed: number;
-  is_active: boolean;
-  last_update_timestamp: number;
-};
-export type Dao = {
-  address?: PublicKey;
-  governance?: Governance;
-  dao_id: string;
-  display_name: string;
-  image_url: string;
-  streams?: Array<Stream>;
-  num_nfts: number;
-  is_member: boolean;
-};
+export type Owner = {address?: PublicKey, daos?: Array<Dao>, collections?: Array<Collection>, nfts?: Array<Nft>};
+export type Nft = {address: PublicKey, owner_address: PublicKey, name: string, image_url: string, collection: Collection, token_account?: PublicKey, stake?: Stake, wallet?, network?}; // TODO this is an ugly addition of connection params - hide them
+export type Collection = {address: PublicKey};
+export type Stake = {address: PublicKey, is_active: boolean, connections?: Array<Connection>, num_connections?: number};
+export type Connection = {address: PublicKey, stream_address: PublicKey, total_earned: number, total_claimed: number, is_active: boolean, last_update_timestamp: number, wallet?};
+export type Dao = {address?: PublicKey, governance?: Governance, dao_id?: string, display_name?: string, image_url?: string, streams?: Array<Stream>, num_nfts?: number, is_member?: boolean};
 export type Stream = {
-  address?: PublicKey;
-  dao_address?: PublicKey;
-  collections?: Array<Collection>;
-  num_connections?: number;
-  is_active?: boolean;
-  name?: string;
-  token_image_url?: string;
-  daily_stream_rate?: number;
-  total_earned?: number;
-  total_claimed?: number;
-  current_pool_amount?: number;
-  token_ticker?: string;
-  last_update_timestamp?: number;
+    address: PublicKey, dao_address: PublicKey, collections: Array<Collection>, num_connections: number,
+    is_active: boolean, name: string, token_image_url: string, daily_stream_rate: number,
+    total_earned: number, total_claimed: number, current_pool_amount: number, token_ticker: string,
+    last_update_timestamp: number, decimals?: number,
 };
-// export type Stream = {
-//   address: PublicKey;
-//   dao_address: PublicKey;
-//   collections: Array<Collection>;
-//   num_connections: number;
-//   is_active: boolean;
-//   name: string;
-//   token_image_url: string;
-//   daily_stream_rate: number;
-//   total_earned: number;
-//   total_claimed: number;
-//   current_pool_amount: number;
-//   token_ticker: string;
-//   last_update_timestamp: number;
-// };
 
 export type Governance = {
   councillors: Array<PublicKey>;
@@ -89,21 +33,13 @@ export type Governance = {
 // owner calls
 export type ConnectOwner = (owner: Owner) => Promise<Owner>;
 export type GetDaos = (daos: Array<Dao>) => Promise<Array<Dao>>;
-export type StakeNFT = (nft: Nft) => Promise<Nft>;
-export type UnstakeNft = (nft: Nft) => Promise<Nft>;
-export type ConnectToStream = (
-  nft: Nft,
-  stream: Stream
-) => Promise<{ nft: Nft; stream: Stream }>;
-export type DisconnectFromStream = (
-  nft: Nft,
-  conn: Connection,
-  stream: Stream
-) => Promise<{ nft: Nft; conn: Connection; stream: Stream }>;
-export type ClaimFromStream = (
-  conn: Connection,
-  stream: Stream
-) => Promise<{ conn: Connection; stream: Stream }>;
+export type RefreshNft = (nft: Nft) => Promise<{nft?: Nft}>;
+export type StakeNFT = (nft: Nft) => Promise<{nft?:Nft}>;
+export type UnstakeNft = (nft: Nft) => Promise<{nft?:Nft}>;
+export type ConnectToStream = (nft: Nft, stream: Stream) => Promise<{nft?: Nft, stream: Stream, conn?: Connection}>;
+export type DisconnectFromStream = (nft: Nft, conn: Connection, stream: Stream) => Promise<{nft?: Nft, conn:Connection, stream: Stream}>;
+export type ClaimFromStream = (nft: Nft, stake: Stake, conn: Connection, stream: Stream) => Promise<{conn?: Connection, stream?: Stream}>;
+export type UpdateStreamAndConnection = (nft: Nft, stream: Stream) => Promise<{nft?: Nft, stream?: Stream, conn?: Connection}>;
 
 //TODO KAIMING - please implement the following calls in sim.ts only.
 
@@ -130,16 +66,13 @@ export type ApproveDaoCommand = (dao: Dao) => Promise<Dao>;
 export type ExecuteDaoCommand = (dao: Dao) => Promise<Dao>;
 
 //KAIMING's self TODO list
-export type social_type={
+export type social_type = {
   website: string;
   twitter: string;
   discord: string;
-}
-export type SaveSocial=(social: social_type)=>Promise<social_type>
+};
+export type SaveSocial = (social: social_type) => Promise<social_type>;
 
-
-export type SetGovernance = (governance: Governance) => Promise<void>;
-export type GetGovernance = () => Promise<Governance>;
 //DAO structure in smart contract is the same with Governance here
 //define SPLTokenStream
 export type SPLTokenStream = {

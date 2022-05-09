@@ -1,0 +1,225 @@
+@use 'sass:math';
+@use 'sass:map';
+
+$nft-card-height: (
+        md: 500px,
+        lg: 420px,
+        xl: 420px,
+        xxl: 360px,
+) !default;
+
+.nft-card {
+  flex-grow: 1;
+}
+
+.nft-card-front {
+  display: flex;
+  flex-direction: row;
+}
+
+@media only screen and (min-width: map.get($grid-breakpoints, xl)) {
+  .nft-card-front {
+    //background-color: red;
+    width: 25% !important;
+    max-width: 25% !important;
+    height: map.get($nft-card-height, xxl) !important;
+  }
+}
+@media only screen and (max-width: map.get($grid-breakpoints, xl)) {
+  .nft-card-front {
+    //background-color: orange;
+    width: calc(100%/3) !important;
+    max-width: calc(100%/3) !important;
+    height: map.get($nft-card-height, xl) !important;
+  }
+}
+
+@media only screen and (max-width: map.get($grid-breakpoints, lg)) {
+  .nft-card-front {
+    //background-color: blue;
+    width: 50% !important;
+    max-width: 50% !important;
+    height: map.get($nft-card-height, lg) !important;
+  }
+}
+
+@media only screen and (max-width: map.get($grid-breakpoints, md)) {
+  .nft-card-front {
+    //background-color: green;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: map.get($nft-card-height, md) !important;
+  }
+}
+
+// nft-card-body
+//.nft-card-body {
+//  display: flex;
+//  flex-direction: column;
+//  max-height: 100%;
+//}
+
+ //status section
+.nft-status {
+  height: 35%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}
+
+//.nft-name-row {
+//  //background-color: orange;
+//  height: 20%;
+//  display: flex;
+//  justify-content: center;
+//  align-content: center;
+//}
+
+//.nft-name-row > h3 {
+//  color: $nft-green;
+//}
+//
+//.nft-info-row {
+//  height: 75%;
+//  display: flex;
+//  flex-direction: row;
+//}
+//
+//.nft-info-row > .data-section {
+//  width: 40%;
+//  display: flex;
+//  flex-direction: column;
+//  justify-content: center;
+//  align-content: center;
+//
+//  & .data-unit {
+//    height: calc(100%/3);
+//    display: flex;
+//    flex-direction: column;
+//    justify-content: center;
+//    align-content: center;
+//
+//    & > h5 {
+//      align-self: center;
+//      font-size: 0.85rem;
+//      margin-bottom: 0.04rem;
+//    }
+//
+//    & > h4 {
+//      align-self: center;
+//      font-size: 1.1rem;
+//      margin-bottom: 0rem;
+//    }
+//  }
+//}
+//
+//.nft-info-row > .stream-section {
+//  //background-color: purple;
+//  width: 60%;
+//  display: flex;
+//  flex-direction: column;
+//  justify-content: center;
+//  align-content: center;
+//
+//  & .loading-row {
+//    width: 100%;
+//    height: 100%;
+//    display: flex;
+//    flex-direction: row;
+//    justify-content: center;
+//    align-content: center;
+//    & > * > svg {
+//      align-self: center;
+//    }
+//  }
+//
+//  & .none-row > * {
+//    text-align: center;
+//  }
+//
+//  & > .multiple-row {
+//    width: 100%;
+//    height: 100%;
+//    display: flex;
+//    flex-direction: column;
+//    justify-content: center;
+//    align-content: center;
+//
+//    & > .multi-stream-row {
+//      //background-color: yellow;
+//      height: 50%;
+//      width: 100%;
+//      display: flex;
+//      flex-direction: column;
+//
+//      & > .token-logo-row {
+//        //background-color: #6E84A3;
+//        height: 60%;
+//        width: 100%;
+//        display: flex;
+//        justify-content: center;
+//        align-content: center;
+//
+//        & > img {
+//          height: 100%;
+//        }
+//
+//
+//      }
+//
+//      & > .token-amount-row {
+//        //background-color: #7203E1;
+//        height: 40%;
+//        width: 100%;
+//        display: flex;
+//        justify-content: center;
+//        align-content: center;
+//
+//        //& > * {
+//        //  text-align: center;
+//        //}
+//      }
+//
+//    }
+//
+//    //& > .continuation {
+//    //  background-color: #2C7BE5;
+//    //  height: 20%;
+//    //  width: 100%;
+//    //  text-align: center;
+//    //  font-size: 1em;
+//    //}
+//
+//  }
+//}
+//
+//.nft-buffer-row {
+//  height: 5%;
+//}
+//
+// image section
+.nft-img-container {
+  //background-color: yellow;
+  height: 65%;
+}
+
+//.nft-img {
+//  object-fit: contain;
+//  height: 100%;
+//}
+
+// nav styles
+//.nav-button-height{
+//  height: 42.5px;
+//  display: flex;
+//}
+
+//.mobile-owner-loading-container{
+//  height: 42.5px;
+//  display: flex;
+//  justify-content: center;
+//  align-content: center;
+//}
+
+

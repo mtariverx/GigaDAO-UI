@@ -4,6 +4,7 @@ import {Dao} from "pic/pic";
 import {pic} from "../pic/connect";
 import {useOwnerData} from "./owner";
 import {cloneObject} from "../utils/pic-object-utils";
+import {getDaoById} from "../utils/pic-object-utils";
 
 async function fetchStreamData(daos: Array<Dao>): Promise<Array<Dao>> {
     let newDaos = await pic.getDaos(daos);
@@ -21,6 +22,11 @@ function daoDataReducer(state: State, action: Action){
 
     switch (action.type){
         case 'refresh': {
+            let newDaos = action.newDaosData;
+            for (const dao of newDaos){
+                let result = getDaoById(state, dao.dao_id);
+                state[result.index] = dao;
+            }
             const myClonedArray = [];
             state.forEach(val => myClonedArray.push(Object.assign({}, val)));
             return myClonedArray;
@@ -41,10 +47,11 @@ export function DaoDataProvider({children}: DaoDataProviderProps) {
             if (owner.daos){
                 if (owner.daos.length > 0){
                     let updateState = false
-                    const daoIds = owner.daos.map((dao, _) => dao.dao_id); // NOTE: should change this to (dao_id || address) for live
+                    const daoIds = owner.daos.map((dao, _) => dao.dao_id);
+                    const daoAddresses = owner.daos.map((dao, _) => dao.address.toString());
                     let daosToRefresh = [];
                     for (let dao of state){
-                        if (daoIds.includes(dao.dao_id)){
+                        if (daoIds.includes(dao.dao_id) || daoAddresses.includes(dao.address?.toString())){
                             if (dao.is_member !== true){
                                 daosToRefresh.push(dao);
                                 dao.is_member = true;

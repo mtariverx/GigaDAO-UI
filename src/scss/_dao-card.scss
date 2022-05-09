@@ -2,9 +2,9 @@
 @use 'sass:map';
 
 $dao-card-height: (
-        md: 720px,
-        lg: 600px,
-        xl: 550px,
+        md: 620px,
+        lg: 550px,
+        xl: 500px,
         xxl: 469px,
 ) !default;
 
@@ -209,6 +209,17 @@ $dao-card-height: (
   height: 100%;
 }
 
+// nav styles
+.nav-button-height{
+  height: 42.5px;
+  display: flex;
+}
 
+.mobile-owner-loading-container{
+  height: 42.5px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
 
 

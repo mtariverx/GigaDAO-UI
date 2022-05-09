@@ -9,7 +9,10 @@ import * as simPic from "../../pic/sim";
 import { PublicKey } from "@solana/web3.js";
 import Button from "components/common/Button";
 import { validateSolanaAddress } from "components/CommonCalls";
-
+import {
+  sampleTokenStream1,
+  sampleTokenStream2,
+} from "pic/sim_data/sample-streams";
 const NewStream = (props) => {
   const { dao } = props;
   const [is_stream, setStream] = useState(1);
@@ -36,15 +39,14 @@ const NewStream = (props) => {
     temp[index] = value;
     setCollections(temp);
   };
-  const onAddCollections = async() => {
+  const onAddCollections = async () => {
     const temp = [...collections];
-    let flag=await validateSolanaAddress(collect);
-    if(flag){
+    let flag = await validateSolanaAddress(collect);
+    if (flag) {
       temp.push(collect);
-      setCollections(temp);  
+      setCollections(temp);
     }
     setCollect("");
-    
   };
 
   const setStreamCompArr = () => {
@@ -61,15 +63,20 @@ const NewStream = (props) => {
   };
 
   const onClickCreateNewStreamBtn = async () => {
-    if(await validateSolanaAddress(address)==false){
+    if ((await validateSolanaAddress(address)) == false) {
       setAddress("");
     }
-    if(await validateSolanaAddress(dao_address)==false){
+    if ((await validateSolanaAddress(dao_address)) == false) {
       setDaoAddress("");
     }
 
-    if (pool_name && await validateSolanaAddress(address) && await validateSolanaAddress(dao_address) && collections.length > 0) {
-      let new_stream = {
+    if (
+      pool_name &&
+      (await validateSolanaAddress(address)) &&
+      (await validateSolanaAddress(dao_address)) &&
+      collections.length > 0
+    ) {
+      let new_stream:pic.Stream = {
         name: pool_name,
         address: new PublicKey(address),
         dao_address: new PublicKey(dao_address),
@@ -80,7 +87,15 @@ const NewStream = (props) => {
 
           return collection;
         }),
-        num_collections: num_connections,
+        num_connections: num_connections,
+        token_image_url: sampleTokenStream1.token_image_url,
+        daily_stream_rate: sampleTokenStream1.daily_stream_rate,
+        total_earned: sampleTokenStream1.earned_amount,
+        total_claimed: sampleTokenStream1.claimed_amount,
+        current_pool_amount: sampleTokenStream1.pool_reserve_amount,
+        token_ticker: sampleTokenStream1.token_ticker,
+        last_update_timestamp: Math.floor(Date.now() / 1000),
+        is_active: true,
       };
 
       const { dao, stream } = await simPic.initializeStream(

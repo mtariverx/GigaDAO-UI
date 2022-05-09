@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import Logo from "img/logos-solana/gigadao-full-brand-cropped.png";
 import { clusterPath } from "utils/url";
 import { Link, NavLink } from "react-router-dom";
@@ -7,22 +7,30 @@ import { ConnectWalletNavButton } from "./ConnectWalletNavButton";
 import { useWallet } from "../providers/adapters/core/react";
 import { useOwnerData } from "../providers/owner";
 import * as pic from "../pic/pic";
+import {Grid} from "react-loader-spinner";
+import {useWalletModal} from "../providers/adapters/core/ui";
 
 export function Navbar() {
   // TODO: use `collapsing` to animate collapsible navbar
   const [collapse, setCollapse] = React.useState(false);
-  const { publicKey, connected } = useWallet();
-  const { dispatch, callConnectOwner, callDisconnectOwner } = useOwnerData();
+  const {publicKey, connected } = useWallet();
+  const {dispatch, callConnectOwner, callDisconnectOwner} = useOwnerData();
+  const [isConnectingToOwner, setIsConnectingToOwner] = useState(false);
 
   // update dao data
   useEffect(() => {
     if (connected) {
-      let newOwner: pic.Owner = { address: publicKey };
-      callConnectOwner(dispatch, newOwner);
+      setIsConnectingToOwner(true);
+      let newOwner: pic.Owner = {address: publicKey};
+      callConnectOwner(dispatch, newOwner)
+          .then(()=>{
+            setIsConnectingToOwner(false);
+          })
     } else {
       callDisconnectOwner(dispatch);
     }
-  }, [connected]);
+  },[connected]);
+
 
   return (
     <nav className="navbar navbar-expand-md navbar-light">
@@ -52,7 +60,7 @@ export function Navbar() {
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
               <NavLink className="nav-link" to={clusterPath("/")} exact>
-                Verified DAOs
+                Collections
               </NavLink>
             </li>
             <li className="nav-item">
@@ -76,6 +84,12 @@ export function Navbar() {
           </ul>
         </div>
 
+        {isConnectingToOwner ? (
+            <div className="d-none d-md-block padded-btn">
+              <ConnectOwnerLoadingButton/>
+            </div>
+        ) : ""}
+
         <div className="d-none d-md-block padded-btn">
           <ConnectWalletNavButton />
         </div>
@@ -85,5 +99,21 @@ export function Navbar() {
         </div>
       </div>
     </nav>
+  );
+}
+
+function ConnectOwnerLoadingButton() {
+  return (
+      <div className="nav-button-height">
+        <Grid height="100%"/>
+      </div>
+  );
+}
+
+export function ConnectOwnerLoadingBanner() {
+  return (
+      <div className="container d-md-none my-4 mobile-owner-loading-container">
+        <Grid height="100%"/>
+      </div>
   );
 }

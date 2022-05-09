@@ -13,6 +13,7 @@ import DAOSocial from "components/DAOSocial";
 import IconButton from "components/common/IconButton";
 import NewDAO from "components/NewDAO";
 import Button from "components/common/Button";
+import { ConnectWalletNavButton } from "../ConnectWalletNavButton";
 
 import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
@@ -251,7 +252,8 @@ const DAODashboard: React.FC = (props) => {
           <div className="nav-dao-search">
             <input type="text" placeholder="DAO Search.." name="search" />
           </div>
-          <Button btn_type="connection" btn_title="Connection" />
+          {/* <Button btn_type="connection" btn_title="Connection" /> */}
+          <ConnectWalletNavButton/>
           <IconButton icon_img={Profile} is_background={false} />
         </div>
         <div className="active-proposal">

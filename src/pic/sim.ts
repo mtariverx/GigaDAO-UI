@@ -31,9 +31,16 @@ let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
     dao.is_member = true;
   }
   let daoIds = daos.map((dao, _) => dao.dao_id);
+  
+  for(const daoId of daoIds){
+    console.log("---id-", daoId);
+    console.log("--", daoAddressMap[daoId]);
+  }
   let collections: Array<pic.Collection> = [];
   let nfts: Array<pic.Nft> = [];
   for (const daoId of daoIds) {
+    console.log("----", daoAddressMap[daoId]);
+    
     const collection_address = new PublicKey(daoAddressMap[daoId]);
     const dao_collection = { address: collection_address };
     collections.push(dao_collection);
@@ -136,12 +143,12 @@ let stakeNft: pic.StakeNFT = async (nft: pic.Nft) => {
     connections: [],
     is_active: true,
   };
-  return nft;
+  return { nft };
 };
 
 let unstakeNft: pic.UnstakeNft = async (nft: pic.Nft) => {
   nft.stake.is_active = false;
-  return nft;
+  return { nft };
 };
 
 let connectToStream: pic.ConnectToStream = async (
@@ -172,6 +179,8 @@ let disconnectFromStream: pic.DisconnectFromStream = async (
 };
 
 let claimFromStream: pic.ClaimFromStream = async (
+  nft: pic.Nft,
+  stake: pic.Stake,
   conn: pic.Connection,
   stream: pic.Stream
 ) => {
@@ -181,6 +190,17 @@ let claimFromStream: pic.ClaimFromStream = async (
   stream.total_claimed += amount_to_claim;
   return { conn, stream };
 };
+
+let refreshNft: pic.RefreshNft = async (nft: pic.Nft) => {
+  return {nft};
+}
+let updateStreamAndConnection: pic.UpdateStreamAndConnection = async (nft: pic.Nft, stream: pic.Stream) => {
+  //TODO
+  return {nft, stream}
+}
+
+
+
 //kaiming
 // retrieves list of daos that owner is a councillor of, but does not lookup Governance data
 let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
@@ -189,13 +209,21 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
   let daos: Array<pic.Dao> = newOwner.daos;
   for (let dao of daos) {
     const governance: pic.Governance = {
-      councillors: [owner.address, Keypair.generate().publicKey,new PublicKey("CRWMVg3k7JGuxFMMADRQTdBSNtB6LNWakEJDUeG8k2KN")],
-      proposed_councillors: [owner.address, Keypair.generate().publicKey,new PublicKey("CRWMVg3k7JGuxFMMADRQTdBSNtB6LNWakEJDUeG8k2KN")],
+      councillors: [
+        owner.address,
+        Keypair.generate().publicKey,
+        new PublicKey("CRWMVg3k7JGuxFMMADRQTdBSNtB6LNWakEJDUeG8k2KN"),
+      ],
+      proposed_councillors: [
+        owner.address,
+        Keypair.generate().publicKey,
+        new PublicKey("CRWMVg3k7JGuxFMMADRQTdBSNtB6LNWakEJDUeG8k2KN"),
+      ],
       approval_threshold: 0,
       proposed_signers: [true, false, false],
       proposal_is_active: true,
       proposal_type: pic.ProposalType.UPDATE_MULTISIG,
-  
+
       // proposed_deactivation_stream: Keypair.generate().publicKey,
       proposed_withdrawal_receiver: Keypair.generate().publicKey,
       // proposed_withdrawal_stream: Keypair.generate().publicKey,
@@ -203,7 +231,7 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
     };
     dao.governance = governance;
   }
-  daos=await getDaos(daos);
+  daos = await getDaos(daos);
 
   console.log("getMemberDaos=", daos);
   return daos;
@@ -237,18 +265,18 @@ let initializeStream: pic.InitializeStream = async (
   dao: pic.Dao,
   stream: pic.Stream
 ) => {
-  stream.token_image_url = sampleTokenStream1.token_image_url;
-  stream.daily_stream_rate = sampleTokenStream1.daily_stream_rate;
-  stream.total_earned = sampleTokenStream1.earned_amount;
-  stream.total_claimed = sampleTokenStream1.claimed_amount;
-  stream.current_pool_amount = sampleTokenStream1.pool_reserve_amount;
-  stream.token_ticker = sampleTokenStream1.token_ticker;
-  stream.last_update_timestamp = Math.floor(Date.now() / 1000);
-  if(dao.streams!=undefined){
-    dao.streams = [];
-  }
-  
-  dao.streams.push(stream);
+  // stream.token_image_url = sampleTokenStream1.token_image_url;
+  // stream.daily_stream_rate = sampleTokenStream1.daily_stream_rate;
+  // stream.total_earned = sampleTokenStream1.earned_amount;
+  // stream.total_claimed = sampleTokenStream1.claimed_amount;
+  // stream.current_pool_amount = sampleTokenStream1.pool_reserve_amount;
+  // stream.token_ticker = sampleTokenStream1.token_ticker;
+  // stream.last_update_timestamp = Math.floor(Date.now() / 1000);
+  // if(dao.streams!=undefined){
+  //   dao.streams = [];
+  // }
+
+  // dao.streams.push(stream);
   return { dao, stream };
 };
 //dao has the argument stream and the stream has dao address
@@ -287,12 +315,8 @@ const saveSocial: pic.SaveSocial = async (social: pic.social_type) => {
   return social;
 };
 
-let setGovernance: pic.SetGovernance = async (governance: pic.Governance) => {
-  governance_store = governance;
-};
-let getGovernance: pic.GetGovernance = async () => {
-  return governance_store;
-};
+
+
 
 export {
   connectOwner,
@@ -302,6 +326,8 @@ export {
   connectToStream,
   disconnectFromStream,
   claimFromStream,
+  updateStreamAndConnection,
+  refreshNft
 };
 export {
   getMemberDaos,
@@ -313,4 +339,3 @@ export {
   approveDaoCommand,
   executeDaoCommand,
 };
-export { setGovernance, getGovernance };

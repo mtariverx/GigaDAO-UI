@@ -5,9 +5,11 @@ import _debounce from 'lodash/debounce';
 import {Grid} from 'react-loader-spinner';
 import {Dao, Stream} from 'pic/pic';
 import imageNotFound from "img/dao-images/image_not_found.png";
+import ReactGA from 'react-ga4';
 
 export function VerifiedDAOs() {
-  const [numCards, setNumCards] = useState(10);
+    // ReactGA.send({hitType: "pageview", page: window.location.pathname + window.location.search});
+    const [numCards, setNumCards] = useState(10);
     const {verifiedDaos, dispatch, refreshStreams} = useDaoData();
 
     const orderedVerifiedDaos = sortByMembership(verifiedDaos);
@@ -31,7 +33,7 @@ export function VerifiedDAOs() {
                 }
                 setNumCards(newNumCards);
             } else {
-                alert("no more DAOs");
+                console.log("no more daos");
             }
             if (newDaosToRefresh.length > 0){
                 refreshStreams(dispatch, newDaosToRefresh);
@@ -60,68 +62,81 @@ export function VerifiedDAOs() {
                 })}
             </div>
         </div>
-  );
+    );
 }
 
 const DaoCardComponent: React.FC<{data: Dao}> = (props) => {
-  const history = useHistory();
-  const path = '/dao/' + props.data.dao_id;
-  const handleOnClick = useCallback(() => history.push(path), [history]);
-  let numActiveStreams = getNumActiveStreams(props.data.streams);
+    const history = useHistory();
+    const path = '/dao/' + props.data.dao_id;
 
-  return (
-      <div className="dao-card-front" onClick={handleOnClick}>
-        <div className="card dao-card">
-          <div className="card-body dao-card-body">
-              <div className="dao-status">
-                  <div className="dao-name-row">
-                      <h3>{props.data.display_name}</h3>
-                  </div>
-                  <div className="dao-info-row">
-                      <div className="data-section">
-                          <div className="data-unit">
-                              <h5>#NFTs</h5>
-                              <h4><em>{props.data.num_nfts}</em></h4>
-                          </div>
-                          <div className="data-unit">
-                              <h5>#Streams</h5>
-                              <h4><em>{numActiveStreams}</em></h4>
-                          </div>
-                          <div className="data-unit">
-                              <h5>Is Holder</h5>
-                              <h4><em>{props.data.is_member ? "Yes" : "No"}</em></h4>
-                          </div>
-                      </div>
-                      <StreamSectionComponent data={props.data}/>
-                  </div>
-                  <div className="dao-buffer-row"></div>
+    let numActiveStreams = getNumActiveStreams(props.data.streams);
+    const navigateToDao = useCallback(() => history.push(path), [history]);
+
+    function handleOnClick(){
+        if (numActiveStreams === 0){
+            alert("The holders of this collection has not initialized a DAO yet...")
+            ReactGA.event({
+                category: 'navigation',
+                action: 'click_initialized_collection'
+            });
+        } else {
+            ReactGA.event({
+                category: 'navigation',
+                action: 'click_unitialized_collection'
+            });
+            navigateToDao();
+        }
+    }
+
+    return (
+        <div className="dao-card-front" onClick={handleOnClick}>
+            <div className="card dao-card">
+                <div className="card-body dao-card-body">
+
+                    <div className="dao-status">
+                        <div className="dao-name-row">
+                            <h3>{props.data.display_name}</h3>
+                        </div>
+                        <div className="dao-info-row">
+                            <div className="data-section">
+                                <div className="data-unit">
+                                    <h5>#NFTs</h5>
+                                    <h4><em>{props.data.num_nfts}</em></h4>
+                                </div>
+                                <div className="data-unit">
+                                    <h5>#Streams</h5>
+                                    <h4><em>{numActiveStreams}</em></h4>
+                                </div>
+                                <div className="data-unit">
+                                    <h5>Is Holder</h5>
+                                    <h4><em>{props.data.is_member ? "Yes" : "No"}</em></h4>
+                                </div>
+                            </div>
+                            <StreamSectionComponent data={props.data}/>
+                        </div>
+                        <div className="dao-buffer-row"></div>
+                    </div>
+
+                    <div className="dao-img-container">
+                        <img
+                            className="card-img dao-img"
+                            src={props.data.image_url}
+                            onError={({currentTarget}) => {
+                                currentTarget.onerror = null;
+                                currentTarget.src = imageNotFound;
+                            }}
+                        />
+                    </div>
+
+                </div>
             </div>
-              <div className="dao-img-container">
-                  <img
-                      className="card-img dao-img"
-                      src={props.data.image_url}
-                      onError={({currentTarget}) => {
-                          currentTarget.onerror = null;
-                          currentTarget.src = imageNotFound;
-                      }}
-                  />
-              </div>
-          </div>
         </div>
-      </div>
-  );
+    );
 }
 
 const StreamSectionComponent: React.FC<{data: Dao}> = (props) => {
 
     let streamState = getStreamState(props.data.streams);
-
-    // const totalStreamed1 = props.data.streams[0].total_earned;
-    // const totalStreamed2 = props.data.streams[1].total_earned;
-    // <img src={props.data.streams[0].token_image_url}/>
-    // <h4><em>{totalStreamed1.toFixed(4)}</em></h4>
-
-    // streamState = StreamState.MULTIPLE;
 
     let content;
     switch (streamState){
@@ -170,6 +185,7 @@ const StreamSectionComponent: React.FC<{data: Dao}> = (props) => {
 }
 
 const MultiStreamRowComponent: React.FC<{stream: Stream}> = (props) => {
+
     return (
         <div className="multi-stream-row">
             <div className="token-logo-row">
