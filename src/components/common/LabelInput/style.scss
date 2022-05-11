@@ -96,3 +96,34 @@
     grid-template-columns: 200px 50px;
   }
 }
+@media (max-width: 768px) {
+  .item-wrapper {
+    grid-template-columns: unset;
+    // grid-template-rows: 1fr 1fr;
+    justify-items: left;
+    padding:0.1rem;
+    margin:0px;
+    gap:3px;
+    
+    &> .title{
+      font-size:14px;
+    }
+    &.plus-button {
+      display: grid;
+      grid-template-columns: unset;
+      // grid-template-rows: 1fr 1fr 1fr;
+    }
+    & > .show-collections {
+      height: 5rem;
+      width:100%;
+    }
+    // & > .show_num {
+    //   display: grid;
+    //   grid-template-columns: unset;
+    // }
+    input.num{
+      width:100%;
+    }
+  }
+  
+}

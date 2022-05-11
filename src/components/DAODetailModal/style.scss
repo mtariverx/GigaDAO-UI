@@ -40,3 +40,12 @@
     }
   }
 }
+@media (max-width: 768px) {
+  .modal-window {
+    & > .modal-main {
+      width: 100%;
+      height: max-content;
+    }
+  }
+
+}

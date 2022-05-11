@@ -24,3 +24,12 @@
     }
   }
 }
+@media (max-width: 768px) {
+  .DAOSocial-container {
+    padding-bottom: 0px;
+    & > .container-body {
+      grid-template-columns: unset;
+    }
+    
+  }
+}

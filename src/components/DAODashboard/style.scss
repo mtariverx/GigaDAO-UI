@@ -1,22 +1,23 @@
 @import "../../scss/DAOVariable.scss";
 /* For desktop: */
 
-.menu-icon {
-  display: grid;
-  grid-template-columns:1fr;
-  text-align:center;
-  background-color: $btn-bgcolor-common;
- 
-  font-size: 20px;
-  display:none;
 
-}
 .dashboard-content {
   background-color: $bg-color-layer1;
   display: grid;
-  grid-template-rows: min-content 1fr;
+  grid-template-rows: min-content min-content 1fr;
   // gap: 30px;
   padding-right: 30px;
+  .menu-icon {
+    display: grid;
+    grid-template-columns:1fr;
+    text-align:center;
+    background-color: $btn-bgcolor-common;
+   
+    font-size: 20px;
+    display:none;
+  
+  }
   & > .top-nav-bar {
     display: grid;
     grid-template-columns: 2fr 1fr;

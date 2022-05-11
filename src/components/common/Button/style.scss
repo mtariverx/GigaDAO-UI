@@ -3,6 +3,7 @@
   display: grid;
   align-items: center;
   justify-content: center;
+  text-align: center;
   width: max-content;
   height: 42px;
   margin: 0 0.5rem;
@@ -43,5 +44,10 @@
   &:hover {
     background-color: $btn-bgcolor-common-hover;
     color: $btn-bgcolor-green-text-hover;
+  }
+}
+@media (max-width: 768px) {
+  .btn-side {
+    margin:0px;
   }
 }

@@ -24,7 +24,7 @@
     }
   }
   .content-title {
-    padding: 20px;
+    // padding: 20px;
     padding-left: 30px;
     font-size: 20px;
   }
@@ -48,7 +48,7 @@
       & > .table-content {
         padding: 5px;
         max-height: 155px;
-        overflow:auto;
+        overflow: auto;
         table {
           width: 100%;
           overflow: scroll;
@@ -89,6 +89,25 @@
       padding-bottom: 30px;
       align-items: flex-end;
       justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .new-stream {
+    & > .stream-pool-content {
+      grid-template-columns: unset;
+      & > .stream-initial-btn {
+        padding-top: 10px;
+      }
+    }
+    .content-title {
+      padding: 5px;
+      padding-left: 30px;
+      font-size: 18px;
+    }
+    .table-container {
+      font-size: 14px;
     }
   }
 }
