@@ -32,15 +32,11 @@ let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
   }
   let daoIds = daos.map((dao, _) => dao.dao_id);
   
-  for(const daoId of daoIds){
-    console.log("---id-", daoId);
-    console.log("--", daoAddressMap[daoId]);
-  }
+  
   let collections: Array<pic.Collection> = [];
   let nfts: Array<pic.Nft> = [];
   for (const daoId of daoIds) {
-    console.log("----", daoAddressMap[daoId]);
-    
+      
     const collection_address = new PublicKey(daoAddressMap[daoId]);
     const dao_collection = { address: collection_address };
     collections.push(dao_collection);

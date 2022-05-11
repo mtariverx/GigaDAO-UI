@@ -7,6 +7,9 @@ import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { validateSolanaAddress } from "../CommonCalls";
+import { useWallet } from "providers/adapters/core/react";
+import { useOwnerData } from "providers/owner";
+import { plugins } from "chart.js";
 
 const NewDAO = (props) => {
   const [dao_id, setDaoId] = useState<string>();
@@ -15,9 +18,18 @@ const NewDAO = (props) => {
   const [councillors, setCouncillors] = useState<string[]>([]);
   const [one_councillor, setOneCouncillor] = useState<string>();
   const [approval_threshold, setApprovalThresold] = useState(0);
-
+  
+  const [collapse, setCollapse] = useState(false);
+  const { publicKey, connected } = useWallet();
+  const { dispatch, callConnectOwner, callDisconnectOwner } = useOwnerData();
+  const [isConnectingToOwner, setIsConnectingToOwner] = useState(false);
+  
   const onClickCreateNewDAOBtn = async () => {
     console.log("--onClickCreateNewDAOBtn--");
+    console.log("--create new dao--");
+    console.log("pubkey-",publicKey);
+    console.log("connected-",connected);
+
 
     let new_dao: pic.Dao = {
       dao_id: "",
@@ -25,6 +37,7 @@ const NewDAO = (props) => {
       display_name: "",
       num_nfts: 0,
       is_member: false,
+      address: new PublicKey(publicKey),
     };
     let governance: pic.Governance={
       councillors:[],

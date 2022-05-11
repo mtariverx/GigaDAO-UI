@@ -131,6 +131,7 @@ const NewProposal = (props) => {
                   <select onChange={onSelectProposalType}>
                     {proposal_options.map(({ value, label }) => (
                       <option key={value} value={value}>
+                        {console.log("---+",{value})}
                         {label}
                       </option>
                     ))}

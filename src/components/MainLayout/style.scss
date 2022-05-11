@@ -91,3 +91,14 @@
     display: grid;
   }
 }
+@media (max-width: 768px) {
+  .mainlayout {
+    & > .left-menu {
+      display: none;
+    }
+    & > .right-content-mainboard {
+      display: grid;
+      width: 100%;
+    }
+  }
+}

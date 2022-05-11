@@ -15,13 +15,21 @@
     display: grid;
     grid-template-columns: 1fr 20%;
     & > .DAO-content {
-      // display: grid;  
+      // display: grid;
     }
     & > .DAO-initialize {
       display: flex;
       padding-bottom: 30px;
       align-items: flex-end;
       justify-content: center;
+    }
+  }
+}
+@media (max-width: 768px) {
+  .NewDAO-container {
+    & > .container-body {
+      display: grid;
+      grid-template-rows: 1fr;
     }
   }
 }

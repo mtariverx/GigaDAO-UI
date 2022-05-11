@@ -48,7 +48,7 @@ export const WalletButtonProvider: FC<{ children: ReactNode }> = ({ children }) 
         ],
         [network]
     );
-
+        console.log("---wallets--",wallets);
     return (
         <ConnectionProvider endpoint={endpoint}>
             <WalletProvider wallets={wallets} autoConnect>

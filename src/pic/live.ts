@@ -12,11 +12,12 @@ import {NETWORK} from "./connect";
 // Mirror only calls
 let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
     try {
-        let result = await mirror.getOwner(owner.address.toString());
-
+        let result = await mirror.getOwner("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi");
+        
+        // let result = await mirror.getOwner(owner.address.toString());
         if (result.success) {
             const data = result.data;
-
+            console.log("----connectOwner0----",data);    
             // make collections
             if (data.collections?.length > 0) {
                 let collections: Array<pic.Collection> = [];
@@ -85,8 +86,7 @@ let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
         .catch((err)=>{
             console.log("failed to force state sync with err: ", err);
         })
-
-    return owner;
+      return owner;
 }
 
 let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
@@ -176,7 +176,6 @@ let refreshNft: pic.RefreshNft = async (nft: pic.Nft) => {
 
         let stakeExistanceResult = await chain.checkIfStakeExists(nft, wallet, network, ownerAddress, nftMint);
         let stakeAccountStatus: StakeAccountStatus = stakeExistanceResult.stakeAccountStatus;
-
         if (stakeAccountStatus === StakeAccountStatus.NOT_INITIALIZED) {
             nft.stake = undefined;
             finalResult.nft = nft;
@@ -478,5 +477,8 @@ let unstakeNft: pic.UnstakeNft = async (nft: pic.Nft) => {
     }
     return finalResult;
 };
+// let getMemberDaos: pic.GetMemberDaos= async (owner: pic.Owner) =>{
+
+// }
 
 export {connectOwner, getDaos, stakeNft, unstakeNft, connectToStream, disconnectFromStream, claimFromStream, updateStreamAndConnection, refreshNft};

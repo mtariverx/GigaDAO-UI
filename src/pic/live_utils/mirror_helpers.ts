@@ -15,6 +15,7 @@ const BASE_URL: string = prod ? PROD_BASE_URL : LOCAL_BASE_URL;
 // READ ONLY METHODS
 
 export async function getOwner(owner_address: string){
+   
     const URL = BASE_URL + "get_owner?owner_address=" + owner_address;
     const response = await fetch(URL, {mode: 'cors'})
     const data = await response.json();
