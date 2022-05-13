@@ -19,7 +19,7 @@ import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
 import * as livePic from "../../pic/live";
 import { Keypair, PublicKey } from "@solana/web3.js";
-import { useWallet } from "providers/adapters/core/react";
+import { useAnchorWallet, useWallet } from "providers/adapters/core/react";
 import { useOwnerData } from "providers/owner";
 
 const DAODashboard: React.FC = (props) => {
@@ -34,7 +34,8 @@ const DAODashboard: React.FC = (props) => {
   const [dashitem, setDashItem] = useState(0);
   const [selected_member_dao, setSelectedMemberDAO] = useState<pic.Dao>();
   const [show_modal, setShowModal] = useState(-1);
-
+  const wallet= useAnchorWallet();
+  console.log("wallet=",wallet);
   type counc_sign_pair = {
     councillor: PublicKey;
     signer: boolean;
@@ -50,17 +51,6 @@ const DAODashboard: React.FC = (props) => {
     return str;
   };
 
-  // useEffect(() => {
-  //   if (connected) {
-  //     setIsConnectingToOwner(true);
-  //     let newOwner: pic.Owner = { address: publicKey };
-  //     callConnectOwner(dispatch, newOwner).then(() => {
-  //       setIsConnectingToOwner(false);
-  //     });
-  //   } else {
-  //     callDisconnectOwner(dispatch);
-  //   }
-  // }, [connected]);
 
   useEffect(() => {
     (async () => {
@@ -76,7 +66,7 @@ const DAODashboard: React.FC = (props) => {
         console.log("member_daos_promise=",await livePic.getMemberDaos(newOwner));
         let member_daos_promise = await simPic.getMemberDaos(new_owner); //testing for sim.ts
         console.log("member_daos_promise=",member_daos_promise);
-        
+        livePic.showAllCallsInProgram(wallet);
         // let member_daos_promise = await simPic.getMemberDaos(new_owner); //testing for sim.ts
         let mdis: Array<string> = [];
         let m_daos: Array<pic.Dao> = [];

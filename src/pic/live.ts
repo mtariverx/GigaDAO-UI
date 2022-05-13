@@ -8,7 +8,15 @@ import * as chain from "./live_utils/onchain-data-helpers";
 import { StakeAccountStatus } from "./live_utils/onchain-data-helpers";
 import * as rpc from "./live_utils/rpc_helpers";
 import { NETWORK } from "./connect";
+import { useAnchorWallet, useWallet } from "providers/adapters/core/react";
 
+//kaiming
+export async function showAllCallsInProgram(wallet){
+  
+  console.log("wallet=",wallet);
+  let program = await rpc.initProgram(wallet, NETWORK);
+  console.log("initprogram=",program);
+};
 // Mirror only calls
 let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
   try {
@@ -104,7 +112,7 @@ let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
     }
 
     let result = await mirror.getDaoStreams(initializedDaos);
-  
+
     if (result.success) {
       const streamMap: { string: Array<any> } = result.data; //{"ab":["a","b"]}
       for (const [daoAddress, streams] of Object.entries(streamMap)) {
@@ -643,7 +651,7 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
   let dao_addresses: Array<pic.Dao> = []; //combination of daos belong to the owner and daos where the pubkey is a councillor of.
   if (result.success) {
     if (result.data.dao_addresses) {
-        dao_addresses = dao_addresses.concat(result.data.dao_addresses);
+      dao_addresses = dao_addresses.concat(result.data.dao_addresses);
     }
   } else {
     console.log("Error in fetching daos from getMemberDaos");
@@ -653,11 +661,11 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
   }
   console.log("concat=", dao_addresses);
   const new_daos: Array<pic.Dao> = dao_addresses.map((dao_address) => {
-    const dao: pic.Dao = { address: new PublicKey(dao_address)};
+    const dao: pic.Dao = { address: new PublicKey(dao_address) };
     return dao;
   });
-  
-  const daos_with_stream=await getDaos(new_daos);
+
+  const daos_with_stream = await getDaos(new_daos);
   console.log("--concat--new dao--", daos_with_stream);
   return daos_with_stream;
 };
