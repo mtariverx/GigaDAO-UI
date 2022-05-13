@@ -14,7 +14,8 @@ export type Stream = {
     total_earned: number, total_claimed: number, current_pool_amount: number, token_ticker: string,
     last_update_timestamp: number, decimals?: number,
 };
-
+// stream_address, dao_address, token_image_url, stream_rate_relative, is_active, num_connections, 
+// total_streamed, last_update_timestamp, stream_name, token_ticker)
 export type Governance = {
   councillors: Array<PublicKey>;
   approval_threshold: number;

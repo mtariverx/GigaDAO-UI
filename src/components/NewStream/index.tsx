@@ -6,7 +6,8 @@ import Plus_fill from "img/icons/plus_symbol_fill.png";
 
 import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
-import { PublicKey } from "@solana/web3.js";
+import * as livePic from "../../pic/live";
+import { Keypair, PublicKey } from "@solana/web3.js";
 import Button from "components/common/Button";
 import { validateSolanaAddress } from "components/CommonCalls";
 import {
@@ -17,8 +18,10 @@ const NewStream = (props) => {
   const { dao } = props;
   const [is_stream, setStream] = useState(1);
   const [pool_name, setPoolName] = useState<string>();
-  const [address, setAddress] = useState<string>();
-  const [dao_address, setDaoAddress] = useState<string>();
+  const [token_mint_address, setTokenMintAddress] = useState<string>();
+  const [token_ticker, setTokenTicker] = useState<string>();
+  const [token_img_url, setTokenImgUrl] = useState<string>();
+  const [stream_rate, setStreamRate] = useState(0);
   const [collections, setCollections] = useState<string[]>([]);
   const [num_connections, setNumCollections] = useState(0);
   const [collect, setCollect] = useState<string>();
@@ -33,7 +36,7 @@ const NewStream = (props) => {
     setStreamCompArr();
   }, []);
 
-  const table_rows = 4;
+  const table_rows = 10;
   const changeCollections = (index: number) => (value: string) => {
     const temp = [...collections];
     temp[index] = value;
@@ -51,7 +54,7 @@ const NewStream = (props) => {
 
   const setStreamCompArr = () => {
     const remain_rows = dao
-      ? dao.streams.length >= 4
+      ? dao.streams.length >= table_rows
         ? 0
         : table_rows - dao.streams.length
       : 0;
@@ -63,23 +66,23 @@ const NewStream = (props) => {
   };
 
   const onClickCreateNewStreamBtn = async () => {
-    if ((await validateSolanaAddress(address)) == false) {
-      setAddress("");
+    if ((await validateSolanaAddress(token_mint_address)) == false) {
+      setTokenMintAddress("");
     }
-    if ((await validateSolanaAddress(dao_address)) == false) {
-      setDaoAddress("");
-    }
+    // if ((await validateSolanaAddress(dao_address)) == false) {
+    //   setDaoAddress("");
+    // }
 
     if (
       pool_name &&
-      (await validateSolanaAddress(address)) &&
-      (await validateSolanaAddress(dao_address)) &&
+      (await validateSolanaAddress(token_mint_address)) &&
       collections.length > 0
     ) {
+      console.log("props.dao.dao_address=",props.dao);
       let new_stream:pic.Stream = {
         name: pool_name,
-        address: new PublicKey(address),
-        dao_address: new PublicKey(dao_address),
+        address: Keypair.generate().publicKey,
+        dao_address: new PublicKey(props.dao.address),
         collections: collections.map((collect) => {
           let collection = {
             address: new PublicKey(collect),
@@ -88,17 +91,17 @@ const NewStream = (props) => {
           return collection;
         }),
         num_connections: num_connections,
-        token_image_url: sampleTokenStream1.token_image_url,
-        daily_stream_rate: sampleTokenStream1.daily_stream_rate,
-        total_earned: sampleTokenStream1.earned_amount,
-        total_claimed: sampleTokenStream1.claimed_amount,
+        token_image_url: token_img_url,
+        daily_stream_rate: stream_rate,
+        total_earned: 0,
+        total_claimed: 0,
         current_pool_amount: sampleTokenStream1.pool_reserve_amount,
-        token_ticker: sampleTokenStream1.token_ticker,
+        token_ticker: token_ticker,
         last_update_timestamp: Math.floor(Date.now() / 1000),
-        is_active: true,
+        is_active: false,
       };
 
-      const { dao, stream } = await simPic.initializeStream(
+      const { dao, stream } = await livePic.initializeStream(
         props.dao,
         new_stream
       ); //initializeStream
@@ -137,19 +140,37 @@ const NewStream = (props) => {
               />
             </div>
             <div className="item-wrapper">
-              <div className="title">Address</div>
+              <div className="title">Token Mint Address</div>
               <input
                 required
-                value={address}
-                onChange={(evt) => setAddress(evt.target.value)}
+                value={token_mint_address}
+                onChange={(evt) => setTokenMintAddress(evt.target.value)}
               />
             </div>
             <div className="item-wrapper">
-              <div className="title">DAO Address</div>
+              <div className="title">Token Ticker</div>
               <input
                 required
-                value={dao_address}
-                onChange={(evt) => setDaoAddress(evt.target.value)}
+                value={token_ticker}
+                onChange={(evt) => setTokenTicker(evt.target.value)}
+              />
+            </div>
+            <div className="item-wrapper">
+              <div className="title">Token Image URL</div>
+              <input
+                required
+                value={token_img_url}
+                onChange={(evt) => setTokenImgUrl(evt.target.value)}
+              />
+            </div>
+            <div className="item-wrapper">
+              <div className="title">Stream Rate</div>
+              <input
+                required
+                value={stream_rate}
+                onChange={(evt) =>
+                  setStreamRate(parseInt(evt.target.value || "0"))
+                }
               />
             </div>
             <div className="item-wrapper plus-button">
@@ -193,25 +214,34 @@ const NewStream = (props) => {
         </div>
       ) : (
         <div className="pool-stream-table">
-          <div className="content-title">Pools & Streams</div>
           <div className="table-container">
             <div className="table-title">Token Streams</div>
             <div className="table-content">
               <table>
                 <tr>
                   <th>Name</th>
+                  <th>Token Pool Address</th>
                   <th>is_active</th>
                   <th>token_image_url</th>
                   <th>daily_stream_rate</th>
+                  <th>total_earned</th>
+                  <th>total_claimed</th>
+                  <th>current_pool_amount</th>
+                  <th>token_tickers</th>
                 </tr>
                 {selected_dao
                   ? selected_dao.streams.map((stream) => {
                       return (
                         <tr>
                           <td>{stream.name}</td>
+                          <td>{stream.address.toString()}</td>
                           <td>{stream.is_active.toString()}</td>
                           <td>{stream.token_image_url}</td>
                           <td>{stream.daily_stream_rate}</td>
+                          <td>{stream.total_earned}</td>
+                          <td>{stream.total_claimed}</td>
+                          <td>{stream.current_pool_amount}</td>
+                          <td>{stream.token_ticker}</td>
                         </tr>
                       );
                     })
@@ -224,13 +254,19 @@ const NewStream = (props) => {
                       <td></td>
                       <td></td>
                       <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
                     </tr>
                   );
                 })}
               </table>
             </div>
           </div>
-          <div className="table-container">
+          {/* <div className="table-container">
             <div className="table-title">Token Pools</div>
             <div className="table-content">
               <table>
@@ -267,7 +303,7 @@ const NewStream = (props) => {
                 })}
               </table>
             </div>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

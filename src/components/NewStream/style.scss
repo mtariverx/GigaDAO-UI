@@ -31,8 +31,10 @@
   & > .pool-stream-table {
     background-color: $bg-color-layer2;
     display: grid;
-    grid-template-rows: min-content 1fr 1fr;
+    // grid-template-rows: min-content 1fr 1fr;
+    grid-template-rows: 1fr;
     gap: 10px;
+    padding-top: 50px;
     padding-bottom: 20px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -47,11 +49,22 @@
       }
       & > .table-content {
         padding: 5px;
-        max-height: 155px;
-        overflow: auto;
+        // display: block;
+        max-height: 340px; //need to be modified
+        overflow: scroll;
+
+        // ::-webkit-scrollbar {
+        //   -webkit-appearance: none;
+        //   width: 7px;
+        // }
+        // ::-webkit-scrollbar-thumb {
+        //   border-radius: 4px;
+        //   background-color: rgba(0, 0, 0, .5);
+        //   -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+        // }
         table {
           width: 100%;
-          overflow: scroll;
+          // overflow: scroll;
           font-weight: 100;
           font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -69,6 +82,8 @@
         td {
           padding-left: 5px;
           padding-right: 5px;
+          text-align: center;
+          white-space: nowrap;
 
           background-color: $bg-color-layer1;
         }

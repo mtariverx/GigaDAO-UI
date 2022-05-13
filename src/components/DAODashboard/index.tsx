@@ -17,6 +17,7 @@ import { ConnectWalletNavButton } from "../ConnectWalletNavButton";
 
 import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
+import * as livePic from "../../pic/live";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { useWallet } from "providers/adapters/core/react";
 import { useOwnerData } from "providers/owner";
@@ -27,7 +28,7 @@ const DAODashboard: React.FC = (props) => {
   const { dispatch, callConnectOwner, callDisconnectOwner } = useOwnerData();
   const [isConnectingToOwner, setIsConnectingToOwner] = useState(false);
 
-  const new_owner: pic.Owner = { address: Keypair.generate().publicKey };
+  const new_owner: pic.Owner = { address: Keypair.generate().publicKey }; //testing for sim.ts
   const [member_daos, setMemberDAOs] = useState<Array<pic.Dao>>([]);
   const [member_dao_ids, setMemberDaoIds] = useState<string[]>([]);
   const [dashitem, setDashItem] = useState(0);
@@ -66,11 +67,17 @@ const DAODashboard: React.FC = (props) => {
       if (connected) {
         setIsConnectingToOwner(true);
         let newOwner: pic.Owner = { address: publicKey };
-        // callConnectOwner(dispatch, newOwner).then(() => {
-        //   setIsConnectingToOwner(false);
-        // });
-        let member_daos_promise = await simPic.getMemberDaos(newOwner);
-        // let member_daos_promise = await simPic.getMemberDaos(new_owner);
+        callConnectOwner(dispatch, newOwner).then(() => {
+          setIsConnectingToOwner(false);
+        });
+        
+       
+        // let member_daos_promise = await livePic.getMemberDaos(newOwner);
+        console.log("member_daos_promise=",await livePic.getMemberDaos(newOwner));
+        let member_daos_promise = await simPic.getMemberDaos(new_owner); //testing for sim.ts
+        console.log("member_daos_promise=",member_daos_promise);
+        
+        // let member_daos_promise = await simPic.getMemberDaos(new_owner); //testing for sim.ts
         let mdis: Array<string> = [];
         let m_daos: Array<pic.Dao> = [];
         m_daos = member_daos_promise;
@@ -95,7 +102,8 @@ const DAODashboard: React.FC = (props) => {
 
   const setCouncillorSignerPair = (dao: pic.Dao) => {
     let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
-    if (dao.governance.proposed_councillors) {
+    console.log("++++",dao);
+    if (dao.governance.proposed_councillors!=undefined) {
       dao.governance.proposed_councillors.forEach(function (councillor, index) {
         let tmp: counc_sign_pair = {
           councillor: councillor,

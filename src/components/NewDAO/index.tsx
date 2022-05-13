@@ -5,6 +5,7 @@ import Button from "components/common/Button";
 import Plus_fill from "img/icons/plus_symbol_fill.png";
 import * as pic from "../../pic/pic";
 import * as simPic from "../../pic/sim";
+import * as livePic from "../../pic/live";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { validateSolanaAddress } from "../CommonCalls";
 import { useWallet } from "providers/adapters/core/react";
@@ -27,20 +28,22 @@ const NewDAO = (props) => {
   const onClickCreateNewDAOBtn = async () => {
     console.log("--onClickCreateNewDAOBtn--");
     console.log("--create new dao--");
-    console.log("pubkey-",publicKey);
+    console.log("pubkey-",publicKey.toString());
     console.log("connected-",connected);
 
 
     let new_dao: pic.Dao = {
+      address:Keypair.generate().publicKey,
       dao_id: "",
       image_url: "",
       display_name: "",
       num_nfts: 0,
       is_member: false,
-      address: new PublicKey(publicKey),
+      // address: new PublicKey(publicKey),
     };
+    console.log("pub---",new_dao.address);
     let governance: pic.Governance={
-      councillors:[],
+      councillors:[publicKey],
       approval_threshold:0,
       proposed_signers: [],
       proposal_is_active:false,
@@ -53,7 +56,9 @@ const NewDAO = (props) => {
       proposed_withdrawal_stream: Keypair.generate().publicKey,
       num_streams:0,
     };
-    if (dao_id && dao_disp_name && dao_disp_img && councillors.length > 0) {
+     
+    if (dao_id!=undefined && dao_disp_name!=undefined && dao_disp_img!=undefined) {
+      
       new_dao.dao_id = dao_id;
       new_dao.display_name = dao_disp_name;
       new_dao.image_url = dao_disp_img;
@@ -65,11 +70,13 @@ const NewDAO = (props) => {
         );
         governance.councillors = councillors_pubkey;
       }
+      governance.councillors.push(publicKey);
       governance.approval_threshold = approval_threshold;
 
       new_dao.governance = governance;
 
-      new_dao = await simPic.initializeDao(new_dao); //initializeDao
+      // new_dao = await simPic.initializeDao(new_dao); //initializeDao
+      new_dao=await livePic.initializeDao(new_dao);
 
       props.onClose(); //close btn
     }
