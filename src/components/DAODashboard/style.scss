@@ -151,7 +151,11 @@
         }
         & > .dash-details {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          // grid-template-columns: 1fr 1fr;
+          background-color: $bg-color-layer2;//remove 
+          font-size: 38px;
+          justify-items: center;
+          align-items: center;
 
           & > .dash-details-items {
             background-color: $bg-color-layer2;

@@ -10,19 +10,27 @@ import * as rpc from "./live_utils/rpc_helpers";
 import { NETWORK } from "./connect";
 import { useAnchorWallet, useWallet } from "providers/adapters/core/react";
 
-//kaiming
-export async function showAllCallsInProgram(wallet){
-  
-  console.log("wallet=",wallet);
+//kaiming testing
+export async function showAllCallsInProgram(wallet) {
+  console.log("showAllCallsInProgram wallet=", wallet);
   let program = await rpc.initProgram(wallet, NETWORK);
-  console.log("initprogram=",program);
-};
+  console.log("initprogram=", program);
+}
+
+export async function getDaoFromChain(wallet, dao) {
+  console.log("getDaoFromChain in live", wallet);
+
+  chain.getDAO(wallet, NETWORK, dao);
+}
+
 // Mirror only calls
 let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
   try {
-    // let result = await mirror.getOwner("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi");
+    let result = await mirror.getOwner(
+      "GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi"
+    );
 
-    let result = await mirror.getOwner(owner.address.toString());
+    // let result = await mirror.getOwner(owner.address.toString());
     if (result.success) {
       const data = result.data;
       console.log("---live-connectOwner----", data);
@@ -112,7 +120,6 @@ let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
     }
 
     let result = await mirror.getDaoStreams(initializedDaos);
-
     if (result.success) {
       const streamMap: { string: Array<any> } = result.data; //{"ab":["a","b"]}
       for (const [daoAddress, streams] of Object.entries(streamMap)) {
@@ -648,25 +655,26 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
   console.log("geMember=", result.data.dao_addresses);
   console.log("connectOwner=", new_owner);
 
-  let dao_addresses: Array<pic.Dao> = []; //combination of daos belong to the owner and daos where the pubkey is a councillor of.
+  let dao_addresses = []; //combination of daos belong to the owner and daos where the pubkey is a councillor of.
   if (result.success) {
     if (result.data.dao_addresses) {
       dao_addresses = dao_addresses.concat(result.data.dao_addresses);
+      console.log("****", dao_addresses);
     }
   } else {
     console.log("Error in fetching daos from getMemberDaos");
   }
   if (new_owner.daos) {
-    dao_addresses = dao_addresses.concat(new_owner.daos);
+    new_owner.daos.map((dao) => dao_addresses.push(dao.address.toString()));
   }
-  console.log("concat=", dao_addresses);
+  //   console.log("concat=", dao_addresses);
   const new_daos: Array<pic.Dao> = dao_addresses.map((dao_address) => {
-    const dao: pic.Dao = { address: new PublicKey(dao_address) };
+    let dao: pic.Dao = { address: new PublicKey(dao_address) };
     return dao;
   });
 
   const daos_with_stream = await getDaos(new_daos);
-  console.log("--concat--new dao--", daos_with_stream);
+  console.log("--get memeber daos--", daos_with_stream);
   return daos_with_stream;
 };
 

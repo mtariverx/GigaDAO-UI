@@ -62,11 +62,12 @@ const DAODashboard: React.FC = (props) => {
         });
         
        
-        // let member_daos_promise = await livePic.getMemberDaos(newOwner);
+        let member_daos_promise = await livePic.getMemberDaos(newOwner);
         console.log("member_daos_promise=",await livePic.getMemberDaos(newOwner));
-        let member_daos_promise = await simPic.getMemberDaos(new_owner); //testing for sim.ts
-        console.log("member_daos_promise=",member_daos_promise);
-        livePic.showAllCallsInProgram(wallet);
+        // let member_daos_promise = await simPic.getMemberDaos(new_owner); //testing for sim.ts
+        // console.log("member_daos_promise=",member_daos_promise);
+        
+
         // let member_daos_promise = await simPic.getMemberDaos(new_owner); //testing for sim.ts
         let mdis: Array<string> = [];
         let m_daos: Array<pic.Dao> = [];
@@ -77,6 +78,9 @@ const DAODashboard: React.FC = (props) => {
         setSelectedMemberDAO({ ...m_daos[0] }); //only first
         setCouncillorSignerPair({ ...m_daos[0] });
         getActiveProposalInfo({ ...m_daos[0] });
+        //testing
+        livePic.showAllCallsInProgram(wallet); // testing for solana
+        console.log("dashboard-getDaoFromChain-",livePic.getDaoFromChain(wallet, m_daos[0]));
       } else {
         callDisconnectOwner(dispatch);
       }
@@ -247,22 +251,23 @@ const DAODashboard: React.FC = (props) => {
               </div>
             </div>
             <div className="dash-details">
-              <div className="dash-details-items">
+              Tracking Data Coming Soon!
+              {/* <div className="dash-details-items">
                 <div className="item-pair">
-                  {/* <div>Unique Wallets</div>
-                  <div>4,302</div> */}
+                  <div>Unique Wallets</div>
+                  <div>4,302</div>
                   Tracking Data coming soon!
                 </div>
                 <div className="item-pair">
-                  {/* <div>Total Staked</div>
-                  <div>5,999</div> */}
+                  <div>Total Staked</div>
+                  <div>5,999</div>
                 </div>
                 <div className="item-pair">
-                  {/* <div>Total Connected</div>
-                  <div>5,999</div> */}
+                  <div>Total Connected</div>
+                  <div>5,999</div>
                 </div>
               </div>
-              <div className="dash-details-graph">{/* <MemberGraph /> */}</div>
+              <div className="dash-details-graph"><MemberGraph /></div> */}
             </div>
           </div>
           <div className="tokenpool-proposal">
