@@ -37,13 +37,19 @@ export async function getDaoStreams(daos: Array<pic.Dao>): Promise<any> {
 }
 
 export async function getMembers(owner_address: string) {
-  console.log("mirror-getMembers=", owner_address);
+  
   const URL = BASE_URL + "get_member_daos?owner_address=" + owner_address;
   const response = await fetch(URL, { mode: "cors" });
   const data = await response.json();
   return data;
 }
 
+export async function getDaoById(dao_address: string){
+  const URL = BASE_URL + "get_dao_by_address?dao_address="+dao_address;
+  const response = await fetch(URL, { mode: "cors" });
+  const data = await response.json();
+  return data;
+}
 // WRITE / UPDATE METHODS
 export async function initializeDAO(dao: pic.Dao) {
   console.log("mirror-initializeDAO=", dao.address.toString());

@@ -175,15 +175,17 @@ export async function refreshStake(wallet, network, stake: pic.Stake) {
   return { stake, numConnections };
 }
 
-export async function getDAO(wallet, network, dao: pic.Dao) {
+//this function get dao from chain, that is, governance in UI.
+export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
   let program = await initProgram(wallet, network);
-  console.log("onchain=", dao.address.toBase58());
-  console.log("----", dao);
   try {
-    const daoAccount = await program.account.dao.fetch(new PublicKey("4s4kQAiVYMR4iLNsUMDty5cmBgMo226ifR8eCrKS6j8d")); //This works well. This address is from belac address
-    // const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
+    // const daoAccount = await program.account.dao.fetch(
+    //   new PublicKey("4s4kQAiVYMR4iLNsUMDty5cmBgMo226ifR8eCrKS6j8d")
+    // ); //This works well. This address is from belac 
+    const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
     //consider return value's type
     const councillors = await daoAccount.councillors;
+    const approvalThreshold=await daoAccount.approvalThreshold;
     const proposalSigners = await daoAccount.proposalSigners;
     const proposalIsActive = await daoAccount.proposalIsActive;
     const proposalType = await daoAccount.proposalType;
@@ -198,9 +200,21 @@ export async function getDAO(wallet, network, dao: pic.Dao) {
     const proposedWithdrawalStream = await daoAccount.proposedWithdrawalStream;
     const numStreams = await daoAccount.numStreams;
 
-    // let governance: pic.Governance = {
-
-    // }
+    let governance: pic.Governance = {
+      councillors: councillors,
+      approval_threshold: approvalThreshold,
+      proposed_signers: proposalSigners,
+      proposal_is_active: proposalIsActive,
+      proposal_type: proposalType,
+      proposed_councillors: proposedCouncillors,
+      proposed_approval_threshold: proposedApprovalThreshold,
+      proposed_deactivation_stream:proposedDeactivationStream,
+      proposed_withdrawal_amount: proposedWithdrawalAmount,
+      proposed_withdrawal_receiver: proposedwithdrawalReceiverOwner,
+      proposed_withdrawal_stream: proposedWithdrawalStream,
+      num_streams: numStreams,
+    };
+    dao.governance=governance;
     console.log("-onchain-data-helper.ts");
     console.log("councillors", councillors);
     console.log("proposalSigners", proposalSigners);
@@ -218,9 +232,8 @@ export async function getDAO(wallet, network, dao: pic.Dao) {
     console.log("proposedWithdrawalStream", proposedWithdrawalStream);
     console.log("numStreams", numStreams);
   } catch (e) {
-    console.log("error on getting dao from solana");
     console.log(e.toString());
   }
-
+  
   return dao;
 }

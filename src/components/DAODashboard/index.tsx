@@ -34,8 +34,8 @@ const DAODashboard: React.FC = (props) => {
   const [dashitem, setDashItem] = useState(0);
   const [selected_member_dao, setSelectedMemberDAO] = useState<pic.Dao>();
   const [show_modal, setShowModal] = useState(-1);
-  const wallet= useAnchorWallet();
-  console.log("wallet=",wallet);
+  const wallet = useAnchorWallet();
+  console.log("wallet=", wallet);
   type counc_sign_pair = {
     councillor: PublicKey;
     signer: boolean;
@@ -51,36 +51,37 @@ const DAODashboard: React.FC = (props) => {
     return str;
   };
 
-
   useEffect(() => {
     (async () => {
       if (connected) {
         setIsConnectingToOwner(true);
-        let newOwner: pic.Owner = { address: publicKey };
+        // let newOwner: pic.Owner = { address: publicKey };
+        let newOwner: pic.Owner = { address: new PublicKey("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi") };
         callConnectOwner(dispatch, newOwner).then(() => {
           setIsConnectingToOwner(false);
         });
-        
-       
+
         let member_daos_promise = await livePic.getMemberDaos(newOwner);
         console.log("member_daos_promise=",await livePic.getMemberDaos(newOwner));
         // let member_daos_promise = await simPic.getMemberDaos(new_owner); //testing for sim.ts
-        // console.log("member_daos_promise=",member_daos_promise);
+        // console.log("member_daos_promise=", member_daos_promise);
         
-
-        // let member_daos_promise = await simPic.getMemberDaos(new_owner); //testing for sim.ts
         let mdis: Array<string> = [];
         let m_daos: Array<pic.Dao> = [];
         m_daos = member_daos_promise;
-        setMemberDAOs(m_daos);
+        setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
         mdis = m_daos.map((dao) => dao.dao_id);
+        console.log("mdis---",mdis);
         setMemberDaoIds(mdis);
         setSelectedMemberDAO({ ...m_daos[0] }); //only first
         setCouncillorSignerPair({ ...m_daos[0] });
         getActiveProposalInfo({ ...m_daos[0] });
         //testing
         livePic.showAllCallsInProgram(wallet); // testing for solana
-        console.log("dashboard-getDaoFromChain-",livePic.getDaoFromChain(wallet, m_daos[0]));
+        console.log(
+          "dashboard-getDaoFromChain-",
+          livePic.getDaoGovernanceFromChain(wallet, m_daos[0])
+        );
       } else {
         callDisconnectOwner(dispatch);
       }
@@ -94,10 +95,12 @@ const DAODashboard: React.FC = (props) => {
     }
   }, [selected_member_dao]);
 
-  const setCouncillorSignerPair = (dao: pic.Dao) => {
+  const setCouncillorSignerPair = async(dao: pic.Dao) => { //making councillor and signs to be showed
+    const _dao=await livePic.getDaoGovernanceFromChain(wallet,dao);
+    dao.governance=_dao.governance;
     let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
-    console.log("++++",dao);
-    if (dao.governance.proposed_councillors!=undefined) {
+    console.log("++++", _dao);
+    if (dao.governance && dao.governance.proposed_councillors != undefined) {
       dao.governance.proposed_councillors.forEach(function (councillor, index) {
         let tmp: counc_sign_pair = {
           councillor: councillor,
@@ -127,37 +130,51 @@ const DAODashboard: React.FC = (props) => {
     }
   };
 
-  const getActiveProposalInfo = (dao: pic.Dao) => {
-    const governance = dao.governance;
+  //get governance info to show them in Active Proposal Section
+  const getActiveProposalInfo = async(dao: pic.Dao) => { 
+    const _dao=await livePic.getDaoGovernanceFromChain(wallet,dao);
+    dao.governance=_dao.governance;
+    console.log("getActiveProposal==",dao);
+    console.log("getActiveProposal governance==",dao.governance.proposal_type);
+    
+    if (dao.governance == undefined) {
+      return dao;
+    }
     let tmp: any = [];
-    if (governance.proposal_type == pic.ProposalType.DEACTIVATE_STREAM) {
+    if (
+      dao.governance &&
+      dao.governance.proposal_type == pic.ProposalType.DEACTIVATE_STREAM
+    ) {
       tmp = [
         ["Proposal Type", "DEACTIVEATE_STREAM"],
         [
           "Stream Public Key",
-          getShortKey(governance.proposed_withdrawal_stream.toString()),
+          getShortKey(dao.governance.proposed_withdrawal_stream.toString()),
         ],
       ];
     } else if (
-      governance.proposal_type == pic.ProposalType.WITHDRAW_FROM_STREAM
+      dao.governance.proposal_type == pic.ProposalType.WITHDRAW_FROM_STREAM
     ) {
       tmp = [
-        ["Proposal Type", "WITHDRAW FROM STREAM"],
-        ["Amount", `${governance.proposed_withdrawal_amount}`],
+        ["Proposal Type: ", "WITHDRAW FROM STREAM"],
+        ["Amount", `${dao.governance.proposed_withdrawal_amount}`],
         [
-          "Proposed Withdraw Receiver",
-          getShortKey(governance.proposed_withdrawal_receiver.toString()),
+          "Proposed Withdraw Receiver: ",
+          getShortKey(dao.governance.proposed_withdrawal_receiver.toString()),
         ],
         [
-          "Proposed Withdraw Stream",
-          getShortKey(governance.proposed_withdrawal_stream.toString()),
+          "Proposed Withdraw Stream: ",
+          getShortKey(dao.governance.proposed_withdrawal_stream.toString()),
         ],
       ];
-    } else if (governance.proposal_type == pic.ProposalType.UPDATE_MULTISIG) {
-      tmp = [["Proposal Type", "UPDATE_MULTISIG"]];
+    } else if (dao.governance.proposal_type == pic.ProposalType.UPDATE_MULTISIG) {
+      tmp = [["Proposal Type: ", "UPDATE_MULTISIG"], 
+      ["councillors: ",dao.governance.proposed_councillors.map(councillor=>getShortKey(councillor.toString())).join("\n")],
+    ];
     }
     setActiveProposalInfo(tmp);
   };
+
   const onClickApproveProposeBtn = async () => {
     const wallet_address = "CRWMVg3k7JGuxFMMADRQTdBSNtB6LNWakEJDUeG8k2KN";
     const dao: pic.Dao = selected_member_dao;

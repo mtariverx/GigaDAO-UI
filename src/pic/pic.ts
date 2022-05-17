@@ -1,6 +1,5 @@
 // PIC
 import { PublicKey } from "@solana/web3.js";
-
 // saps
 export type Owner = {address?: PublicKey, daos?: Array<Dao>, collections?: Array<Collection>, nfts?: Array<Nft>};
 export type Nft = {address: PublicKey, owner_address: PublicKey, name: string, image_url: string, collection: Collection, token_account?: PublicKey, stake?: Stake, wallet?, network?}; // TODO this is an ugly addition of connection params - hide them

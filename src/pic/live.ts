@@ -9,7 +9,6 @@ import { StakeAccountStatus } from "./live_utils/onchain-data-helpers";
 import * as rpc from "./live_utils/rpc_helpers";
 import { NETWORK } from "./connect";
 import { useAnchorWallet, useWallet } from "providers/adapters/core/react";
-
 //kaiming testing
 export async function showAllCallsInProgram(wallet) {
   console.log("showAllCallsInProgram wallet=", wallet);
@@ -17,10 +16,11 @@ export async function showAllCallsInProgram(wallet) {
   console.log("initprogram=", program);
 }
 
-export async function getDaoFromChain(wallet, dao) {
+export async function getDaoGovernanceFromChain(wallet, dao) {
   console.log("getDaoFromChain in live", wallet);
 
-  chain.getDAO(wallet, NETWORK, dao);
+  const _dao=chain.getDaoFromChain(wallet, NETWORK, dao);
+  return _dao;
 }
 
 // Mirror only calls
@@ -645,21 +645,20 @@ let unstakeNft: pic.UnstakeNft = async (nft: pic.Nft) => {
   }
   return finalResult;
 };
+
 let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
+  
   // let result=await mirror.getMembers("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi");
   //getting member daos from database if the owner address is a councillor of
   const result = await mirror.getMembers(owner.address.toString());
   //getting daos if the owner has daos
   const new_owner = await connectOwner(owner);
 
-  console.log("geMember=", result.data.dao_addresses);
-  console.log("connectOwner=", new_owner);
-
+  
   let dao_addresses = []; //combination of daos belong to the owner and daos where the pubkey is a councillor of.
   if (result.success) {
     if (result.data.dao_addresses) {
       dao_addresses = dao_addresses.concat(result.data.dao_addresses);
-      console.log("****", dao_addresses);
     }
   } else {
     console.log("Error in fetching daos from getMemberDaos");
@@ -674,7 +673,17 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
   });
 
   const daos_with_stream = await getDaos(new_daos);
-  console.log("--get memeber daos--", daos_with_stream);
+  for (const dao of daos_with_stream) {
+    const result = await mirror.getDaoById(dao.address.toString());
+    console.log("result=", result);
+    if (result.success) {
+      dao.dao_id = result.data[0].dao_id;
+      dao.display_name = result.data[0].display_name;
+      dao.image_url = result.data[0].image_url;
+      dao.num_nfts = result.data[0].num_nfts;
+    }
+  }
+  console.log("--get memeber daos--", daos_with_stream); //dao with address and streams, dao_id, display_name, num_nfts
   return daos_with_stream;
 };
 
