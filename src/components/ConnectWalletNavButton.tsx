@@ -49,10 +49,6 @@ function Button() {
     const {publicKey, wallet, connected, connecting} = useWallet();
 
     // TODO can we add a useEffect animation loop in here contingent upon if the connectOwner call is awaiting?
-    if(publicKey){
-
-        console.log("--useWallet--",publicKey.toString());
-    }
     // format button
     const base58 = useMemo(() => publicKey?.toBase58(), [publicKey]);
     const str_rep = (!wallet || !base58) ? null : (base58.slice(0, 4) + '..' + base58.slice(-4));

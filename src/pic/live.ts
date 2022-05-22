@@ -11,26 +11,27 @@ import { NETWORK } from "./connect";
 import { useAnchorWallet, useWallet } from "providers/adapters/core/react";
 //kaiming testing
 export async function showAllCallsInProgram(wallet) {
-  console.log("showAllCallsInProgram wallet=", wallet);
-  let program = await rpc.initProgram(wallet, NETWORK);
-  console.log("initprogram=", program);
+  try {
+    let program = await rpc.initProgram(wallet, NETWORK);
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 export async function getDaoGovernanceFromChain(wallet, dao) {
-  console.log("getDaoFromChain in live", wallet);
 
-  const _dao=chain.getDaoFromChain(wallet, NETWORK, dao);
+  const _dao = chain.getDaoFromChain(wallet, NETWORK, dao);
   return _dao;
 }
 
 // Mirror only calls
 let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
   try {
-    let result = await mirror.getOwner(
-      "GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi"
-    );
+    // let result = await mirror.getOwner(
+    //   "GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi"
+    // );
 
-    // let result = await mirror.getOwner(owner.address.toString());
+    let result = await mirror.getOwner(owner.address.toString());
     if (result.success) {
       const data = result.data;
       console.log("---live-connectOwner----", data);
@@ -647,18 +648,17 @@ let unstakeNft: pic.UnstakeNft = async (nft: pic.Nft) => {
 };
 
 let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
-  
   // let result=await mirror.getMembers("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi");
   //getting member daos from database if the owner address is a councillor of
   const result = await mirror.getMembers(owner.address.toString());
   //getting daos if the owner has daos
   const new_owner = await connectOwner(owner);
 
-  
   let dao_addresses = []; //combination of daos belong to the owner and daos where the pubkey is a councillor of.
   if (result.success) {
     if (result.data.dao_addresses) {
       dao_addresses = dao_addresses.concat(result.data.dao_addresses);
+      // console.log("dao addresses=", dao_addresses);
     }
   } else {
     console.log("Error in fetching daos from getMemberDaos");
@@ -675,38 +675,52 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
   const daos_with_stream = await getDaos(new_daos);
   for (const dao of daos_with_stream) {
     const result = await mirror.getDaoById(dao.address.toString());
-    console.log("result=", result);
-    if (result.success) {
-      dao.dao_id = result.data[0].dao_id;
-      dao.display_name = result.data[0].display_name;
-      dao.image_url = result.data[0].image_url;
-      dao.num_nfts = result.data[0].num_nfts;
+    // console.log("result=", result);
+    try {
+      if (result.success) {
+        dao.dao_id = result.data[0].dao_id;
+        dao.display_name = result.data[0].display_name;
+        dao.image_url = result.data[0].image_url;
+        dao.num_nfts = result.data[0].num_nfts;
+        // console.log("id=", dao.dao_id);
+        // console.log("disp_name=", dao.display_name);
+        // console.log("url=", dao.image_url);
+        // console.log("num_nft=", dao.num_nfts);
+      }
+    } catch (e) {
+      console.log(e);
     }
   }
-  console.log("--get memeber daos--", daos_with_stream); //dao with address and streams, dao_id, display_name, num_nfts
+  console.log("--get memeber daos with stream--", daos_with_stream); //dao with address and streams, dao_id, display_name, num_nfts
   return daos_with_stream;
 };
 
-let initializeDao: pic.InitializeDao = async (dao: pic.Dao) => {
+let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
   let result_dao = await mirror.initializeDAO(dao);
-  if (result_dao.sucess) {
+  console.log("initializeDao=", result_dao.success);
+  if (result_dao.success) {
     console.log("initializeDao successed");
+   
+
+    //insert councillors into database
+    let result_councillors = await mirror.insertCouncillors(dao);
+    result_councillors.map((result) => {
+      if (result.success) {
+        console.log("insertCouncillors successed");
+        rpc.initializeDAO(wallet,NETWORK,dao); //calls for onchain
+      } else {
+        console.log("insertCouncillors failed");
+      }
+    });
   } else {
     console.log("initializeDao failed");
   }
-  let result_councillors = await mirror.insertCouncillors(dao);
-  result_councillors.map((result) => {
-    if (result.success) {
-      console.log("insertCouncillors successed");
-    } else {
-      console.log("insertCouncillors failed");
-    }
-  });
 
   return dao;
 };
 
 let initializeStream: pic.InitializeStream = async (
+  wallet,
   dao: pic.Dao,
   stream: pic.Stream
 ) => {
@@ -714,11 +728,35 @@ let initializeStream: pic.InitializeStream = async (
   if (result.success) {
     console.log("initializeStream successed");
     console.log(result);
+    rpc.initializeStream(wallet, NETWORK, dao, stream)
   } else {
     console.log("initializeStream failed");
   }
   return { dao, stream };
 };
+
+//writing calls
+export async function proposeDaoCommand(wallet, dao) {
+  console.log("I am proposeDaoCommand in live");
+  rpc.proposeDaoCommand(wallet, NETWORK, dao);
+}
+export async function approveDaoCommand(wallet, dao) {
+  console.log("approveDaoCommand in live");
+  rpc.approveDaoCommand(wallet, NETWORK, dao);
+}
+
+export async function executeUpdateDaoMultisig(wallet, dao){
+  console.log("executeUpdateDaoMultisig in live");
+  rpc.executeUpdateDaoMultisig(wallet, NETWORK, dao);
+}
+export async function executeDeactivateStream(wallet, dao){
+  console.log("executeDeactivateStream in live");
+  rpc.executeDeactivateStream(wallet, NETWORK, dao);
+}
+export async function executeWithdrawFromStream(wallet, dao){
+  console.log("executeWithdrawFromStream in live");
+  rpc.executeWithdrawFromStream(wallet, NETWORK, dao);
+}
 
 export {
   connectOwner,

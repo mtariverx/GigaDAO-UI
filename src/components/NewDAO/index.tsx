@@ -8,7 +8,7 @@ import * as simPic from "../../pic/sim";
 import * as livePic from "../../pic/live";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { validateSolanaAddress } from "../CommonCalls";
-import { useWallet } from "providers/adapters/core/react";
+import { useAnchorWallet, useWallet } from "providers/adapters/core/react";
 import { useOwnerData } from "providers/owner";
 import { plugins } from "chart.js";
 
@@ -25,27 +25,29 @@ const NewDAO = (props) => {
   const { dispatch, callConnectOwner, callDisconnectOwner } = useOwnerData();
   const [isConnectingToOwner, setIsConnectingToOwner] = useState(false);
   
+  const wallet = useAnchorWallet();
+
   const onClickCreateNewDAOBtn = async () => {
     console.log("--onClickCreateNewDAOBtn--");
     console.log("--create new dao--");
     console.log("pubkey-",publicKey.toString());
     console.log("connected-",connected);
 
-
+    const key=Keypair.generate();
     let new_dao: pic.Dao = {
-      address:Keypair.generate().publicKey,
+      address:key.publicKey,
       dao_id: "",
       image_url: "",
       display_name: "",
       num_nfts: 0,
       is_member: false,
-      // address: new PublicKey(publicKey),
+      dao_keypair: key,
     };
     console.log("pub---",new_dao.address);
     let governance: pic.Governance={
       councillors:[publicKey],
       approval_threshold:0,
-      proposed_signers: [],
+      proposed_signers: [false],
       proposal_is_active:false,
       proposal_type: pic.ProposalType.DEACTIVATE_STREAM, 
       proposed_councillors:[],
@@ -69,14 +71,19 @@ const NewDAO = (props) => {
           (councillor) => new PublicKey(councillor)
         );
         governance.councillors = councillors_pubkey;
+        for (let i = 0; i < councillors_pubkey.length; i++) {
+          // governance.proposed_signers.push(true);
+          governance.proposed_signers.push(false);
+        } //no need here, in approve dao 
       }
-      governance.councillors.push(publicKey);
+      governance.councillors.push(publicKey); //add owner as a councillor
+      
       governance.approval_threshold = approval_threshold;
 
       new_dao.governance = governance;
-
+      
       // new_dao = await simPic.initializeDao(new_dao); //initializeDao
-      new_dao=await livePic.initializeDao(new_dao);
+      new_dao=await livePic.initializeDao(wallet, new_dao);
 
       props.onClose(); //close btn
     }

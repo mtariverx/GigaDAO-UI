@@ -14,7 +14,9 @@ import {
   sampleTokenStream1,
   sampleTokenStream2,
 } from "pic/sim_data/sample-streams";
+import { useAnchorWallet } from "providers/adapters/core/react";
 const NewStream = (props) => {
+
   const { dao } = props;
   const [is_stream, setStream] = useState(1);
   const [pool_name, setPoolName] = useState<string>();
@@ -30,7 +32,7 @@ const NewStream = (props) => {
   const [stream_compensate_arr, setStreamCompensateArr] = useState<string[]>(
     []
   );
-
+ const wallet = useAnchorWallet();
   useEffect(() => {
     setSelectedDao({ ...dao });
     setStreamCompArr();
@@ -53,11 +55,11 @@ const NewStream = (props) => {
   };
 
   const setStreamCompArr = () => {
-    const remain_rows = dao
+    const remain_rows = dao.streams
       ? dao.streams.length >= table_rows
         ? 0
         : table_rows - dao.streams.length
-      : 0;
+      : 10;
     let tmp_stream: string[] = [];
     for (let i = 0; i < remain_rows; i++) {
       tmp_stream.push("tmp_stream");
@@ -99,9 +101,11 @@ const NewStream = (props) => {
         token_ticker: token_ticker,
         last_update_timestamp: Math.floor(Date.now() / 1000),
         is_active: false,
+        token_mint_address:new PublicKey(token_mint_address),
       };
 
       const { dao, stream } = await livePic.initializeStream(
+        wallet,
         props.dao,
         new_stream
       ); //initializeStream
@@ -229,7 +233,7 @@ const NewStream = (props) => {
                   <th>current_pool_amount</th>
                   <th>token_tickers</th>
                 </tr>
-                {selected_dao
+                {selected_dao && selected_dao.streams
                   ? selected_dao.streams.map((stream) => {
                       return (
                         <tr>

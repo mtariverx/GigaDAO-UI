@@ -18,7 +18,6 @@ export async function getOwner(owner_address: string) {
   const URL = BASE_URL + "get_owner?owner_address=" + owner_address;
   const response = await fetch(URL, { mode: "cors" });
   const data = await response.json();
-  console.log("mirror getOwner=",data);
   return data;
 }
 

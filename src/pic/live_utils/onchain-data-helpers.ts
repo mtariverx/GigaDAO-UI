@@ -10,7 +10,7 @@ import {
   STAKE_PDA_SEED,
 } from "./rpc_helpers";
 import * as pic from "../pic";
-
+// const FEE_RX_ADDRESS = new PublicKey("J7fUvwoKiseS2LedKE31z7vYnB7bWbbhWeA5SRR43QBB");
 export enum StakeAccountStatus {
   NOT_INITIALIZED,
   INITIALIZED_NOT_ACTIVE,
@@ -28,39 +28,41 @@ export async function checkIfStakeExists(
   stakeAddress: PublicKey | undefined;
   numConnections?: number;
 }> {
-  let program = await initProgram(wallet, network);
-  const [stake_pda] = await PublicKey.findProgramAddress(
-    [
-      ownerAddress.toBuffer(),
-      nftMintPubkey.toBuffer(),
-      Buffer.from(STAKE_PDA_SEED),
-    ],
-    program.programId
-  );
-  let stakeAccountStatus: StakeAccountStatus;
-  let numConnections = undefined;
   try {
-    const stakeAccount = await program.account.stake.fetch(stake_pda);
-    if (stakeAccount.isActive) {
-      stakeAccountStatus = StakeAccountStatus.INITIALIZED_AND_ACTIVE;
-      numConnections = stakeAccount.numConnections.toNumber();
-    } else {
-      stakeAccountStatus = StakeAccountStatus.INITIALIZED_NOT_ACTIVE;
+    let program = await initProgram(wallet, network);
+    const [stake_pda] = await PublicKey.findProgramAddress(
+      [
+        ownerAddress.toBuffer(),
+        nftMintPubkey.toBuffer(),
+        Buffer.from(STAKE_PDA_SEED),
+      ],
+      program.programId
+    );
+    let stakeAccountStatus: StakeAccountStatus;
+    let numConnections = undefined;
+    try {
+      const stakeAccount = await program.account.stake.fetch(stake_pda);
+      if (stakeAccount.isActive) {
+        stakeAccountStatus = StakeAccountStatus.INITIALIZED_AND_ACTIVE;
+        numConnections = stakeAccount.numConnections.toNumber();
+      } else {
+        stakeAccountStatus = StakeAccountStatus.INITIALIZED_NOT_ACTIVE;
+      }
+    } catch (e) {
+      let accountDoesNotExistError = e
+        .toString()
+        .includes("Account does not exist");
+      if (!accountDoesNotExistError) {
+        alert("got unknown type of error: " + e);
+      }
+      stakeAccountStatus = StakeAccountStatus.NOT_INITIALIZED;
     }
-  } catch (e) {
-    let accountDoesNotExistError = e
-      .toString()
-      .includes("Account does not exist");
-    if (!accountDoesNotExistError) {
-      alert("got unknown type of error: " + e);
-    }
-    stakeAccountStatus = StakeAccountStatus.NOT_INITIALIZED;
-  }
-  return {
-    stakeAccountStatus: stakeAccountStatus,
-    stakeAddress: stake_pda,
-    numConnections: numConnections,
-  };
+    return {
+      stakeAccountStatus: stakeAccountStatus,
+      stakeAddress: stake_pda,
+      numConnections: numConnections,
+    };
+  } catch (e) {}
 }
 
 export async function checkIfConnectionExists(
@@ -179,13 +181,19 @@ export async function refreshStake(wallet, network, stake: pic.Stake) {
 export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
   let program = await initProgram(wallet, network);
   try {
-    // const daoAccount = await program.account.dao.fetch(
-    //   new PublicKey("4s4kQAiVYMR4iLNsUMDty5cmBgMo226ifR8eCrKS6j8d")
-    // ); //This works well. This address is from belac 
-    const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
+    console.log("getDaoFromChain in onchain-data-helper.ts");
+    console.log("============",program);
+    
+    const daoAccount = await program.account.dao.fetch(dao.address); //kaiming
+    // dao.address=new PublicKey("9EbGGkMWU5Vi1TNve6K3wuH14ScUfSoy2TPhnLKzQf9C");
+    // const daoAccount = await program.account.dao.fetch("9EbGGkMWU5Vi1TNve6K3wuH14ScUfSoy2TPhnLKzQf9C"); //kaiming
+    // const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
+    console.log("++++++++++=",daoAccount);
+    
     //consider return value's type
+    
     const councillors = await daoAccount.councillors;
-    const approvalThreshold=await daoAccount.approvalThreshold;
+    const approvalThreshold = await daoAccount.approvalThreshold;
     const proposalSigners = await daoAccount.proposalSigners;
     const proposalIsActive = await daoAccount.proposalIsActive;
     const proposalType = await daoAccount.proposalType;
@@ -195,26 +203,28 @@ export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
     const proposedDeactivationStream =
       await daoAccount.proposedDeactivationStream;
     const proposedWithdrawalAmount = await daoAccount.proposedWithdrawalAmount;
-    const proposedwithdrawalReceiverOwner =
-      await daoAccount.proposedwithdrawalReceiverOwner;
+    const proposedWithdrawalReceiverOwner =
+      await daoAccount.proposedWithdrawalReceiverOwner;
     const proposedWithdrawalStream = await daoAccount.proposedWithdrawalStream;
     const numStreams = await daoAccount.numStreams;
 
     let governance: pic.Governance = {
       councillors: councillors,
-      approval_threshold: approvalThreshold,
+      approval_threshold: parseInt(approvalThreshold.toString()),
       proposed_signers: proposalSigners,
       proposal_is_active: proposalIsActive,
       proposal_type: proposalType,
       proposed_councillors: proposedCouncillors,
-      proposed_approval_threshold: proposedApprovalThreshold,
-      proposed_deactivation_stream:proposedDeactivationStream,
-      proposed_withdrawal_amount: proposedWithdrawalAmount,
-      proposed_withdrawal_receiver: proposedwithdrawalReceiverOwner,
+      proposed_approval_threshold: parseInt(
+        proposedApprovalThreshold.toString()
+      ),
+      proposed_deactivation_stream: proposedDeactivationStream,
+      proposed_withdrawal_amount: parseInt(proposedWithdrawalAmount.toString()),
+      proposed_withdrawal_receiver: proposedWithdrawalReceiverOwner,
       proposed_withdrawal_stream: proposedWithdrawalStream,
-      num_streams: numStreams,
+      num_streams: parseInt(numStreams.toString()),
     };
-    dao.governance=governance;
+    dao.governance = governance;
     console.log("-onchain-data-helper.ts");
     console.log("councillors", councillors);
     console.log("proposalSigners", proposalSigners);
@@ -225,15 +235,12 @@ export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
     console.log("proposedApprovalThreshold", proposedApprovalThreshold);
     console.log("proposedDeactivationStream", proposedDeactivationStream);
     console.log("proposedWithdrawalAmount", proposedWithdrawalAmount);
-    console.log(
-      "proposedwithdrawalReceiverOwner",
-      proposedwithdrawalReceiverOwner
-    );
+    console.log("proposedwithdrawalReceiverOwner",proposedWithdrawalReceiverOwner );
     console.log("proposedWithdrawalStream", proposedWithdrawalStream);
     console.log("numStreams", numStreams);
   } catch (e) {
     console.log(e.toString());
   }
-  
+
   return dao;
 }
