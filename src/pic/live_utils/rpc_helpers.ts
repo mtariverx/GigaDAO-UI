@@ -308,32 +308,43 @@ export async function initializeStream(
   stream: pic.Stream
 ) {
   let program = await initProgram(wallet, network);
-    [fee_controller] = await PublicKey.findProgramAddress(
-      [Buffer.from(FEE_CONTROLLER_PDA_SEED)],
-      program.programId
-    );
-    [tokenPool] = await PublicKey.findProgramAddress(
-      [
-        stream.address.toBuffer(), //kaiming not sure
-        Buffer.from(anchor.utils.bytes.utf8.encode(TOKEN_POOL_PDA_SEED)),
-      ],
-      program.programId
-    );
-    [daoAuthPda] = await PublicKey.findProgramAddress(
-      [
-        dao.address.toBuffer(),
-        Buffer.from(anchor.utils.bytes.utf8.encode(DAO_AUTH_PDA_SEED)),
-      ],
-      program.programId
-    );
+  [fee_controller] = await PublicKey.findProgramAddress(
+    [Buffer.from(FEE_CONTROLLER_PDA_SEED)],
+    program.programId
+  );
+  [tokenPool] = await PublicKey.findProgramAddress(
+    [
+      stream.address.toBuffer(), //kaiming not sure
+      Buffer.from(anchor.utils.bytes.utf8.encode(TOKEN_POOL_PDA_SEED)),
+    ],
+    program.programId
+  );
+  [daoAuthPda] = await PublicKey.findProgramAddress(
+    [
+      dao.address.toBuffer(),
+      Buffer.from(anchor.utils.bytes.utf8.encode(DAO_AUTH_PDA_SEED)),
+    ],
+    program.programId
+  );
   try {
     console.log("I'm initializeStream");
     console.log(dao.address.toString());
-    console.log("stream address=",stream.address.toString());
-    console.log("token_mint_address address=",stream.token_mint_address.toString());
+    console.log("stream address=", stream.address.toString());
+    console.log(
+      "token_mint_address address=",
+      stream.token_mint_address.toString()
+    );
+    let tokenMint: spl_token.Mint = await spl_token.getMint(
+      program.provider.connection,
+      stream.token_mint_address
+    );
+    // let tokenMint: spl_token.Mint = await spl_token.getMint(
+    //     program.provider.connection,
+    //     tokenMintAddress
+    //   );
 
     let verified_creator_addresses = [wallet.publicKey];
-    
+
     let is_simulation = true;
     await program.rpc.initializeStream(
       verified_creator_addresses,
@@ -342,9 +353,9 @@ export async function initializeStream(
       {
         accounts: {
           signer: wallet.publicKey,
-          stream:stream.address,
+          stream: stream.address,
           dao: dao.address,
-          tokenMintAddress: stream.token_mint_address,
+          tokenMint: stream.token_mint_address,
           tokenPool: tokenPool, //kaiming not sure
           daoAuthPda: daoAuthPda,
           feeReceiverAddress: FEE_RX_ADDRESS,
@@ -353,7 +364,7 @@ export async function initializeStream(
           tokenProgram: TOKEN_PROGRAM_ID,
           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
         },
-        signers:[stream.stream_keypair],
+        signers: [stream.stream_keypair],
       }
     );
     console.log("executeWithdrawFromStream success");

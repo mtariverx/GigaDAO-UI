@@ -181,63 +181,48 @@ export async function refreshStake(wallet, network, stake: pic.Stake) {
 export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
   let program = await initProgram(wallet, network);
   try {
-    console.log("getDaoFromChain in onchain-data-helper.ts");
-    console.log("============",program);
     
-    const daoAccount = await program.account.dao.fetch(dao.address); //kaiming
+        
+    
     // dao.address=new PublicKey("9EbGGkMWU5Vi1TNve6K3wuH14ScUfSoy2TPhnLKzQf9C");
     // const daoAccount = await program.account.dao.fetch("9EbGGkMWU5Vi1TNve6K3wuH14ScUfSoy2TPhnLKzQf9C"); //kaiming
-    // const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
-    console.log("++++++++++=",daoAccount);
+    const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
     
+    console.log("getDaoFromChain in onchain-data-helper.ts --daoAccount--", daoAccount);
     //consider return value's type
-    
-    const councillors = await daoAccount.councillors;
-    const approvalThreshold = await daoAccount.approvalThreshold;
-    const proposalSigners = await daoAccount.proposalSigners;
-    const proposalIsActive = await daoAccount.proposalIsActive;
-    const proposalType = await daoAccount.proposalType;
-    const proposedCouncillors = await daoAccount.proposedCouncillors;
+    //delete await keyword
+    const councillors = daoAccount.councillors;
+    const approvalThreshold = daoAccount.approvalThreshold.toNumber();
+    const proposalSigners =  daoAccount.proposalSigners;
+    const proposalIsActive =  daoAccount.proposalIsActive;
+    const proposalType =  daoAccount.proposalType;
+    const proposedCouncillors =  daoAccount.proposedCouncillors;
     const proposedApprovalThreshold =
-      await daoAccount.proposedApprovalThreshold;
+       daoAccount.proposedApprovalThreshold.toNumber();
     const proposedDeactivationStream =
-      await daoAccount.proposedDeactivationStream;
-    const proposedWithdrawalAmount = await daoAccount.proposedWithdrawalAmount;
+       daoAccount.proposedDeactivationStream;
+    const proposedWithdrawalAmount =  daoAccount.proposedWithdrawalAmount.toNumber();
     const proposedWithdrawalReceiverOwner =
-      await daoAccount.proposedWithdrawalReceiverOwner;
-    const proposedWithdrawalStream = await daoAccount.proposedWithdrawalStream;
-    const numStreams = await daoAccount.numStreams;
+       daoAccount.proposedWithdrawalReceiverOwner;
+    const proposedWithdrawalStream =  daoAccount.proposedWithdrawalStream;
+    const numStreams =  daoAccount.numStreams.toNumber();
 
     let governance: pic.Governance = {
       councillors: councillors,
-      approval_threshold: parseInt(approvalThreshold.toString()),
+      approval_threshold: approvalThreshold,
       proposed_signers: proposalSigners,
       proposal_is_active: proposalIsActive,
       proposal_type: proposalType,
       proposed_councillors: proposedCouncillors,
-      proposed_approval_threshold: parseInt(
-        proposedApprovalThreshold.toString()
-      ),
+      proposed_approval_threshold: proposedApprovalThreshold,
       proposed_deactivation_stream: proposedDeactivationStream,
-      proposed_withdrawal_amount: parseInt(proposedWithdrawalAmount.toString()),
+      proposed_withdrawal_amount: proposedWithdrawalAmount,
       proposed_withdrawal_receiver: proposedWithdrawalReceiverOwner,
       proposed_withdrawal_stream: proposedWithdrawalStream,
-      num_streams: parseInt(numStreams.toString()),
+      num_streams: numStreams,
     };
     dao.governance = governance;
-    console.log("-onchain-data-helper.ts");
-    console.log("councillors", councillors);
-    console.log("proposalSigners", proposalSigners);
-    console.log("proposalIsActive", proposalIsActive);
-    console.log("proposalType", proposalType);
-    console.log("proposedCouncillors", proposedCouncillors);
-    console.log("counciproposedCouncillorsllors", proposedCouncillors);
-    console.log("proposedApprovalThreshold", proposedApprovalThreshold);
-    console.log("proposedDeactivationStream", proposedDeactivationStream);
-    console.log("proposedWithdrawalAmount", proposedWithdrawalAmount);
-    console.log("proposedwithdrawalReceiverOwner",proposedWithdrawalReceiverOwner );
-    console.log("proposedWithdrawalStream", proposedWithdrawalStream);
-    console.log("numStreams", numStreams);
+
   } catch (e) {
     console.log(e.toString());
   }

@@ -34,7 +34,9 @@ const DAODashboard: React.FC = (props) => {
   const [dashitem, setDashItem] = useState(0);
   const [selected_member_dao, setSelectedMemberDAO] = useState<pic.Dao>();
   const [show_modal, setShowModal] = useState(-1);
+  const [refresh, setRefresh] = useState(false);
   const wallet = useAnchorWallet();
+
   // console.log("wallet=", wallet);
   type counc_sign_pair = {
     councillor: PublicKey;
@@ -51,6 +53,23 @@ const DAODashboard: React.FC = (props) => {
     return str;
   };
 
+  const onClickRefresh = async() => {
+   
+    let newOwner: pic.Owner = { address: publicKey };
+    let member_daos_promise = await livePic.getMemberDaos(newOwner);
+
+    let mdis: Array<string> = [];
+    let m_daos: Array<pic.Dao> = [];
+    m_daos = member_daos_promise;
+    console.log("-------------");
+    console.log(m_daos);
+    setMemberDAOs({...m_daos}); //set daos to memberdaos but the dao has only address and streams
+    mdis = m_daos.map((dao) => dao.dao_id);
+    setMemberDaoIds(mdis);
+    setRefresh(!refresh);
+    console.log("refresh is clicked");
+
+  };
   useEffect(() => {
     (async () => {
       if (connected) {
@@ -72,29 +91,30 @@ const DAODashboard: React.FC = (props) => {
         let mdis: Array<string> = [];
         let m_daos: Array<pic.Dao> = [];
         m_daos = member_daos_promise;
-        setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
+        setMemberDAOs({...m_daos}); //set daos to memberdaos but the dao has only address and streams
         mdis = m_daos.map((dao) => dao.dao_id);
-        console.log("mdis---", mdis);
+        
         setMemberDaoIds(mdis);
         setSelectedMemberDAO({ ...m_daos[0] }); //only first
         setCouncillorSignerPair({ ...m_daos[0] }); //kaiming
         getActiveProposalInfo({ ...m_daos[0] });
         //testing
-        livePic.showAllCallsInProgram(wallet); // testing for solana
-        console.log(
-          "dashboard-getDaoFromChain-",
-          livePic.getDaoGovernanceFromChain(wallet, m_daos[0])
-        );
+        // livePic.showAllCallsInProgram(wallet); // testing for solana
+        // console.log(
+        //   "dashboard-getDaoFromChain-",
+        //   livePic.getDaoGovernanceFromChain(wallet, m_daos[0])
+        // );
+        console.log("select member---", selected_member_dao);
       } else {
         callDisconnectOwner(dispatch);
       }
     })();
-  }, [connected]);
+  }, [connected, refresh]);
 
   useEffect(() => {
     if (selected_member_dao != undefined) {
-      setCouncillorSignerPair(selected_member_dao); //kaiming
-      getActiveProposalInfo(selected_member_dao);
+      setCouncillorSignerPair({...selected_member_dao}); //kaiming
+      getActiveProposalInfo({...selected_member_dao});
     }
   }, [selected_member_dao]);
 
@@ -103,7 +123,6 @@ const DAODashboard: React.FC = (props) => {
     const _dao = await livePic.getDaoGovernanceFromChain(wallet, dao);
     dao.governance = _dao.governance;
     let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
-    console.log("++++", _dao);
     if (dao.governance && dao.governance.councillors != undefined) {
       dao.governance.councillors.forEach(function (councillor, index) {
         let tmp: counc_sign_pair = {
@@ -190,7 +209,10 @@ const DAODashboard: React.FC = (props) => {
     }
     let tmp: any = [];
 
-    if (dao.governance && Object.keys(dao.governance.proposal_type)[0] == "deactivateStream") {
+    if (
+      dao.governance &&
+      Object.keys(dao.governance.proposal_type)[0] == "deactivateStream"
+    ) {
       tmp = [
         ["Proposal Type", "DEACTIVEATE_STREAM"],
         [
@@ -198,20 +220,26 @@ const DAODashboard: React.FC = (props) => {
           getShortKey(dao.governance.proposed_withdrawal_stream.toString()),
         ],
       ];
-    } else if (dao.governance && Object.keys(dao.governance.proposal_type)[0] == "withdrawFromStream") {
+    } else if (
+      dao.governance &&
+      Object.keys(dao.governance.proposal_type)[0] == "withdrawFromStream"
+    ) {
       tmp = [
         ["Proposal Type: ", "WITHDRAW FROM STREAM"],
         ["Amount", `${dao.governance.proposed_withdrawal_amount}`],
         [
-          "Proposed Withdraw Receiver: ",
+          "Withdraw Receiver: ",
           getShortKey(dao.governance.proposed_withdrawal_receiver.toString()),
         ],
         [
-          "Proposed Withdraw Stream: ",
+          "Withdraw Stream: ",
           getShortKey(dao.governance.proposed_withdrawal_stream.toString()),
         ],
       ];
-    } else if (dao.governance && Object.keys(dao.governance.proposal_type)[0] == "updateMultisig") {
+    } else if (
+      dao.governance &&
+      Object.keys(dao.governance.proposal_type)[0] == "updateMultisig"
+    ) {
       tmp = [
         ["Proposal Type: ", "UPDATE_MULTISIG"],
         [
@@ -227,7 +255,6 @@ const DAODashboard: React.FC = (props) => {
 
   //call for clicking Approve button on Active Proposal
   const onClickApproveProposeBtn = async () => {
-
     const wallet_address = publicKey.toString();
     const dao: pic.Dao = selected_member_dao;
     if (dao.governance) {
@@ -243,22 +270,30 @@ const DAODashboard: React.FC = (props) => {
         setSelectedMemberDAO({ ...dao });
       }
     }
-    livePic.approveDaoCommand(wallet,dao);
+    livePic.approveDaoCommand(wallet, dao);
     console.log("---clickapprove---", dao);
-    
+
     // const _dao = await livePic.approveDaoCommand(dao);
   };
 
   const onClickExecuteProposeBtn = () => {
-    
     const dao: pic.Dao = selected_member_dao;
     console.log("onclick Execute Propose Btn", dao.governance);
-    if(dao.governance!=undefined){
-      if (dao.governance && Object.keys(dao.governance.proposal_type)[0] == "deactivateStream") {
+    if (dao.governance != undefined) {
+      if (
+        dao.governance &&
+        Object.keys(dao.governance.proposal_type)[0] == "deactivateStream"
+      ) {
         livePic.executeDeactivateStream(wallet, dao);
-      } else if (dao.governance && Object.keys(dao.governance.proposal_type)[0] == "withdrawFromStream") {
+      } else if (
+        dao.governance &&
+        Object.keys(dao.governance.proposal_type)[0] == "withdrawFromStream"
+      ) {
         livePic.executeWithdrawFromStream(wallet, dao);
-      } else if (dao.governance && Object.keys(dao.governance.proposal_type)[0] == "updateMultisig") {
+      } else if (
+        dao.governance &&
+        Object.keys(dao.governance.proposal_type)[0] == "updateMultisig"
+      ) {
         livePic.executeUpdateDaoMultisig(wallet, dao);
       }
     }
@@ -299,7 +334,7 @@ const DAODashboard: React.FC = (props) => {
                 ))}
               </select>
             </div>
-            <div>
+            <div onClick={onClickRefresh}>
               <IconButton icon_img={Refresh} is_background={false} />
             </div>
           </div>
@@ -390,19 +425,6 @@ const DAODashboard: React.FC = (props) => {
             <div className="proposal-setting">
               <div className="proposal-active">Active proposal</div>
               <div className="proposal-description">
-                {/* <div className="description-item-value">
-                <div className="description-item">Amount</div>
-                <div className="description-value">1,000,000</div>
-              </div>
-              <div className="description-item-value">
-                <div className="description-item">Token</div>
-                <div className="description-value">
-                  <div>GIGS</div>
-                  <div className="div-img">
-                    <img src={Gigs_log} />
-                  </div>
-                </div>
-              </div> */}
                 {active_proposal_info.map((item_pair) => {
                   return (
                     <div className="description-item-value">
@@ -411,11 +433,11 @@ const DAODashboard: React.FC = (props) => {
                     </div>
                   );
                 })}
-                <div>Description</div>
+                {/* <div>Description</div>
                 <div>
                   Moving GIGS to a new token pool for a new stream for our
                   platinum holders
-                </div>
+                </div> */}
               </div>
               <div className="proposal-councillors">Councillors</div>
               <div className="proposal-councillor-pubkeys">
@@ -438,7 +460,11 @@ const DAODashboard: React.FC = (props) => {
                   btn_title="Approve"
                   onClick={onClickApproveProposeBtn}
                 />
-                <Button btn_type="common" btn_title="Execute" onClick={onClickExecuteProposeBtn}/>
+                <Button
+                  btn_type="common"
+                  btn_title="Execute"
+                  onClick={onClickExecuteProposeBtn}
+                />
               </div>
             </div>
           </div>
@@ -452,7 +478,7 @@ const DAODashboard: React.FC = (props) => {
       ) : (
         ""
       )}
-      {show_modal == 1 && connected ? (
+      {show_modal == 1 && connected && selected_member_dao != undefined ? (
         <DAODetailModal onClick={() => setShowModal(-1)}>
           <NewStream
             dao={selected_member_dao}
