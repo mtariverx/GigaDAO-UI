@@ -693,7 +693,7 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
   console.log("initializeDao=", result_dao.success);
   if (result_dao.success) {
     console.log("initializeDao success");
-
+    alert("Initializing dao in database was success!");
     //insert councillors into database
     let result_councillors = await mirror.insertCouncillors(dao);
     let count_success = 0;
@@ -704,15 +704,19 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
     });
     if (count_success == dao.governance.councillors.length) {
       console.log("insertCouncillors success");
+      alert("Inserting councillors in database was success!");
       try{
         await rpc.initializeDAO(wallet, NETWORK, dao); //calls for onchain
         console.log("initalizeDao success");
+        alert("Initializing dao in onchain was success!");
       }catch (e) {
         let result_dao_delete=await mirror.deleteDao(dao);
         if(result_dao_delete.success){
           console.log("delete dao success");
+          alert("Deleting dao in onchain was success!");
           let result_councillors_delete=await mirror.deleteCouncillors(dao);
           console.log("delete councillor success");
+          alert("Deleting councillors in onchain was success!");
         }
       }
       
@@ -731,9 +735,11 @@ let initializeStream: pic.InitializeStream = async (
 ) => {
   let result = await mirror.insertNewStream(stream);
   if (result.success) {
+    alert("Initializing stream in database was success!")
     console.log("initializeStream success");
     console.log(result);
     await rpc.initializeStream(wallet, NETWORK, dao, stream);
+    alert("Initializing stream in onchain was success!")
   } else {
     console.log("initializeStream failed");
   }
@@ -744,6 +750,7 @@ let initializeStream: pic.InitializeStream = async (
 export async function proposeDaoCommand(wallet, dao) {
   console.log("I am proposeDaoCommand in live");
   await rpc.proposeDaoCommand(wallet, NETWORK, dao);
+  alert("Proposing dao command was success!");
 }
 export async function approveDaoCommand(wallet, dao) {
   console.log("approveDaoCommand in live");
@@ -753,14 +760,17 @@ export async function approveDaoCommand(wallet, dao) {
 export async function executeUpdateDaoMultisig(wallet, dao) {
   console.log("executeUpdateDaoMultisig in live");
   await rpc.executeUpdateDaoMultisig(wallet, NETWORK, dao);
+  alert("ExecuteUpdateDaoMultisig was success!")
 }
 export async function executeDeactivateStream(wallet, dao) {
   console.log("executeDeactivateStream in live");
   await rpc.executeDeactivateStream(wallet, NETWORK, dao);
+  alert("executeDeactivateStream was success!")
 }
 export async function executeWithdrawFromStream(wallet, dao) {
   console.log("executeWithdrawFromStream in live");
   await rpc.executeWithdrawFromStream(wallet, NETWORK, dao);
+  alert("executeWithdrawFromStream was success!")
 }
 
 export {

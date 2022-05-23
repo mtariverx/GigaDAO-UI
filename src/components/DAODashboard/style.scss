@@ -278,10 +278,10 @@
             text-align: left;
           }
           & > .proposal-description {
-            display: grid;
+            // display: grid;
             // grid-template-rows: 1fr 1fr 1f 1fr 1fr;
-            padding-left: 20px;
-            gap: 5px;
+            // padding-left: 20px;
+            // gap: 5px;
             // max-height: 200px;
             overflow: auto;
             & > .description-item-value {

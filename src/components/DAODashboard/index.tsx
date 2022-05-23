@@ -108,7 +108,7 @@ const DAODashboard: React.FC = (props) => {
         callDisconnectOwner(dispatch);
       }
     })();
-  }, [connected, refresh]);
+  }, [connected, refresh, show_modal]);
 
   useEffect(() => {
     if (selected_member_dao != undefined) {
@@ -135,7 +135,7 @@ const DAODashboard: React.FC = (props) => {
   //   }
   // };
 
-  useEffect(() => {});
+  // useEffect(() => {});
 
   let dao: pic.Dao;
 
