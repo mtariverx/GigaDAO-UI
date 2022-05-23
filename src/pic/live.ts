@@ -692,7 +692,7 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
   let result_dao = await mirror.initializeDAO(dao);
   console.log("initializeDao=", result_dao.success);
   if (result_dao.success) {
-    console.log("initializeDao successed");
+    console.log("initializeDao success");
 
     //insert councillors into database
     let result_councillors = await mirror.insertCouncillors(dao);
@@ -703,8 +703,19 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
       }
     });
     if (count_success == dao.governance.councillors.length) {
-      console.log("insertCouncillors successed");
-      await rpc.initializeDAO(wallet, NETWORK, dao); //calls for onchain
+      console.log("insertCouncillors success");
+      try{
+        await rpc.initializeDAO(wallet, NETWORK, dao); //calls for onchain
+        console.log("initalizeDao success");
+      }catch (e) {
+        let result_dao_delete=await mirror.deleteDao(dao);
+        if(result_dao_delete.success){
+          console.log("delete dao success");
+          let result_councillors_delete=await mirror.deleteCouncillors(dao);
+          console.log("delete councillor success");
+        }
+      }
+      
     }
   } else {
     console.log("initializeDao failed");
@@ -720,7 +731,7 @@ let initializeStream: pic.InitializeStream = async (
 ) => {
   let result = await mirror.insertNewStream(stream);
   if (result.success) {
-    console.log("initializeStream successed");
+    console.log("initializeStream success");
     console.log(result);
     await rpc.initializeStream(wallet, NETWORK, dao, stream);
   } else {

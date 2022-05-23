@@ -36,15 +36,14 @@ export async function getDaoStreams(daos: Array<pic.Dao>): Promise<any> {
 }
 
 export async function getMembers(owner_address: string) {
-  
   const URL = BASE_URL + "get_member_daos?owner_address=" + owner_address;
   const response = await fetch(URL, { mode: "cors" });
   const data = await response.json();
   return data;
 }
 
-export async function getDaoById(dao_address: string){
-  const URL = BASE_URL + "get_dao_by_address?dao_address="+dao_address;
+export async function getDaoById(dao_address: string) {
+  const URL = BASE_URL + "get_dao_by_address?dao_address=" + dao_address;
   const response = await fetch(URL, { mode: "cors" });
   const data = await response.json();
   return data;
@@ -57,7 +56,6 @@ export async function initializeDAO(dao: pic.Dao) {
   const display_name = dao.display_name;
   const image_url = dao.image_url;
   const num_streams = 0;
-  console.log("insert query=",`insert_dao?dao_address=${dao_address}&dao_id=${dao_id}&display_name=${display_name}&image_url=${image_url}&num_streams=${num_streams}`)
   const URL =
     BASE_URL +
     `insert_dao?dao_address=${dao_address}&dao_id=${dao_id}&display_name=${display_name}&image_url=${image_url}&num_streams=${num_streams}`;
@@ -68,23 +66,45 @@ export async function initializeDAO(dao: pic.Dao) {
 }
 
 export async function insertCouncillors(dao: pic.Dao) {
-    console.log("mirror insertCouncillor=",dao);
+  console.log("mirror insertCouncillor=", dao);
   const dao_address = dao.address.toString();
-  const governance = dao.governance;
-  const councillors = governance.councillors;
+  const councillors = dao.governance.councillors;
   const add_remove = true;
   let result: any = [];
   for (const councillor of councillors) {
-      console.log("-mirror counciilor-",`update_dao_councillor?dao_address=${dao_address}&owner_address=${councillor.toString()}&add_remove=${add_remove}`);
     const URL =
       BASE_URL +
       `update_dao_councillor?dao_address=${dao_address}&owner_address=${councillor.toString()}&add_remove=${add_remove}`;
     const response = await fetch(URL, { mode: "cors" });
     const data = await response.json();
-    console.log("insert councillor=",data);
     result.push(data);
   }
   return result;
+}
+
+export async function deleteDao(dao: pic.Dao) {
+  console.log("delete dao in mirror");
+  const dao_address = dao.address.toString();
+  const URL = BASE_URL + `delete_dao?dao_address=${dao_address}`;
+  const response = await fetch(URL, { mode: "cors" });
+  const data = await response.json();
+  return data;
+}
+
+export async function deleteCouncillors(dao: pic.Dao) {
+  console.log("delete councillor in mirror");
+  const dao_address = dao.address.toString();
+  const councillors = dao.governance.councillors;
+  const add_remove = false;
+  let result: any = [];
+  for (const councillor of councillors) {
+    const URL =
+      BASE_URL +
+      `update_dao_councillor?dao_address=${dao_address}&owner_address=${councillor.toString()}&add_remove=${add_remove}`;
+    const response = await fetch(URL, { mode: "cors" });
+    const data = await response.json();
+    result.push(data);
+  }
 }
 
 export async function insertNewStream(stream: pic.Stream) {

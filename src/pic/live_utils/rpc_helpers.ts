@@ -43,6 +43,7 @@ export async function initProgram(wallet: anchor.Wallet, network: string) {
     let program = new anchor.Program(idl, programId, provider);
     return program;
   } catch (e) {
+      console.log("initProgram error");
     console.log(e);
   }
 }
@@ -169,7 +170,7 @@ export async function proposeDaoCommand(
         },
       }
     );
-    console.log("rpc_helpers proposeDaoCommand success");
+    console.log("proposeDaoCommand success");
   } catch (e) {
     console.log(e);
   }

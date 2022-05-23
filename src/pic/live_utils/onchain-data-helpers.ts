@@ -10,7 +10,6 @@ import {
   STAKE_PDA_SEED,
 } from "./rpc_helpers";
 import * as pic from "../pic";
-// const FEE_RX_ADDRESS = new PublicKey("J7fUvwoKiseS2LedKE31z7vYnB7bWbbhWeA5SRR43QBB");
 export enum StakeAccountStatus {
   NOT_INITIALIZED,
   INITIALIZED_NOT_ACTIVE,
@@ -181,14 +180,13 @@ export async function refreshStake(wallet, network, stake: pic.Stake) {
 export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
   let program = await initProgram(wallet, network);
   try {
-    
-        
-    
     // dao.address=new PublicKey("9EbGGkMWU5Vi1TNve6K3wuH14ScUfSoy2TPhnLKzQf9C");
     // const daoAccount = await program.account.dao.fetch("9EbGGkMWU5Vi1TNve6K3wuH14ScUfSoy2TPhnLKzQf9C"); //kaiming
+
+    console.log("getDaoFromChain");
     const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
     
-    console.log("getDaoFromChain in onchain-data-helper.ts --daoAccount--", daoAccount);
+    // console.log("getDaoFromChain in onchain-data-helper.ts --daoAccount--", daoAccount);
     //consider return value's type
     //delete await keyword
     const councillors = daoAccount.councillors;

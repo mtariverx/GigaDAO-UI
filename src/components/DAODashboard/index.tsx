@@ -53,8 +53,7 @@ const DAODashboard: React.FC = (props) => {
     return str;
   };
 
-  const onClickRefresh = async() => {
-   
+  const onClickRefresh = async () => {
     let newOwner: pic.Owner = { address: publicKey };
     let member_daos_promise = await livePic.getMemberDaos(newOwner);
 
@@ -63,12 +62,11 @@ const DAODashboard: React.FC = (props) => {
     m_daos = member_daos_promise;
     console.log("-------------");
     console.log(m_daos);
-    setMemberDAOs({...m_daos}); //set daos to memberdaos but the dao has only address and streams
+    setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
     mdis = m_daos.map((dao) => dao.dao_id);
     setMemberDaoIds(mdis);
     setRefresh(!refresh);
     console.log("refresh is clicked");
-
   };
   useEffect(() => {
     (async () => {
@@ -91,12 +89,13 @@ const DAODashboard: React.FC = (props) => {
         let mdis: Array<string> = [];
         let m_daos: Array<pic.Dao> = [];
         m_daos = member_daos_promise;
-        setMemberDAOs({...m_daos}); //set daos to memberdaos but the dao has only address and streams
+        setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
         mdis = m_daos.map((dao) => dao.dao_id);
-        
+
         setMemberDaoIds(mdis);
         setSelectedMemberDAO({ ...m_daos[0] }); //only first
-        setCouncillorSignerPair({ ...m_daos[0] }); //kaiming
+        // setCouncillorSignerPair({ ...m_daos[0] }); //kaiming
+        console.log("m_daos[0]=", m_daos[0]);
         getActiveProposalInfo({ ...m_daos[0] });
         //testing
         // livePic.showAllCallsInProgram(wallet); // testing for solana
@@ -113,27 +112,28 @@ const DAODashboard: React.FC = (props) => {
 
   useEffect(() => {
     if (selected_member_dao != undefined) {
-      setCouncillorSignerPair({...selected_member_dao}); //kaiming
-      getActiveProposalInfo({...selected_member_dao});
+      // setCouncillorSignerPair({...selected_member_dao}); //kaiming
+      console.log("use Effect=",selected_member_dao);
+      getActiveProposalInfo( selected_member_dao);
     }
   }, [selected_member_dao]);
 
-  const setCouncillorSignerPair = async (dao: pic.Dao) => {
-    //making councillor and signs to be showed
-    const _dao = await livePic.getDaoGovernanceFromChain(wallet, dao);
-    dao.governance = _dao.governance;
-    let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
-    if (dao.governance && dao.governance.councillors != undefined) {
-      dao.governance.councillors.forEach(function (councillor, index) {
-        let tmp: counc_sign_pair = {
-          councillor: councillor,
-          signer: dao.governance.proposed_signers[index],
-        };
-        tmp_counc_sign_arr.push(tmp);
-      });
-      setCounc_Sign(tmp_counc_sign_arr);
-    }
-  };
+  // const setCouncillorSignerPair = async (dao: pic.Dao) => {
+  //   //making councillor and signs to be showed
+  //   const _dao = await livePic.getDaoGovernanceFromChain(wallet, dao);
+  //   dao.governance = _dao.governance;
+  //   let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
+  //   if (dao.governance && dao.governance.councillors != undefined) {
+  //     dao.governance.councillors.forEach(function (councillor, index) {
+  //       let tmp: counc_sign_pair = {
+  //         councillor: councillor,
+  //         signer: dao.governance.proposed_signers[index],
+  //       };
+  //       tmp_counc_sign_arr.push(tmp);
+  //     });
+  //     setCounc_Sign(tmp_counc_sign_arr);
+  //   }
+  // };
 
   useEffect(() => {});
 
@@ -142,114 +142,133 @@ const DAODashboard: React.FC = (props) => {
   const onChangeSelectMemberDAO = (event) => {
     let dao_id = event.target.value;
     setMemberDao(dao_id);
-    setCouncillorSignerPair({ ...selected_member_dao });
+    // setCouncillorSignerPair({ ...selected_member_dao });
   };
 
   const setMemberDao = (dao_id: string) => {
+    console.log("member_daos =", member_daos);
     for (const dao of member_daos) {
+      console.log(dao.address.toString());
       if (dao.dao_id == dao_id) {
+        console.log("selected new dao ", dao.dao_id);
         setSelectedMemberDAO({ ...dao });
-      }
+       }
     }
   };
 
   //get governance info to show them in Active Proposal Section
   const getActiveProposalInfo = async (dao: pic.Dao) => {
-    // if(dao.governance==undefined){
-    //   return dao;
-    // }
-    const _dao = await livePic.getDaoGovernanceFromChain(wallet, dao);
-    if (_dao.governance == undefined) {
-      return dao;
-    }
-    dao.governance = _dao.governance;
-    console.log("===============getActiveProposalInfo=============", dao);
-    console.log("getActiveProposal==", dao);
-    console.log("proposal_type==", dao.governance.proposal_type);
-    console.log(
-      "councillors==",
-      dao.governance.councillors.map((councillor) => councillor.toString())
-    );
-    console.log(
-      "approval_threshold==",
-      dao.governance.approval_threshold.toString()
-    );
-    console.log("proposed_signers==", dao.governance.proposed_signers);
-    console.log("proposal_is_active==", dao.governance.proposal_is_active);
-    console.log(
-      "proposed_councillors==",
-      dao.governance.proposed_councillors.map((councillor) =>
-        councillor.toString()
-      )
-    );
-    // console.log("proposed_approval_threshold==",dao.governance.proposed_approval_threshold.toString());
-    console.log(
-      "proposed_deactivation_stream==",
-      dao.governance.proposed_deactivation_stream.toString()
-    );
-    console.log(
-      "proposed_withdrawal_amount==",
-      dao.governance.proposed_withdrawal_amount.toString()
-    );
-    console.log(
-      "proposed_withdrawal_receiver==",
-      dao.governance.proposed_withdrawal_receiver.toString()
-    );
-    console.log(
-      "proposed_withdrawal_stream==",
-      dao.governance.proposed_withdrawal_stream.toString()
-    );
-    console.log(
-      "num_streams==",
-      parseInt(dao.governance.num_streams.toString())
-    );
-
-    if (dao.governance == undefined) {
-      return dao;
-    }
     let tmp: any = [];
+    let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
+    try {
+      console.log("===============getActiveProposalInfo=============", dao.dao_id);
+      const _dao = await livePic.getDaoGovernanceFromChain(wallet, dao);
+      console.log("===============getActiveProposalInfo=====1========", dao);
+      dao.governance = _dao.governance;
+      
+      if (dao.governance && dao.governance.councillors != undefined) {
+        dao.governance.councillors.forEach(function (councillor, index) {
+          let tmp_c: counc_sign_pair = {
+            councillor: councillor,
+            signer: dao.governance.proposed_signers[index],
+          };
+          tmp_counc_sign_arr.push(tmp_c);
+        });
+        
+      }
 
-    if (
-      dao.governance &&
-      Object.keys(dao.governance.proposal_type)[0] == "deactivateStream"
-    ) {
-      tmp = [
-        ["Proposal Type", "DEACTIVEATE_STREAM"],
-        [
-          "Stream Public Key",
-          getShortKey(dao.governance.proposed_withdrawal_stream.toString()),
-        ],
-      ];
-    } else if (
-      dao.governance &&
-      Object.keys(dao.governance.proposal_type)[0] == "withdrawFromStream"
-    ) {
-      tmp = [
-        ["Proposal Type: ", "WITHDRAW FROM STREAM"],
-        ["Amount", `${dao.governance.proposed_withdrawal_amount}`],
-        [
-          "Withdraw Receiver: ",
-          getShortKey(dao.governance.proposed_withdrawal_receiver.toString()),
-        ],
-        [
-          "Withdraw Stream: ",
-          getShortKey(dao.governance.proposed_withdrawal_stream.toString()),
-        ],
-      ];
-    } else if (
-      dao.governance &&
-      Object.keys(dao.governance.proposal_type)[0] == "updateMultisig"
-    ) {
-      tmp = [
-        ["Proposal Type: ", "UPDATE_MULTISIG"],
-        [
-          "councillors: ",
-          dao.governance.proposed_councillors
-            .map((councillor) => getShortKey(councillor.toString()))
-            .join("\n"),
-        ],
-      ];
+      console.log("===============getActiveProposalInfo======2=======", dao);
+      console.log("getActiveProposal==", dao);
+      console.log("proposal_type==", dao.governance.proposal_type);
+      console.log(
+        "councillors==",
+        dao.governance.councillors.map((councillor) => councillor.toString())
+      );
+      console.log(
+        "approval_threshold==",
+        dao.governance.approval_threshold.toString()
+      );
+      console.log("proposed_signers==", dao.governance.proposed_signers);
+      console.log("proposal_is_active==", dao.governance.proposal_is_active);
+      console.log(
+        "proposed_councillors==",
+        dao.governance.proposed_councillors.map((councillor) =>
+          councillor.toString()
+        )
+      );
+      // console.log("proposed_approval_threshold==",dao.governance.proposed_approval_threshold.toString());
+      console.log(
+        "proposed_deactivation_stream==",
+        dao.governance.proposed_deactivation_stream.toString()
+      );
+      console.log(
+        "proposed_withdrawal_amount==",
+        dao.governance.proposed_withdrawal_amount.toString()
+      );
+      console.log(
+        "proposed_withdrawal_receiver==",
+        dao.governance.proposed_withdrawal_receiver.toString()
+      );
+      console.log(
+        "proposed_withdrawal_stream==",
+        dao.governance.proposed_withdrawal_stream.toString()
+      );
+      console.log(
+        "num_streams==",
+        parseInt(dao.governance.num_streams.toString())
+      );
+
+      if (dao.governance == undefined) {
+        return dao;
+      }
+
+      if (
+        dao.governance &&
+        Object.keys(dao.governance.proposal_type)[0] == "deactivateStream"
+      ) {
+        tmp = [
+          ["Proposal Type:", "DEACTIVEATE_STREAM"],
+          [
+            "Stream Public Key:",
+            getShortKey(dao.governance.proposed_deactivation_stream.toString()),
+          ],
+        ];
+      } else if (
+        dao.governance &&
+        Object.keys(dao.governance.proposal_type)[0] == "withdrawFromStream"
+      ) {
+        tmp = [
+          ["Proposal Type: ", "WITHDRAW FROM STREAM"],
+          ["Amount", `${dao.governance.proposed_withdrawal_amount}`],
+          [
+            "Withdraw Receiver: ",
+            getShortKey(dao.governance.proposed_withdrawal_receiver.toString()),
+          ],
+          [
+            "Withdraw Stream: ",
+            getShortKey(dao.governance.proposed_withdrawal_stream.toString()),
+          ],
+        ];
+      } else if (
+        dao.governance &&
+        Object.keys(dao.governance.proposal_type)[0] == "updateMultisig"
+      ) {
+        tmp = [
+          ["Proposal Type: ", "UPDATE_MULTISIG"],
+          [
+            "councillors: ",
+            dao.governance.proposed_councillors
+              .map((councillor) => getShortKey(councillor.toString()))
+              .join("\n"),
+          ],
+        ];
+      }
+      // setSelectedMemberDAO(dao);
+      setActiveProposalInfo(tmp);
+    } catch (e) {
+      console.log(e);
     }
+    setCounc_Sign(tmp_counc_sign_arr);
     setActiveProposalInfo(tmp);
   };
 
