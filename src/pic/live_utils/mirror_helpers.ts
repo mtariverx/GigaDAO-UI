@@ -91,6 +91,15 @@ export async function deleteDao(dao: pic.Dao) {
   return data;
 }
 
+export async function deleteStream(stream: pic.Stream){
+  console.log("delete stream in mirror");
+  const stream_address=stream.address.toString();
+  const URL = BASE_URL + `delete_stream?stream_address=${stream_address}`;
+  const response = await fetch(URL, { mode: "cors" });
+  const data = await response.json();
+  return data;
+}
+
 export async function deleteCouncillors(dao: pic.Dao) {
   console.log("delete councillor in mirror");
   const dao_address = dao.address.toString();

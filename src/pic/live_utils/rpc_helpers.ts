@@ -319,6 +319,7 @@ export async function initializeStream(
   stream: pic.Stream
 ) {
   let program = await initProgram(wallet, network);
+  console.log("program=",program);
   [fee_controller] = await PublicKey.findProgramAddress(
     [Buffer.from(FEE_CONTROLLER_PDA_SEED)],
     program.programId
@@ -345,16 +346,17 @@ export async function initializeStream(
       "token_mint_address address=",
       stream.token_mint_address.toString()
     );
+
+   
     let tokenMint: spl_token.Mint = await spl_token.getMint(
       program.provider.connection,
-      stream.token_mint_address //error
+      stream.token_mint_address 
     );
-    // let tokenMint: spl_token.Mint = await spl_token.getMint(
-    //     program.provider.connection,
-    //     tokenMintAddress
-    //   );
-
-    let verified_creator_addresses = [wallet.publicKey];
+    console.log("stream key=",stream.address.toString());
+    console.log("stream.stream_keypaire=",stream.stream_keypair.publicKey.toString());
+    
+    let verified_creator_addresses = stream.collections.map(item=>item.address);
+    console.log("stream.collections=", verified_creator_addresses.map(item=>item.toString()));
 
     let is_simulation = true;
     await program.rpc.initializeStream(

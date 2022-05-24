@@ -46,7 +46,8 @@ const NewStream = (props) => {
   };
   const onAddCollections = async () => {
     const temp = [...collections];
-    let flag = await validateSolanaAddress(collect);
+    let flag=true;
+    //  let flag = await validateSolanaAddress(collect);
     if (flag) {
       temp.push(collect);
       setCollections(temp);
@@ -77,13 +78,14 @@ const NewStream = (props) => {
 
     if (
       pool_name &&
-      (await validateSolanaAddress(token_mint_address)) &&
+      (token_mint_address) &&
       collections.length > 0
     ) {
       console.log("props.dao.dao_address=",props.dao);
+      const key=Keypair.generate();
       let new_stream:pic.Stream = {
         name: pool_name,
-        address: Keypair.generate().publicKey,
+        address: key.publicKey,
         dao_address: new PublicKey(props.dao.address),
         collections: collections.map((collect) => {
           let collection = {
@@ -102,6 +104,7 @@ const NewStream = (props) => {
         last_update_timestamp: Math.floor(Date.now() / 1000),
         is_active: false,
         token_mint_address:new PublicKey(token_mint_address),
+        stream_keypair:key,
       };
 
       const { dao, stream } = await livePic.initializeStream(

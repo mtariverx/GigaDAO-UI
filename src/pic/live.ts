@@ -732,18 +732,10 @@ let initializeStream: pic.InitializeStream = async (
   dao: pic.Dao,
   stream: pic.Stream
 ) => {
-  // try {
-  //   await rpc.initializeStream(wallet, NETWORK, dao, stream).then(function(f){console.log("--Success")});
-  //   console.log("Initializing stream in onchain was success!");
-  //   alert("Initializing stream in onchain was success!");
-  // } catch (e) {
-  //   alert("Initializing stream in onchain was failed!");
-  //   console.log("error=",e);
-  // }
+
   let result = await mirror.insertNewStream(stream);
   if (result.success) {
     alert("Initializing stream in database was success!");
-    console.log("initializeStream in database success");
     console.log(result);
     try {
       await rpc.initializeStream(wallet, NETWORK, dao, stream);
@@ -751,6 +743,10 @@ let initializeStream: pic.InitializeStream = async (
       alert("Initializing stream in onchain was success!");
     } catch (e) {
       alert("Initializing stream in onchain was failed!");
+      let result_stream_delete=await mirror.deleteStream(stream);
+      if (result_stream_delete.success){
+        alert("Deleting stream is success");
+      }
     }
   } else {
     console.log("initializeStream in database failed");
