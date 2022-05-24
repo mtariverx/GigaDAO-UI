@@ -43,7 +43,8 @@ export async function initProgram(wallet: anchor.Wallet, network: string) {
     let program = new anchor.Program(idl, programId, provider);
     return program;
   } catch (e) {
-      console.log("initProgram error");
+    throw e;
+    console.log("initProgram error");
     console.log(e);
   }
 }
@@ -72,6 +73,7 @@ export async function approveDaoCommand(
     });
     console.log("approveDaoCommand sucess");
   } catch (e) {
+    throw e;
     console.log(e);
   }
 }
@@ -117,9 +119,13 @@ export async function initializeDAO(
         signers: [dao.dao_keypair],
       }
     );
+
     console.log("initial dao transaction is okay");
+    // return true;
   } catch (e) {
+    throw e;
     console.log(e);
+    // return false;
   }
 }
 export async function proposeDaoCommand(
@@ -172,6 +178,7 @@ export async function proposeDaoCommand(
     );
     console.log("proposeDaoCommand success");
   } catch (e) {
+    throw e;
     console.log(e);
   }
 }
@@ -202,6 +209,7 @@ export async function executeUpdateDaoMultisig(
     });
     console.log("executeUpdateDaoMultisig success");
   } catch (e) {
+    throw e;
     console.log(e);
   }
 }
@@ -243,6 +251,7 @@ export async function executeDeactivateStream(
     });
     console.log("executeDeactivateStream success");
   } catch (e) {
+    throw e;
     console.log(e);
   }
 }
@@ -298,6 +307,7 @@ export async function executeWithdrawFromStream(
     });
     console.log("executeWithdrawFromStream success");
   } catch (e) {
+    throw e;
     console.log(e);
   }
 }
@@ -337,7 +347,7 @@ export async function initializeStream(
     );
     let tokenMint: spl_token.Mint = await spl_token.getMint(
       program.provider.connection,
-      stream.token_mint_address
+      stream.token_mint_address //error
     );
     // let tokenMint: spl_token.Mint = await spl_token.getMint(
     //     program.provider.connection,
@@ -370,7 +380,8 @@ export async function initializeStream(
     );
     console.log("executeWithdrawFromStream success");
   } catch (e) {
-    console.log(e);
+      throw e;
+      console.log(e);
   }
 }
 

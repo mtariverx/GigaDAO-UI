@@ -705,21 +705,20 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
     if (count_success == dao.governance.councillors.length) {
       console.log("insertCouncillors success");
       alert("Inserting councillors in database was success!");
-      try{
+      try {
         await rpc.initializeDAO(wallet, NETWORK, dao); //calls for onchain
         console.log("initalizeDao success");
         alert("Initializing dao in onchain was success!");
-      }catch (e) {
-        let result_dao_delete=await mirror.deleteDao(dao);
-        if(result_dao_delete.success){
+      } catch (e) {
+        let result_dao_delete = await mirror.deleteDao(dao);
+        if (result_dao_delete.success) {
           console.log("delete dao success");
           alert("Deleting dao in onchain was success!");
-          let result_councillors_delete=await mirror.deleteCouncillors(dao);
+          let result_councillors_delete = await mirror.deleteCouncillors(dao);
           console.log("delete councillor success");
           alert("Deleting councillors in onchain was success!");
         }
       }
-      
     }
   } else {
     console.log("initializeDao failed");
@@ -733,15 +732,29 @@ let initializeStream: pic.InitializeStream = async (
   dao: pic.Dao,
   stream: pic.Stream
 ) => {
+  // try {
+  //   await rpc.initializeStream(wallet, NETWORK, dao, stream).then(function(f){console.log("--Success")});
+  //   console.log("Initializing stream in onchain was success!");
+  //   alert("Initializing stream in onchain was success!");
+  // } catch (e) {
+  //   alert("Initializing stream in onchain was failed!");
+  //   console.log("error=",e);
+  // }
   let result = await mirror.insertNewStream(stream);
   if (result.success) {
-    alert("Initializing stream in database was success!")
-    console.log("initializeStream success");
+    alert("Initializing stream in database was success!");
+    console.log("initializeStream in database success");
     console.log(result);
-    await rpc.initializeStream(wallet, NETWORK, dao, stream);
-    alert("Initializing stream in onchain was success!")
+    try {
+      await rpc.initializeStream(wallet, NETWORK, dao, stream);
+      console.log("Initializing stream in onchain was success!");
+      alert("Initializing stream in onchain was success!");
+    } catch (e) {
+      alert("Initializing stream in onchain was failed!");
+    }
   } else {
-    console.log("initializeStream failed");
+    console.log("initializeStream in database failed");
+    alert("Initializing stream in database was failed!");
   }
   return { dao, stream };
 };
@@ -760,17 +773,17 @@ export async function approveDaoCommand(wallet, dao) {
 export async function executeUpdateDaoMultisig(wallet, dao) {
   console.log("executeUpdateDaoMultisig in live");
   await rpc.executeUpdateDaoMultisig(wallet, NETWORK, dao);
-  alert("ExecuteUpdateDaoMultisig was success!")
+  alert("ExecuteUpdateDaoMultisig was success!");
 }
 export async function executeDeactivateStream(wallet, dao) {
   console.log("executeDeactivateStream in live");
   await rpc.executeDeactivateStream(wallet, NETWORK, dao);
-  alert("executeDeactivateStream was success!")
+  alert("executeDeactivateStream was success!");
 }
 export async function executeWithdrawFromStream(wallet, dao) {
   console.log("executeWithdrawFromStream in live");
   await rpc.executeWithdrawFromStream(wallet, NETWORK, dao);
-  alert("executeWithdrawFromStream was success!")
+  alert("executeWithdrawFromStream was success!");
 }
 
 export {

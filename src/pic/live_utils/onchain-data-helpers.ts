@@ -182,6 +182,13 @@ export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
   try {
     // dao.address=new PublicKey("9EbGGkMWU5Vi1TNve6K3wuH14ScUfSoy2TPhnLKzQf9C");
     // const daoAccount = await program.account.dao.fetch("9EbGGkMWU5Vi1TNve6K3wuH14ScUfSoy2TPhnLKzQf9C"); //kaiming
+    try{
+      const streamAccount=await program.account.stream.fetch("HRQZFgVGLzTtthyTe4ra9KJyJVQNzmqBbQFNA9qdHFNa");
+      console.log("streamAccount=",streamAccount);
+    }catch (e) {
+      console.log("stream error=",e);
+    }
+    
 
     console.log("getDaoFromChain");
     const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
