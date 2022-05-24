@@ -154,8 +154,10 @@ export async function proposeDaoCommand(
       dao.governance.proposed_withdrawal_amount
     );
     let proposed_withdraw_receiver_owner =
-      dao.governance.proposed_withdrawal_stream;
+      dao.governance.proposed_withdrawal_receiver;
     let proposed_withdraw_stream = dao.governance.proposed_withdrawal_stream;
+    console.log("receiver=",dao.governance.proposed_withdrawal_receiver.toString());
+    console.log("stream=", dao.governance.proposed_withdrawal_stream.toString());
     await program.rpc.proposeDaoCommand(
       proposal_type,
       proposed_councillors,
@@ -283,18 +285,17 @@ export async function executeWithdrawFromStream(
   try {
     console.log("I'm executeWithdrawFromStream");
     console.log(dao.address.toString());
-    console.log(
-      "deactivate stream=",
-      dao.governance.proposed_deactivation_stream.toString()
-    );
+ 
     console.log("token pool=", tokenPool.toString());
     console.log("daoAuthPda=", daoAuthPda.toString());
+    console.log("proposed_withdrawal_stream=",dao.governance.proposed_withdrawal_stream.toString());
+   
 
     await program.rpc.executeWithdrawFromStream({
       accounts: {
         signer: wallet.publicKey,
         dao: dao.address,
-        stream: dao.governance.proposed_deactivation_stream, //deactivate stream pubkey
+        stream: dao.governance.proposed_withdrawal_stream, //deactivate stream pubkey
         tokenPool: tokenPool,
         receiverTokenAccount: dao.governance.proposed_withdrawal_receiver, //
         daoAuthPda: daoAuthPda,

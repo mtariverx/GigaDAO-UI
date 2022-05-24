@@ -118,31 +118,11 @@ const DAODashboard: React.FC = (props) => {
     }
   }, [selected_member_dao]);
 
-  // const setCouncillorSignerPair = async (dao: pic.Dao) => {
-  //   //making councillor and signs to be showed
-  //   const _dao = await livePic.getDaoGovernanceFromChain(wallet, dao);
-  //   dao.governance = _dao.governance;
-  //   let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
-  //   if (dao.governance && dao.governance.councillors != undefined) {
-  //     dao.governance.councillors.forEach(function (councillor, index) {
-  //       let tmp: counc_sign_pair = {
-  //         councillor: councillor,
-  //         signer: dao.governance.proposed_signers[index],
-  //       };
-  //       tmp_counc_sign_arr.push(tmp);
-  //     });
-  //     setCounc_Sign(tmp_counc_sign_arr);
-  //   }
-  // };
-
-  // useEffect(() => {});
-
   let dao: pic.Dao;
 
   const onChangeSelectMemberDAO = (event) => {
     let dao_id = event.target.value;
     setMemberDao(dao_id);
-    // setCouncillorSignerPair({ ...selected_member_dao });
   };
 
   const setMemberDao = (dao_id: string) => {
