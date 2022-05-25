@@ -60,8 +60,6 @@ const DAODashboard: React.FC = (props) => {
     let mdis: Array<string> = [];
     let m_daos: Array<pic.Dao> = [];
     m_daos = member_daos_promise;
-    console.log("-------------");
-    console.log(m_daos);
     setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
     mdis = m_daos.map((dao) => dao.dao_id);
     setMemberDaoIds(mdis);
@@ -79,30 +77,15 @@ const DAODashboard: React.FC = (props) => {
         });
 
         let member_daos_promise = await livePic.getMemberDaos(newOwner);
-        console.log(
-          "member_daos_promise=",
-          await livePic.getMemberDaos(newOwner)
-        );
         // let member_daos_promise = await simPic.getMemberDaos(new_owner); //testing for sim.ts
-        // console.log("member_daos_promise=", member_daos_promise);
-
         let mdis: Array<string> = [];
         let m_daos: Array<pic.Dao> = [];
         m_daos = member_daos_promise;
         setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
         mdis = m_daos.map((dao) => dao.dao_id);
-
         setMemberDaoIds(mdis);
         setSelectedMemberDAO({ ...m_daos[0] }); //only first
-        // setCouncillorSignerPair({ ...m_daos[0] }); //kaiming
-        console.log("m_daos[0]=", m_daos[0]);
         getActiveProposalInfo({ ...m_daos[0] });
-        //testing
-        // livePic.showAllCallsInProgram(wallet); // testing for solana
-        // console.log(
-        //   "dashboard-getDaoFromChain-",
-        //   livePic.getDaoGovernanceFromChain(wallet, m_daos[0])
-        // );
         console.log("select member---", selected_member_dao);
       } else {
         callDisconnectOwner(dispatch);
@@ -112,25 +95,18 @@ const DAODashboard: React.FC = (props) => {
 
   useEffect(() => {
     if (selected_member_dao != undefined) {
-      // setCouncillorSignerPair({...selected_member_dao}); //kaiming
-      console.log("use Effect=",selected_member_dao);
       getActiveProposalInfo( selected_member_dao);
     }
   }, [selected_member_dao]);
-
   let dao: pic.Dao;
-
   const onChangeSelectMemberDAO = (event) => {
     let dao_id = event.target.value;
     setMemberDao(dao_id);
   };
-
   const setMemberDao = (dao_id: string) => {
     console.log("member_daos =", member_daos);
     for (const dao of member_daos) {
-      console.log(dao.address.toString());
       if (dao.dao_id == dao_id) {
-        console.log("selected new dao ", dao.dao_id);
         setSelectedMemberDAO({ ...dao });
        }
     }
@@ -141,9 +117,7 @@ const DAODashboard: React.FC = (props) => {
     let tmp: any = [];
     let tmp_counc_sign_arr: Array<counc_sign_pair> = [];
     try {
-      console.log("===============getActiveProposalInfo=============", dao.dao_id);
       const _dao = await livePic.getDaoGovernanceFromChain(wallet, dao);
-      console.log("===============getActiveProposalInfo=====1========", dao);
       dao.governance = _dao.governance;
       
       if (dao.governance && dao.governance.councillors != undefined) {
@@ -176,7 +150,6 @@ const DAODashboard: React.FC = (props) => {
           councillor.toString()
         )
       );
-      // console.log("proposed_approval_threshold==",dao.governance.proposed_approval_threshold.toString());
       console.log(
         "proposed_deactivation_stream==",
         dao.governance.proposed_deactivation_stream.toString()

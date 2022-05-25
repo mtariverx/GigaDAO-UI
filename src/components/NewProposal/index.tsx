@@ -86,19 +86,19 @@ const NewProposal = (props) => {
     if ((await validateSolanaAddress(stream_pubkey)) == false) {
       setStreamPubkey("");
     }
-    if ((await validateSolanaAddress(proposed_withdrawal_receiver)) == false) {
-      setProposedWithdrawalReceiver("");
-    }
+    // if ((await validateSolanaAddress(proposed_withdrawal_receiver)) == false) {
+    //   setProposedWithdrawalReceiver("");
+    // }
     if ((await validateSolanaAddress(proposed_withdrawal_stream)) == false) {
       setProposedWithdrawalStream("");
     }
     if (
       proposed_councillors.length > 0 ||
       (await validateSolanaAddress(stream_pubkey)) ||
-      ((await validateSolanaAddress(proposed_withdrawal_receiver)) &&
+      (proposed_withdrawal_receiver &&
         (await validateSolanaAddress(proposed_withdrawal_stream)))
     ) {
-      console.log("***************", props.dao);
+ 
 
       if (proposed_councillors && proposed_councillors.length > 0) {
         let proposed_councillors_pubkey = proposed_councillors.map(
@@ -107,8 +107,6 @@ const NewProposal = (props) => {
         props.dao.governance.proposed_councillors = proposed_councillors_pubkey;
         props.dao.governance.proposed_councillors.push(wallet.publicKey); //add owner
       }
-      console.log("proposal_type---",proposal_type);
-      console.log("proposal_type--dao-",props.dao);
       props.dao.governance.proposal_type=proposal_type;
 
       props.dao.governance.proposal_is_active = true;

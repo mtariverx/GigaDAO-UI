@@ -50,7 +50,6 @@ export async function getDaoById(dao_address: string) {
 }
 // WRITE / UPDATE METHODS
 export async function initializeDAO(dao: pic.Dao) {
-  console.log("mirror-initializeDAO=", dao.address.toString());
   const dao_address = dao.address.toString();
   const dao_id = dao.dao_id;
   const display_name = dao.display_name;
@@ -66,7 +65,6 @@ export async function initializeDAO(dao: pic.Dao) {
 }
 
 export async function insertCouncillors(dao: pic.Dao) {
-  console.log("mirror insertCouncillor=", dao);
   const dao_address = dao.address.toString();
   const councillors = dao.governance.councillors;
   const add_remove = true;
@@ -83,7 +81,6 @@ export async function insertCouncillors(dao: pic.Dao) {
 }
 
 export async function deleteDao(dao: pic.Dao) {
-  console.log("delete dao in mirror");
   const dao_address = dao.address.toString();
   const URL = BASE_URL + `delete_dao?dao_address=${dao_address}`;
   const response = await fetch(URL, { mode: "cors" });
@@ -92,7 +89,6 @@ export async function deleteDao(dao: pic.Dao) {
 }
 
 export async function deleteStream(stream: pic.Stream){
-  console.log("delete stream in mirror");
   const stream_address=stream.address.toString();
   const URL = BASE_URL + `delete_stream?stream_address=${stream_address}`;
   const response = await fetch(URL, { mode: "cors" });
@@ -101,7 +97,6 @@ export async function deleteStream(stream: pic.Stream){
 }
 
 export async function deleteCouncillors(dao: pic.Dao) {
-  console.log("delete councillor in mirror");
   const dao_address = dao.address.toString();
   const councillors = dao.governance.councillors;
   const add_remove = false;

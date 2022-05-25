@@ -28,10 +28,6 @@ const NewDAO = (props) => {
   const wallet = useAnchorWallet();
 
   const onClickCreateNewDAOBtn = async () => {
-    console.log("--onClickCreateNewDAOBtn--");
-    console.log("--create new dao--");
-    console.log("pubkey-",publicKey.toString());
-    console.log("connected-",connected);
 
     const key=Keypair.generate();
     let new_dao: pic.Dao = {

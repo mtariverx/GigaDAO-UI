@@ -59,7 +59,6 @@ export async function approveDaoCommand(
     program.programId
   );
   try {
-    console.log("I'm approveDaoCommand");
     await program.rpc.approveDaoCommand({
       accounts: {
         signer: wallet.publicKey,
@@ -98,9 +97,7 @@ export async function initializeDAO(
   );
   let councillors = dao.governance.councillors;
   let approval_threshold = 1;
-  console.log("signer=", wallet.publicKey.toString());
-  console.log("dao keypair=", dao.dao_keypair.publicKey.toString());
-  console.log("dao address=", dao.address.toString());
+
   try {
     await program.rpc.initializeDao(
       councillors,
@@ -133,8 +130,6 @@ export async function proposeDaoCommand(
   network: string,
   dao: pic.Dao
 ) {
-  console.log("I am proposeDaoCommand in rpc_helper");
-
   let program = await initProgram(wallet, network);
 
   [fee_controller] = await PublicKey.findProgramAddress(
@@ -156,8 +151,6 @@ export async function proposeDaoCommand(
     let proposed_withdraw_receiver_owner =
       dao.governance.proposed_withdrawal_receiver;
     let proposed_withdraw_stream = dao.governance.proposed_withdrawal_stream;
-    console.log("receiver=",dao.governance.proposed_withdrawal_receiver.toString());
-    console.log("stream=", dao.governance.proposed_withdrawal_stream.toString());
     await program.rpc.proposeDaoCommand(
       proposal_type,
       proposed_councillors,
@@ -196,8 +189,7 @@ export async function executeUpdateDaoMultisig(
     program.programId
   );
   try {
-    console.log("I'm executeUpdateDaoMultisig");
-    console.log(dao.address.toString());
+ 
     await program.rpc.executeUpdateDaoMultisig({
       accounts: {
         signer: wallet.publicKey,
@@ -235,9 +227,7 @@ export async function executeDeactivateStream(
       ],
       program.programId
     );
-    console.log("I'm executeDeactivateStream");
 
-    console.log(dao.address.toString());
     await program.rpc.executeDeactivateStream({
       accounts: {
         signer: wallet.publicKey,
@@ -271,6 +261,8 @@ export async function executeWithdrawFromStream(
   [tokenPool] = await PublicKey.findProgramAddress(
     [
       dao.governance.proposed_withdrawal_stream.toBuffer(), //kaiming not sure
+    //   dao.governance.proposed_deactivation_stream.toBuffer(), //kaiming not sure
+    
       Buffer.from(anchor.utils.bytes.utf8.encode(TOKEN_POOL_PDA_SEED)),
     ],
     program.programId
@@ -284,18 +276,23 @@ export async function executeWithdrawFromStream(
   );
   try {
     console.log("I'm executeWithdrawFromStream");
-    console.log(dao.address.toString());
- 
+    console.log("signer=",wallet.publicKey.toString());
+    console.log("dao=",dao.address.toString());
+    console.log("stream=",dao.governance.proposed_withdrawal_stream.toString());
     console.log("token pool=", tokenPool.toString());
+    console.log("receiverTokenAccount=", dao.governance.proposed_withdrawal_receiver.toString());
     console.log("daoAuthPda=", daoAuthPda.toString());
-    console.log("proposed_withdrawal_stream=",dao.governance.proposed_withdrawal_stream.toString());
-   
-
+    
+    // dao.governance.proposed_withdrawal_receiver=new PublicKey("HLS5Y68QSQgJP7wUbbbbCjEnMknVZrHXYDwwVaDcsdK7");
+    // dao.governance.proposed_withdrawal_receiver=new PublicKey("5F1xSVrk8JuZj2qCqYupKjwzUFhYDJZoVZoJWR9JpxPB");
+    // // AFbX8oGjGpmVFywbVouvhQSRmiW2aR1mohfahi4Y2AdB
+    // dao.governance.proposed_withdrawal_stream=new PublicKey("69Uw1pMckp6PLoQf32Kp8RjQ3QxayzsBseUuGxyC4dsK");
+    // tokenPool=new PublicKey("HLS5Y68QSQgJP7wUbbbbCjEnMknVZrHXYDwwVaDcsdK7");
     await program.rpc.executeWithdrawFromStream({
       accounts: {
         signer: wallet.publicKey,
         dao: dao.address,
-        stream: dao.governance.proposed_withdrawal_stream, //deactivate stream pubkey
+        stream: dao.governance.proposed_withdrawal_stream, 
         tokenPool: tokenPool,
         receiverTokenAccount: dao.governance.proposed_withdrawal_receiver, //
         daoAuthPda: daoAuthPda,
@@ -308,8 +305,8 @@ export async function executeWithdrawFromStream(
     });
     console.log("executeWithdrawFromStream success");
   } catch (e) {
-    throw e;
     console.log(e);
+    throw e;
   }
 }
 
@@ -340,24 +337,15 @@ export async function initializeStream(
     program.programId
   );
   try {
-    console.log("I'm initializeStream");
-    console.log(dao.address.toString());
-    console.log("stream address=", stream.address.toString());
-    console.log(
-      "token_mint_address address=",
-      stream.token_mint_address.toString()
-    );
+   
 
    
     let tokenMint: spl_token.Mint = await spl_token.getMint(
       program.provider.connection,
       stream.token_mint_address 
     );
-    console.log("stream key=",stream.address.toString());
-    console.log("stream.stream_keypaire=",stream.stream_keypair.publicKey.toString());
-    
+  
     let verified_creator_addresses = stream.collections.map(item=>item.address);
-    console.log("stream.collections=", verified_creator_addresses.map(item=>item.toString()));
 
     let is_simulation = true;
     await program.rpc.initializeStream(
