@@ -369,10 +369,12 @@ export async function initializeStream(
         signers: [stream.stream_keypair],
       }
     );
-    console.log("executeWithdrawFromStream success");
+    console.log("initialize stream was success");
   } catch (e) {
       throw e;
+      console.log("initialize stream error in rpc");
       console.log(e);
+
   }
 }
 

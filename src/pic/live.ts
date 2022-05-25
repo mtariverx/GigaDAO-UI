@@ -701,7 +701,6 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
       }
     });
     if (count_success == dao.governance.councillors.length) {
-      
       alert("Inserting councillors in database was success!");
       try {
         await rpc.initializeDAO(wallet, NETWORK, dao); //calls for onchain
@@ -727,7 +726,6 @@ let initializeStream: pic.InitializeStream = async (
   dao: pic.Dao,
   stream: pic.Stream
 ) => {
-
   let result = await mirror.insertNewStream(stream);
   if (result.success) {
     alert("Initializing stream in database was success!");
@@ -735,9 +733,9 @@ let initializeStream: pic.InitializeStream = async (
       await rpc.initializeStream(wallet, NETWORK, dao, stream);
       alert("Initializing stream in onchain was success!");
     } catch (e) {
-      alert("Initializing stream in onchain was failed!");
-      let result_stream_delete=await mirror.deleteStream(stream);
-      if (result_stream_delete.success){
+      alert(e.toString+" \nPlease do it again");
+      let result_stream_delete = await mirror.deleteStream(stream);
+      if (result_stream_delete.success) {
         alert("Deleting stream is success");
       }
     }
