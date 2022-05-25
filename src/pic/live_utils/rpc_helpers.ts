@@ -337,14 +337,12 @@ export async function initializeStream(
     program.programId
   );
   try {
-   
-
-   
     let tokenMint: spl_token.Mint = await spl_token.getMint(
       program.provider.connection,
       stream.token_mint_address 
     );
   
+    console.log("stream keypair=",stream.stream_keypair.publicKey.toString());
     let verified_creator_addresses = stream.collections.map(item=>item.address);
 
     let is_simulation = true;
@@ -371,9 +369,9 @@ export async function initializeStream(
     );
     console.log("initialize stream was success");
   } catch (e) {
-      throw e;
       console.log("initialize stream error in rpc");
       console.log(e);
+      throw e;
 
   }
 }
