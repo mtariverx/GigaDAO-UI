@@ -706,11 +706,12 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
         await rpc.initializeDAO(wallet, NETWORK, dao); //calls for onchain
         alert("Initializing dao in onchain was success!");
       } catch (e) {
+        alert(e);
         let result_dao_delete = await mirror.deleteDao(dao);
         if (result_dao_delete.success) {
-          alert("Deleting dao in onchain was success!");
+          alert("Deleting dao in database was success!");
           let result_councillors_delete = await mirror.deleteCouncillors(dao);
-          alert("Deleting councillors in onchain was success!");
+          alert("Deleting councillors in database was success!");
         }
       }
     }
@@ -733,11 +734,48 @@ let initializeStream: pic.InitializeStream = async (
       await rpc.initializeStream(wallet, NETWORK, dao, stream);
       alert("Initializing stream in onchain was success!");
     } catch (e) {
-      alert(e.toString+" \nPlease do it again");
-      let result_stream_delete = await mirror.deleteStream(stream);
-      if (result_stream_delete.success) {
-        alert("Deleting stream is success");
+      console.log("error message=", e.message);
+
+      //TODO transaction was not confirmed in 30s
+      if (
+        e.message
+          .toLowerCase()
+          .includes("Transaction was not confirmed in".toLowerCase())
+      ) {
+        alert(e.message);
+        let checkStreamOnChain = new Promise(function (resolve, reject) {
+          setTimeout(async function () {
+            try{
+              await rpc.getStreamByAddress(wallet, NETWORK, dao, stream);  
+            }catch (e) {
+              reject(e);
+            }
+            
+          }, 1000 * 60 * 5);
+        });
+        checkStreamOnChain.catch(async(err) => {
+          let result_stream_delete = await mirror.deleteStream(stream);
+          if (result_stream_delete.success) {
+            alert("Writing stream in blockchain was failed. \nDeleting stream is success");
+          }
+        });
+      } else {
+        //TODO if transaction is failed, delete the stream in database.
+        alert(e);
+        let result_stream_delete = await mirror.deleteStream(stream);
+        if (result_stream_delete.success) {
+          alert("Deleting stream is success");
+        }
       }
+      // if (e.message.toLowerCase().includes("Signature verification failed".toLowerCase())
+      // ) {
+      //   alert("Signature verification failed");
+      // }
+
+      //TODO insufficient funds
+      // if(e.message.toLowerCase( ).includes("insufficient fund".toLowerCase())){
+      //   alert("The transaction was not confirmed");
+      // }
     }
   } else {
     alert("Initializing stream in database was failed!");

@@ -189,7 +189,6 @@ export async function executeUpdateDaoMultisig(
     program.programId
   );
   try {
- 
     await program.rpc.executeUpdateDaoMultisig({
       accounts: {
         signer: wallet.publicKey,
@@ -261,8 +260,8 @@ export async function executeWithdrawFromStream(
   [tokenPool] = await PublicKey.findProgramAddress(
     [
       dao.governance.proposed_withdrawal_stream.toBuffer(), //kaiming not sure
-    //   dao.governance.proposed_deactivation_stream.toBuffer(), //kaiming not sure
-    
+      //   dao.governance.proposed_deactivation_stream.toBuffer(), //kaiming not sure
+
       Buffer.from(anchor.utils.bytes.utf8.encode(TOKEN_POOL_PDA_SEED)),
     ],
     program.programId
@@ -276,13 +275,19 @@ export async function executeWithdrawFromStream(
   );
   try {
     console.log("I'm executeWithdrawFromStream");
-    console.log("signer=",wallet.publicKey.toString());
-    console.log("dao=",dao.address.toString());
-    console.log("stream=",dao.governance.proposed_withdrawal_stream.toString());
+    console.log("signer=", wallet.publicKey.toString());
+    console.log("dao=", dao.address.toString());
+    console.log(
+      "stream=",
+      dao.governance.proposed_withdrawal_stream.toString()
+    );
     console.log("token pool=", tokenPool.toString());
-    console.log("receiverTokenAccount=", dao.governance.proposed_withdrawal_receiver.toString());
+    console.log(
+      "receiverTokenAccount=",
+      dao.governance.proposed_withdrawal_receiver.toString()
+    );
     console.log("daoAuthPda=", daoAuthPda.toString());
-    
+
     // dao.governance.proposed_withdrawal_receiver=new PublicKey("HLS5Y68QSQgJP7wUbbbbCjEnMknVZrHXYDwwVaDcsdK7");
     // dao.governance.proposed_withdrawal_receiver=new PublicKey("5F1xSVrk8JuZj2qCqYupKjwzUFhYDJZoVZoJWR9JpxPB");
     // // AFbX8oGjGpmVFywbVouvhQSRmiW2aR1mohfahi4Y2AdB
@@ -292,7 +297,7 @@ export async function executeWithdrawFromStream(
       accounts: {
         signer: wallet.publicKey,
         dao: dao.address,
-        stream: dao.governance.proposed_withdrawal_stream, 
+        stream: dao.governance.proposed_withdrawal_stream,
         tokenPool: tokenPool,
         receiverTokenAccount: dao.governance.proposed_withdrawal_receiver, //
         daoAuthPda: daoAuthPda,
@@ -309,7 +314,20 @@ export async function executeWithdrawFromStream(
     throw e;
   }
 }
-
+export async function getStreamByAddress(
+  wallet: anchor.Wallet,
+  network: string,
+  dao: pic.Dao,
+  stream: pic.Stream
+) {
+  try {
+    let program = await initProgram(wallet, network);
+    const streamAccount = await program.account.stream.fetch(stream.address);
+    console.log("streamAccount=", streamAccount);
+  } catch (e) {
+    throw e;
+  }
+}
 export async function initializeStream(
   wallet: anchor.Wallet,
   network: string,
@@ -317,7 +335,8 @@ export async function initializeStream(
   stream: pic.Stream
 ) {
   let program = await initProgram(wallet, network);
-  console.log("program=",program);
+  console.log("program=", program);
+  
   [fee_controller] = await PublicKey.findProgramAddress(
     [Buffer.from(FEE_CONTROLLER_PDA_SEED)],
     program.programId
@@ -339,11 +358,13 @@ export async function initializeStream(
   try {
     let tokenMint: spl_token.Mint = await spl_token.getMint(
       program.provider.connection,
-      stream.token_mint_address 
+      stream.token_mint_address
     );
-  
-    console.log("stream keypair=",stream.stream_keypair.publicKey.toString());
-    let verified_creator_addresses = stream.collections.map(item=>item.address);
+
+    console.log("stream keypair=", stream.stream_keypair.publicKey.toString());
+    let verified_creator_addresses = stream.collections.map(
+      (item) => item.address
+    );
 
     let is_simulation = true;
     await program.rpc.initializeStream(
@@ -369,10 +390,9 @@ export async function initializeStream(
     );
     console.log("initialize stream was success");
   } catch (e) {
-      console.log("initialize stream error in rpc");
-      console.log(e);
-      throw e;
-
+    console.log("initialize stream error in rpc");
+    console.log(e);
+    throw e;
   }
 }
 
