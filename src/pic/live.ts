@@ -697,6 +697,10 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
   if (result_dao.success) {
     alert("Initializing dao in database was success!");
     //insert councillors into database
+    dao.governance.councillors.map((item) =>
+      console.log("dao councillor=", item.toString())
+    );
+
     let result_councillors = await mirror.insertCouncillors(dao);
     console.log("insert councillors=", result_councillors);
     let count_success = 0;
@@ -713,14 +717,28 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
         await rpc.initializeDAO(wallet, NETWORK, dao); //calls for onchain
         alert("Initializing dao in onchain was success!");
       } catch (e) {
-        alert(e);
         if (
           e.message
             .toLowerCase()
             .includes("Transaction was not confirmed in".toLowerCase())
         ) {
+          alert("Transaction was not confirmed");
+        } else if (
+          e.message
+            .toLowerCase()
+            .includes(
+              "failed to send transaction: Transaction simulation failed: Error processing Instruction 0: custom program error: 0x1".toLocaleLowerCase()
+            )
+        ) {
+          alert("Insufficient funds");
+          let result_dao_delete = await mirror.deleteDao(dao);
+          if (result_dao_delete.success) {
+            alert("Deleting dao in database was success!");
+            let result_councillors_delete = await mirror.deleteCouncillors(dao);
+            alert("Deleting councillors in database was success!");
+          }
+        } else {
           alert(e);
-        }else{
           let result_dao_delete = await mirror.deleteDao(dao);
           if (result_dao_delete.success) {
             alert("Deleting dao in database was success!");
@@ -766,7 +784,24 @@ let initializeStream: pic.InitializeStream = async (
           .includes("Transaction was not confirmed in".toLowerCase())
       ) {
         alert(e.message);
-
+      } else if (
+        e.message
+          .toLowerCase()
+          .includes(
+            "failed to send transaction: Transaction simulation failed: Error processing Instruction 0: custom program error: 0x1".toLocaleLowerCase()
+          )
+      ) {
+        alert("Insufficient funds");
+        let result_stream_delete = await mirror.deleteStream(stream);
+        if (result_stream_delete.success) {
+          alert("Deleting stream is success");
+        }
+      } else if (
+        e.message
+          .toLowerCase()
+          .includes("Signature verification failed".toLowerCase())
+      ) {
+        alert("Signature verification failed");
       } else {
         //TODO if transaction is failed, delete the stream in database.
         alert(e);
@@ -775,15 +810,6 @@ let initializeStream: pic.InitializeStream = async (
           alert("Deleting stream is success");
         }
       }
-      // if (e.message.toLowerCase().includes("Signature verification failed".toLowerCase())
-      // ) {
-      //   alert("Signature verification failed");
-      // }
-
-      //TODO insufficient funds
-      // if(e.message.toLowerCase( ).includes("insufficient fund".toLowerCase())){
-      //   alert("The transaction was not confirmed");
-      // }
     }
   } else {
     alert("Initializing stream in database was failed!");
@@ -802,7 +828,7 @@ export async function checkIfStreamOnChain(wallet, daos) {
     // }
 
     console.log("dao address=", dao.address.toString());
-    console.log("dao address=", dao.dao_id);
+    console.log("dao id=", dao.dao_id);
 
     if (dao.streams) {
       for (const stream of dao.streams) {
@@ -810,9 +836,11 @@ export async function checkIfStreamOnChain(wallet, daos) {
         try {
           rpc.getStreamByAddress(wallet, NETWORK, dao, stream);
         } catch (e) {
-          let result_stream_delete=await mirror.deleteStream(stream);
+          let result_stream_delete = await mirror.deleteStream(stream);
           if (result_stream_delete.success) {
-            alert("The stream is not in blockchain.\nDeleting stream from DB was succdeded");
+            alert(
+              "The stream is not in blockchain.\nDeleting stream from DB was succdeded"
+            );
           }
           console.log(e);
           console.log("no stream in blockchain");

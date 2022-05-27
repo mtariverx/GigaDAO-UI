@@ -77,7 +77,7 @@ const NewDAO = (props) => {
         } //no need here, in approve dao 
       }
 
-      governance.councillors.push(publicKey); //add owner as a councillor
+      // governance.councillors.push(publicKey); //add owner as a councillor
       
       governance.approval_threshold = approval_threshold;
 
