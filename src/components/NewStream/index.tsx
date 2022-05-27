@@ -49,8 +49,12 @@ const NewStream = (props) => {
     let flag=true;
     //  let flag = await validateSolanaAddress(collect);
     if (flag) {
-      temp.push(collect);
-      setCollections(temp);
+      if(!temp.includes(collect)){
+        temp.push(collect);
+        setCollections(temp);
+      } else {
+        alert("The collection address is duplicated");
+      }
     }
     setCollect("");
   };

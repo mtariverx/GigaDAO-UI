@@ -28,7 +28,6 @@ const DAODashboard: React.FC = (props) => {
   const { dispatch, callConnectOwner, callDisconnectOwner } = useOwnerData();
   const [isConnectingToOwner, setIsConnectingToOwner] = useState(false);
 
-  const new_owner: pic.Owner = { address: Keypair.generate().publicKey }; //testing for sim.ts
   const [member_daos, setMemberDAOs] = useState<Array<pic.Dao>>([]);
   const [member_dao_ids, setMemberDaoIds] = useState<string[]>([]);
   const [dashitem, setDashItem] = useState(0);
@@ -37,7 +36,6 @@ const DAODashboard: React.FC = (props) => {
   const [refresh, setRefresh] = useState(false);
   const wallet = useAnchorWallet();
 
-  // console.log("wallet=", wallet);
   type counc_sign_pair = {
     councillor: PublicKey;
     signer: boolean;
@@ -77,7 +75,9 @@ const DAODashboard: React.FC = (props) => {
         });
 
         let member_daos_promise = await livePic.getMemberDaos(newOwner);
-        // let member_daos_promise = await simPic.getMemberDaos(new_owner); //testing for sim.ts
+        console.log("member_daos_promise=",member_daos_promise);
+        await livePic.checkIfStreamOnChain(wallet, member_daos_promise);
+
         let mdis: Array<string> = [];
         let m_daos: Array<pic.Dao> = [];
         m_daos = member_daos_promise;

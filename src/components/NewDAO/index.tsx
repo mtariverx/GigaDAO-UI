@@ -1,6 +1,6 @@
 import "./style.scss";
 import "../common/LabelInput/style.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "components/common/Button";
 import Plus_fill from "img/icons/plus_symbol_fill.png";
 import * as pic from "../../pic/pic";
@@ -26,6 +26,9 @@ const NewDAO = (props) => {
   const [isConnectingToOwner, setIsConnectingToOwner] = useState(false);
   
   const wallet = useAnchorWallet();
+  useEffect(() => {
+    setCouncillors([wallet.publicKey.toString()]);
+  },[])
 
   const onClickCreateNewDAOBtn = async () => {
 
@@ -41,7 +44,8 @@ const NewDAO = (props) => {
     };
     console.log("pub---",new_dao.address);
     let governance: pic.Governance={
-      councillors:[publicKey],
+      councillors:[],
+      // councillors:[publicKey],
       approval_threshold:0,
       proposed_signers: [false],
       proposal_is_active:false,
@@ -72,6 +76,7 @@ const NewDAO = (props) => {
           governance.proposed_signers.push(false);
         } //no need here, in approve dao 
       }
+
       governance.councillors.push(publicKey); //add owner as a councillor
       
       governance.approval_threshold = approval_threshold;
@@ -89,8 +94,13 @@ const NewDAO = (props) => {
     const temp = [...councillors];
     let flag=await validateSolanaAddress(one_councillor);
     if(flag){
-      temp.push(one_councillor);
-      setCouncillors(temp);
+      if(!temp.includes(one_councillor)){
+        temp.push(one_councillor);
+        setCouncillors(temp);
+      }else{
+        alert("The public key is duplicated");
+      }
+      
     }
     setOneCouncillor("");
   };
@@ -142,7 +152,7 @@ const NewDAO = (props) => {
             <div></div>
             <div className="show-collections">
               {councillors.map((item, index) => (
-                <div className="item">{item}</div>
+                <div key={index} className="item">{item}</div>
               ))}
             </div>
           </div>

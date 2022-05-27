@@ -47,15 +47,18 @@ const NewProposal = (props) => {
     const temp = [...proposed_councillors];
     let flag = await validateSolanaAddress(one_councillor);
     if (flag) {
-      temp.push(one_councillor);
-      setProposedCouncillors(temp);
+      if(!temp.includes(one_councillor)){
+        temp.push(one_councillor);
+        setProposedCouncillors(temp);
+      }else{
+        alert("The councillor is duplicated");
+      }
     }
     setOneCouncillor("");
   };
 
   const onSelectProposalType = (event) => {
     setProposalType(event.target.value);
-    
     setProposedCouncillors([]);
     setProposedApprovalThresold(0);
     setStreamPubkey("");

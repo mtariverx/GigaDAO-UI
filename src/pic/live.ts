@@ -25,72 +25,68 @@ export async function getDaoGovernanceFromChain(wallet, dao) {
 
 // Mirror only calls
 let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
-  try {
-    // let result = await mirror.getOwner(
-    //   "GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi"
-    // );
-
-    let result = await mirror.getOwner(owner.address.toString());
-    if (result.success) {
-      const data = result.data;
-      console.log("---live-connectOwner----", data);
-      // make collections
-      if (data.collections?.length > 0) {
-        let collections: Array<pic.Collection> = [];
-        for (const collection of data.collections) {
-          collections.push({
-            address: new PublicKey(collection),
-          });
-        }
-        owner.collections = collections;
+  // try {
+  let result = await mirror.getOwner(owner.address.toString());
+  if (result.success) {
+    const data = result.data;
+    console.log("---live-connectOwner----", data);
+    // make collections
+    if (data.collections?.length > 0) {
+      let collections: Array<pic.Collection> = [];
+      for (const collection of data.collections) {
+        collections.push({
+          address: new PublicKey(collection),
+        });
       }
-
-      if (data.daos?.length > 0) {
-        let daos: Array<pic.Dao> = [];
-        for (const dao of data.daos) {
-          daos.push({
-            address: new PublicKey(dao),
-          });
-        }
-        owner.daos = daos;
-      }
-
-      if (data.nfts?.length > 0) {
-        let nfts: Array<pic.Nft> = [];
-        for (const nft of data.nfts) {
-          let newNft: pic.Nft = {
-            address: new PublicKey(nft.address),
-            owner_address: owner.address,
-            name: nft.nft_name,
-            image_url: nft.image_url,
-            collection: { address: nft.collection_address },
-          };
-          if (nft.token_account) {
-            newNft.token_account = new PublicKey(nft.token_account);
-          }
-          if (nft.stake) {
-            // console.log("got stake from mirror acconut: ", nft.stake)
-
-            let newStake: pic.Stake = {
-              address: new PublicKey(nft.stake.address),
-              is_active: nft.stake.is_active,
-              num_connections: nft.stake.num_connections,
-            };
-            newNft.stake = newStake;
-          }
-          nfts.push(newNft);
-        }
-        owner.nfts = nfts;
-      }
-    } else {
-      alert(
-        "Failed to get owner data from backend, support has be automatically notified."
-      );
+      owner.collections = collections;
     }
-  } catch (e) {
-    alert("got error: " + e);
-    console.log(e);
+
+    if (data.daos?.length > 0) {
+      let daos: Array<pic.Dao> = [];
+      for (const dao of data.daos) {
+        daos.push({
+          address: new PublicKey(dao),
+        });
+      }
+      owner.daos = daos;
+    }
+
+    if (data.nfts?.length > 0) {
+      let nfts: Array<pic.Nft> = [];
+      for (const nft of data.nfts) {
+        let newNft: pic.Nft = {
+          address: new PublicKey(nft.address),
+          owner_address: owner.address,
+          name: nft.nft_name,
+          image_url: nft.image_url,
+          collection: { address: nft.collection_address },
+        };
+        if (nft.token_account) {
+          newNft.token_account = new PublicKey(nft.token_account);
+        }
+        if (nft.stake) {
+          // console.log("got stake from mirror acconut: ", nft.stake)
+
+          let newStake: pic.Stake = {
+            address: new PublicKey(nft.stake.address),
+            is_active: nft.stake.is_active,
+            num_connections: nft.stake.num_connections,
+          };
+          newNft.stake = newStake;
+        }
+        nfts.push(newNft);
+      }
+      owner.nfts = nfts;
+    }
+  } else {
+    alert(
+      "Failed to get owner data from backend, support has be automatically notified.\n Please check your interent connection."
+    );
   }
+  // } catch (e) {
+  //   alert("got error: " + e);
+  //   console.log(e);
+  // }
 
   mirror
     .forceSyncStakes(owner.address.toString())
@@ -646,46 +642,54 @@ let unstakeNft: pic.UnstakeNft = async (nft: pic.Nft) => {
 };
 
 let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
-  // let result=await mirror.getMembers("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi");
   //getting member daos from database if the owner address is a councillor of
-  const result = await mirror.getMembers(owner.address.toString());
-  //getting daos if the owner has daos
-  const new_owner = await connectOwner(owner);
+  try {
+    const result = await mirror.getMembers(owner.address.toString()); //get dao address lists
+    //getting daos if the owner has daos
+    const new_owner = await connectOwner(owner);
 
-  let dao_addresses = []; //combination of daos belong to the owner and daos where the pubkey is a councillor of.
-  if (result.success) {
-    if (result.data.dao_addresses) {
-      dao_addresses = dao_addresses.concat(result.data.dao_addresses);
-      // console.log("dao addresses=", dao_addresses);
-    }
-  } else {
-    console.log("Error in fetching daos from getMemberDaos");
-  }
-  if (new_owner.daos) {
-    new_owner.daos.map((dao) => dao_addresses.push(dao.address.toString()));
-  }
-  //   console.log("concat=", dao_addresses);
-  const new_daos: Array<pic.Dao> = dao_addresses.map((dao_address) => {
-    let dao: pic.Dao = { address: new PublicKey(dao_address) };
-    return dao;
-  });
-
-  const daos_with_stream = await getDaos(new_daos);
-  for (const dao of daos_with_stream) {
-    const result = await mirror.getDaoById(dao.address.toString());
-    try {
-      if (result.success) {
-        dao.dao_id = result.data[0].dao_id;
-        dao.display_name = result.data[0].display_name;
-        dao.image_url = result.data[0].image_url;
-        dao.num_nfts = result.data[0].num_nfts;
+    let dao_addresses = []; //combination of daos belong to the owner and daos where the pubkey is a councillor of.
+    if (result.success) {
+      if (result.data.dao_addresses) {
+        dao_addresses = dao_addresses.concat(result.data.dao_addresses);
       }
-    } catch (e) {
-      console.log(e);
+    } else {
+      console.log("Error in fetching daos from getMemberDaos");
     }
+    if (new_owner.daos) {
+      new_owner.daos.map((dao) => dao_addresses.push(dao.address.toString()));
+    }
+    const new_daos: Array<pic.Dao> = dao_addresses.map((dao_address) => {
+      let dao: pic.Dao = { address: new PublicKey(dao_address) };
+      return dao;
+    });
+
+    const daos_with_stream = await getDaos(new_daos);
+    for (const dao of daos_with_stream) {
+      const result = await mirror.getDaoById(dao.address.toString());
+      // console.log("dao details=", result);
+      console.log("doa address=", dao.address.toString());
+      if (dao.streams) {
+        for (const stream of dao.streams) {
+          console.log("stream address=", stream.address.toString());
+        }
+      }
+      try {
+        if (result.success) {
+          dao.dao_id = result.data[0].dao_id;
+          dao.display_name = result.data[0].display_name;
+          dao.image_url = result.data[0].image_url;
+          dao.num_nfts = result.data[0].num_nfts;
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    console.log("--get memeber daos with stream--", daos_with_stream); //dao with address and streams, dao_id, display_name, num_nfts
+    return daos_with_stream;
+  } catch (e) {
+    alert(e);
   }
-  console.log("--get memeber daos with stream--", daos_with_stream); //dao with address and streams, dao_id, display_name, num_nfts
-  return daos_with_stream;
 };
 
 let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
@@ -694,12 +698,15 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
     alert("Initializing dao in database was success!");
     //insert councillors into database
     let result_councillors = await mirror.insertCouncillors(dao);
+    console.log("insert councillors=", result_councillors);
     let count_success = 0;
     result_councillors.map((result) => {
       if (result.success) {
         count_success += 1;
       }
     });
+    console.log("councillor success=", count_success);
+
     if (count_success == dao.governance.councillors.length) {
       alert("Inserting councillors in database was success!");
       try {
@@ -707,12 +714,28 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
         alert("Initializing dao in onchain was success!");
       } catch (e) {
         alert(e);
-        let result_dao_delete = await mirror.deleteDao(dao);
-        if (result_dao_delete.success) {
-          alert("Deleting dao in database was success!");
-          let result_councillors_delete = await mirror.deleteCouncillors(dao);
-          alert("Deleting councillors in database was success!");
+        if (
+          e.message
+            .toLowerCase()
+            .includes("Transaction was not confirmed in".toLowerCase())
+        ) {
+          alert(e);
+        }else{
+          let result_dao_delete = await mirror.deleteDao(dao);
+          if (result_dao_delete.success) {
+            alert("Deleting dao in database was success!");
+            let result_councillors_delete = await mirror.deleteCouncillors(dao);
+            alert("Deleting councillors in database was success!");
+          }
         }
+      }
+    } else {
+      alert("Error in inserting councillors");
+      let result_dao_delete = await mirror.deleteDao(dao);
+      if (result_dao_delete.success) {
+        alert("Deleting dao in database was success!");
+      } else {
+        alert("Deleting dao in db was failed");
       }
     }
   } else {
@@ -743,22 +766,7 @@ let initializeStream: pic.InitializeStream = async (
           .includes("Transaction was not confirmed in".toLowerCase())
       ) {
         alert(e.message);
-        let checkStreamOnChain = new Promise(function (resolve, reject) {
-          setTimeout(async function () {
-            try{
-              await rpc.getStreamByAddress(wallet, NETWORK, dao, stream);  
-            }catch (e) {
-              reject(e);
-            }
-            
-          }, 1000 * 60 * 5);
-        });
-        checkStreamOnChain.catch(async(err) => {
-          let result_stream_delete = await mirror.deleteStream(stream);
-          if (result_stream_delete.success) {
-            alert("Writing stream in blockchain was failed. \nDeleting stream is success");
-          }
-        });
+
       } else {
         //TODO if transaction is failed, delete the stream in database.
         alert(e);
@@ -783,6 +791,36 @@ let initializeStream: pic.InitializeStream = async (
   return { dao, stream };
 };
 
+export async function checkIfStreamOnChain(wallet, daos) {
+  for (const dao of daos) {
+    // if (
+    //   dao.address.toString() === "CF4k1dNCakuEhBD1oQzpgGznkVqYNDmEbdAw8pdBJjt6"
+    // ) {
+    //   let result_dao_delete = await mirror.deleteDao(dao);
+    //   await mirror.deleteCouncillors(dao);
+    //   console.log("yes deleted");
+    // }
+
+    console.log("dao address=", dao.address.toString());
+    console.log("dao address=", dao.dao_id);
+
+    if (dao.streams) {
+      for (const stream of dao.streams) {
+        console.log("stream address=", stream.address.toString());
+        try {
+          rpc.getStreamByAddress(wallet, NETWORK, dao, stream);
+        } catch (e) {
+          let result_stream_delete=await mirror.deleteStream(stream);
+          if (result_stream_delete.success) {
+            alert("The stream is not in blockchain.\nDeleting stream from DB was succdeded");
+          }
+          console.log(e);
+          console.log("no stream in blockchain");
+        }
+      }
+    }
+  }
+}
 //writing calls
 export async function proposeDaoCommand(wallet, dao) {
   await rpc.proposeDaoCommand(wallet, NETWORK, dao);

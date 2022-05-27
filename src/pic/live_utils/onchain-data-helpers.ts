@@ -4,6 +4,8 @@ Read-only requests to the solana cluster
 
 import { PublicKey } from "@solana/web3.js";
 import * as spl_token from "libs/spl-token";
+import { NETWORK } from "../connect";
+import * as mirror from "../live_utils/mirror_helpers";
 import {
   CONNECTION_PDA_SEED,
   initProgram,
@@ -180,37 +182,26 @@ export async function refreshStake(wallet, network, stake: pic.Stake) {
 export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
   let program = await initProgram(wallet, network);
   try {
-    // dao.address=new PublicKey("9EbGGkMWU5Vi1TNve6K3wuH14ScUfSoy2TPhnLKzQf9C");
-    // const daoAccount = await program.account.dao.fetch("9EbGGkMWU5Vi1TNve6K3wuH14ScUfSoy2TPhnLKzQf9C"); //kaiming
-    // try{
-    //   const streamAccount=await program.account.stream.fetch("HRQZFgVGLzTtthyTe4ra9KJyJVQNzmqBbQFNA9qdHFNa");
-    //   console.log("streamAccount=",streamAccount);
-    // }catch (e) {
-    //   console.log("stream error=",e);
-    // }
-    
-
     console.log("getDaoFromChain");
     const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
-    
-    // console.log("getDaoFromChain in onchain-data-helper.ts --daoAccount--", daoAccount);
+
     //consider return value's type
     //delete await keyword
     const councillors = daoAccount.councillors;
     const approvalThreshold = daoAccount.approvalThreshold.toNumber();
-    const proposalSigners =  daoAccount.proposalSigners;
-    const proposalIsActive =  daoAccount.proposalIsActive;
-    const proposalType =  daoAccount.proposalType;
-    const proposedCouncillors =  daoAccount.proposedCouncillors;
+    const proposalSigners = daoAccount.proposalSigners;
+    const proposalIsActive = daoAccount.proposalIsActive;
+    const proposalType = daoAccount.proposalType;
+    const proposedCouncillors = daoAccount.proposedCouncillors;
     const proposedApprovalThreshold =
-       daoAccount.proposedApprovalThreshold.toNumber();
-    const proposedDeactivationStream =
-       daoAccount.proposedDeactivationStream;
-    const proposedWithdrawalAmount =  daoAccount.proposedWithdrawalAmount.toNumber();
+      daoAccount.proposedApprovalThreshold.toNumber();
+    const proposedDeactivationStream = daoAccount.proposedDeactivationStream;
+    const proposedWithdrawalAmount =
+      daoAccount.proposedWithdrawalAmount.toNumber();
     const proposedWithdrawalReceiverOwner =
-       daoAccount.proposedWithdrawalReceiverOwner;
-    const proposedWithdrawalStream =  daoAccount.proposedWithdrawalStream;
-    const numStreams =  daoAccount.numStreams.toNumber();
+      daoAccount.proposedWithdrawalReceiverOwner;
+    const proposedWithdrawalStream = daoAccount.proposedWithdrawalStream;
+    const numStreams = daoAccount.numStreams.toNumber();
 
     let governance: pic.Governance = {
       councillors: councillors,
@@ -227,9 +218,15 @@ export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
       num_streams: numStreams,
     };
     dao.governance = governance;
-
   } catch (e) {
-    console.log(e.toString());
+    console.log(e);
+    console.log("Dao is not in blockchain=",dao.address.toString());
+    // let result_dao_delete = await mirror.deleteDao(dao);
+    // if (result_dao_delete.success) {
+    //   alert("Deleting dao in database was success!");
+    //   let result_councillors_delete = await mirror.deleteCouncillors(dao);
+    //   alert("Deleting councillors in database was success!");
+    // }
   }
 
   return dao;
