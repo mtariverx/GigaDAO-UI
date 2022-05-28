@@ -314,22 +314,7 @@ export async function executeWithdrawFromStream(
     throw e;
   }
 }
-export async function getStreamByAddress(
-  wallet: anchor.Wallet,
-  network: string,
-  dao: pic.Dao,
-  stream: pic.Stream
-) {
-  try {
-    let program = await initProgram(wallet, network);
-    const streamAccount = await program.account.stream.fetch(stream.address);
-    // const streamAccount = await program.account.stream.fetch(new PublicKey("AxvGMjANRrA16KHUA3tBKEn1harY5PvmdUY5uMH9Qktg"));
-    
-    console.log("streamAccount=", streamAccount);
-  } catch (e) {
-    throw e;
-  }
-}
+
 export async function initializeStream(
   wallet: anchor.Wallet,
   network: string,
@@ -338,7 +323,7 @@ export async function initializeStream(
 ) {
   let program = await initProgram(wallet, network);
   console.log("program=", program);
-  
+
   [fee_controller] = await PublicKey.findProgramAddress(
     [Buffer.from(FEE_CONTROLLER_PDA_SEED)],
     program.programId
@@ -369,7 +354,7 @@ export async function initializeStream(
     console.log("tokenmint=", stream.token_mint_address.toString());
     console.log("tokenPool=", tokenPool.toString());
     console.log("stream keypair=", stream.stream_keypair.publicKey.toString());
-    
+
     let verified_creator_addresses = stream.collections.map(
       (item) => item.address
     );
@@ -381,7 +366,6 @@ export async function initializeStream(
       is_simulation,
       {
         accounts: {
-        //   signer: new PublicKey("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi"),
           signer: wallet.publicKey,
           stream: stream.address,
           dao: dao.address,

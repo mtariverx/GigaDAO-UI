@@ -116,7 +116,8 @@ let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
 
     let result = await mirror.getDaoStreams(initializedDaos);
     if (result.success) {
-      const streamMap: { string: Array<any> } = result.data; //{"ab":["a","b"]}
+      const streamMap: { string: Array<any> } = result.data; //{"ab":["c","d"]}
+      console.log("streamMap=",streamMap);
       for (const [daoAddress, streams] of Object.entries(streamMap)) {
         let matches = daos.filter(
           (dao, _) => dao.address?.toString() === daoAddress
@@ -125,6 +126,7 @@ let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
           alert(
             "Multiple matches found in DAO array, this should not happen, support has been automatically notified."
           );
+          matches.map(item=>console.log("matches=",item.address.toString()));
         } else {
           let dao = matches[0];
           dao.streams = [];
@@ -667,13 +669,11 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
     const daos_with_stream = await getDaos(new_daos);
     for (const dao of daos_with_stream) {
       const result = await mirror.getDaoById(dao.address.toString());
-      // console.log("dao details=", result);
-      console.log("doa address=", dao.address.toString());
-      if (dao.streams) {
-        for (const stream of dao.streams) {
-          console.log("stream address=", stream.address.toString());
-        }
-      }
+      // if (dao.streams) {
+      //   for (const stream of dao.streams) {
+      //     console.log("stream address=", stream.address.toString());
+      //   }
+      // }
       try {
         if (result.success) {
           dao.dao_id = result.data[0].dao_id;
@@ -819,13 +819,6 @@ let initializeStream: pic.InitializeStream = async (
 
 export async function checkIfStreamOnChain(wallet, daos) {
   for (const dao of daos) {
-    // if (
-    //   dao.address.toString() === "CF4k1dNCakuEhBD1oQzpgGznkVqYNDmEbdAw8pdBJjt6"
-    // ) {
-    //   let result_dao_delete = await mirror.deleteDao(dao);
-    //   await mirror.deleteCouncillors(dao);
-    //   console.log("yes deleted");
-    // }
 
     console.log("dao address=", dao.address.toString());
     console.log("dao id=", dao.dao_id);
@@ -834,7 +827,10 @@ export async function checkIfStreamOnChain(wallet, daos) {
       for (const stream of dao.streams) {
         console.log("stream address=", stream.address.toString());
         try {
-          rpc.getStreamByAddress(wallet, NETWORK, dao, stream);
+          let program = await rpc.initProgram(wallet, NETWORK);
+          const streamAccount = await program.account.stream.fetch(
+            stream.address
+          );
         } catch (e) {
           let result_stream_delete = await mirror.deleteStream(stream);
           if (result_stream_delete.success) {

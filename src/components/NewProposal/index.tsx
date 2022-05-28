@@ -143,10 +143,11 @@ const NewProposal = (props) => {
               <div className="label-select-group">
                 <div className="proposal_notation">Proposal Type</div>
                 <div className="select-proposal-type">
-                  <select onChange={onSelectProposalType}>
+                  <select value={proposal_type} onChange={onSelectProposalType}>
+                    {console.log("proposal_type=",proposal_type)}
                     {proposal_options.map(({ value, label }) => (
                       <option key={value} value={value}>
-                        {console.log("---+", { value })}
+                        {/* {console.log("---+", { value })} */}
                         {label}
                       </option>
                     ))}

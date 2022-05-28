@@ -42,10 +42,9 @@ const NewDAO = (props) => {
       is_member: false,
       dao_keypair: key,
     };
-    console.log("pub---",new_dao.address);
+    
     let governance: pic.Governance={
       councillors:[],
-      // councillors:[publicKey],
       approval_threshold:0,
       proposed_signers: [false],
       proposal_is_active:false,
@@ -85,7 +84,7 @@ const NewDAO = (props) => {
       
       // new_dao = await simPic.initializeDao(new_dao); //initializeDao
       new_dao=await livePic.initializeDao(wallet, new_dao);
-
+      console.log("new create dao close");
       props.onClose(); //close btn
     }
   };

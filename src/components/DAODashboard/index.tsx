@@ -34,6 +34,8 @@ const DAODashboard: React.FC = (props) => {
   const [selected_member_dao, setSelectedMemberDAO] = useState<pic.Dao>();
   const [show_modal, setShowModal] = useState(-1);
   const [refresh, setRefresh] = useState(false);
+  const [select_dao_id, setSelectDaoId] = useState<string>();
+  const [reset, setReset] = useState<boolean>(true);
   const wallet = useAnchorWallet();
 
   type counc_sign_pair = {
@@ -50,7 +52,75 @@ const DAODashboard: React.FC = (props) => {
     const str: string = long_key.slice(0, 7) + "..." + long_key.slice(-7);
     return str;
   };
+  useEffect(() => {
+    (async () => {
+      if (connected) {
+        setIsConnectingToOwner(true);
+        const newOwner: pic.Owner = { address: publicKey };
+        // const newOwner: pic.Owner = { address: new PublicKey("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi") };
+        callConnectOwner(dispatch, newOwner).then(() => {
+          setIsConnectingToOwner(false);
+        });
 
+        let member_daos_promise = await livePic.getMemberDaos(newOwner);
+        console.log("member_daos_promise=", member_daos_promise);
+        await livePic.checkIfStreamOnChain(wallet, member_daos_promise);
+
+        let mdis: Array<string> = [];
+        let m_daos: Array<pic.Dao> = [];
+        m_daos = member_daos_promise;
+        setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
+        mdis = m_daos.map((dao) => dao.dao_id);
+        setMemberDaoIds(mdis);
+        setSelectDaoId(mdis[0]);
+        setSelectedMemberDAO({ ...m_daos[0] }); //only first
+        getActiveProposalInfo({ ...m_daos[0] });
+        console.log("select member---", selected_member_dao);
+      } else {
+        callDisconnectOwner(dispatch);
+      }
+    })();
+  }, [connected, refresh]);
+  useEffect(() => {
+    (async () => {
+      if (connected) {
+        setIsConnectingToOwner(true);
+        const newOwner: pic.Owner = { address: publicKey };
+        // const newOwner: pic.Owner = { address: new PublicKey("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi") };
+        callConnectOwner(dispatch, newOwner).then(() => {
+          setIsConnectingToOwner(false);
+        });
+
+        let member_daos_promise = await livePic.getMemberDaos(newOwner);
+        console.log("member_daos_promise=", member_daos_promise);
+        await livePic.checkIfStreamOnChain(wallet, member_daos_promise);
+
+        let mdis: Array<string> = [];
+        let m_daos: Array<pic.Dao> = [];
+        m_daos = member_daos_promise;
+        setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
+        mdis = m_daos.map((dao) => dao.dao_id);
+        setMemberDaoIds(mdis);
+        setSelectDaoId(select_dao_id);
+        setSelectedMemberDAO({ ...selected_member_dao }); //only first
+        getActiveProposalInfo({ ...selected_member_dao });
+        console.log("select member---", selected_member_dao);
+      } else {
+        callDisconnectOwner(dispatch);
+      }
+    })();
+  }, [reset]);
+
+  useEffect(() => {
+    if (selected_member_dao != undefined) {
+      getActiveProposalInfo(selected_member_dao);
+    }
+  }, [selected_member_dao]);
+  const onCloseModeal = () => {
+    console.log("onCloseModal");
+    setShowModal(-1);
+    setReset(!reset);
+  };
   const onClickRefresh = async () => {
     let newOwner: pic.Owner = { address: publicKey };
     let member_daos_promise = await livePic.getMemberDaos(newOwner);
@@ -64,51 +134,21 @@ const DAODashboard: React.FC = (props) => {
     setRefresh(!refresh);
     console.log("refresh is clicked");
   };
-  useEffect(() => {
-    (async () => {
-      if (connected) {
-        setIsConnectingToOwner(true);
-        let newOwner: pic.Owner = { address: publicKey };
-        // let newOwner: pic.Owner = { address: new PublicKey("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi") };
-        callConnectOwner(dispatch, newOwner).then(() => {
-          setIsConnectingToOwner(false);
-        });
 
-        let member_daos_promise = await livePic.getMemberDaos(newOwner);
-        console.log("member_daos_promise=",member_daos_promise);
-        await livePic.checkIfStreamOnChain(wallet, member_daos_promise);
-
-        let mdis: Array<string> = [];
-        let m_daos: Array<pic.Dao> = [];
-        m_daos = member_daos_promise;
-        setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
-        mdis = m_daos.map((dao) => dao.dao_id);
-        setMemberDaoIds(mdis);
-        setSelectedMemberDAO({ ...m_daos[0] }); //only first
-        getActiveProposalInfo({ ...m_daos[0] });
-        console.log("select member---", selected_member_dao);
-      } else {
-        callDisconnectOwner(dispatch);
-      }
-    })();
-  }, [connected, refresh]);
-
-  useEffect(() => {
-    if (selected_member_dao != undefined) {
-      getActiveProposalInfo( selected_member_dao);
-    }
-  }, [selected_member_dao]);
   let dao: pic.Dao;
   const onChangeSelectMemberDAO = (event) => {
     let dao_id = event.target.value;
+    setSelectDaoId(dao_id);
     setMemberDao(dao_id);
   };
+
   const setMemberDao = (dao_id: string) => {
     console.log("member_daos =", member_daos);
     for (const dao of member_daos) {
       if (dao.dao_id == dao_id) {
         setSelectedMemberDAO({ ...dao });
-       }
+        setSelectDaoId(dao_id);
+      }
     }
   };
 
@@ -119,7 +159,7 @@ const DAODashboard: React.FC = (props) => {
     try {
       const _dao = await livePic.getDaoGovernanceFromChain(wallet, dao);
       dao.governance = _dao.governance;
-      
+
       if (dao.governance && dao.governance.councillors != undefined) {
         dao.governance.councillors.forEach(function (councillor, index) {
           let tmp_c: counc_sign_pair = {
@@ -128,7 +168,6 @@ const DAODashboard: React.FC = (props) => {
           };
           tmp_counc_sign_arr.push(tmp_c);
         });
-        
       }
 
       console.log("===============getActiveProposalInfo======2=======", dao);
@@ -298,7 +337,7 @@ const DAODashboard: React.FC = (props) => {
               <IconButton icon_img={Plus_fill} is_background={false} />
             </div>
             <div className="select-memeberDAO">
-              <select onChange={onChangeSelectMemberDAO}>
+              <select value={select_dao_id} onChange={onChangeSelectMemberDAO}>
                 {member_dao_ids.map((value) => (
                   <option key={value} value={value}>
                     {value}
@@ -445,7 +484,11 @@ const DAODashboard: React.FC = (props) => {
 
       {show_modal == 0 && connected ? (
         <DAODetailModal onClick={() => setShowModal(-1)}>
-          <NewDAO dao={selected_member_dao} onClose={() => setShowModal(-1)} />
+          <NewDAO
+            dao={selected_member_dao}
+            // onClose={() => setShowModal(-1)}
+            onClose={onCloseModeal}
+          />
         </DAODetailModal>
       ) : (
         ""
@@ -454,7 +497,8 @@ const DAODashboard: React.FC = (props) => {
         <DAODetailModal onClick={() => setShowModal(-1)}>
           <NewStream
             dao={selected_member_dao}
-            onClose={() => setShowModal(-1)}
+            // onClose={() => setShowModal(-1)}
+            onClose={onCloseModeal}
           />
         </DAODetailModal>
       ) : (
@@ -464,7 +508,8 @@ const DAODashboard: React.FC = (props) => {
         <DAODetailModal onClick={() => setShowModal(-1)}>
           <NewProposal
             dao={selected_member_dao}
-            onClose={() => setShowModal(-1)}
+            // onClose={() => setShowModal(-1)}
+            onClose={onCloseModeal}
           />
         </DAODetailModal>
       ) : (
@@ -472,7 +517,7 @@ const DAODashboard: React.FC = (props) => {
       )}
       {show_modal == 4 && connected ? (
         <DAODetailModal onClick={() => setShowModal(-1)}>
-          <DAOSocial onClose={() => setShowModal(-1)} />
+          {/* <DAOSocial onClose={() => setShowModal(-1)} /> */}
         </DAODetailModal>
       ) : (
         ""
