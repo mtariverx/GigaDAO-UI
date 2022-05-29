@@ -62,9 +62,9 @@ const DAODashboard: React.FC = (props) => {
           setIsConnectingToOwner(false);
         });
 
-        let member_daos_promise = await livePic.getMemberDaos(newOwner);
+        let member_daos_promise = await livePic.getMemberDaos(newOwner, wallet);
         console.log("member_daos_promise=", member_daos_promise);
-        await livePic.checkIfStreamOnChain(wallet, member_daos_promise);
+        // await livePic.checkIfStreamOnChain(wallet, member_daos_promise);
 
         let mdis: Array<string> = [];
         let m_daos: Array<pic.Dao> = [];
@@ -91,9 +91,9 @@ const DAODashboard: React.FC = (props) => {
           setIsConnectingToOwner(false);
         });
 
-        let member_daos_promise = await livePic.getMemberDaos(newOwner);
+        let member_daos_promise = await livePic.getMemberDaos(newOwner, wallet);
         console.log("member_daos_promise=", member_daos_promise);
-        await livePic.checkIfStreamOnChain(wallet, member_daos_promise);
+        // await livePic.checkIfStreamOnChain(wallet, member_daos_promise);
 
         let mdis: Array<string> = [];
         let m_daos: Array<pic.Dao> = [];
@@ -123,7 +123,7 @@ const DAODashboard: React.FC = (props) => {
   };
   const onClickRefresh = async () => {
     let newOwner: pic.Owner = { address: publicKey };
-    let member_daos_promise = await livePic.getMemberDaos(newOwner);
+    let member_daos_promise = await livePic.getMemberDaos(newOwner, wallet);
 
     let mdis: Array<string> = [];
     let m_daos: Array<pic.Dao> = [];
@@ -143,7 +143,7 @@ const DAODashboard: React.FC = (props) => {
   };
 
   const setMemberDao = (dao_id: string) => {
-    console.log("member_daos =", member_daos);
+    // console.log("member_daos =", member_daos);
     for (const dao of member_daos) {
       if (dao.dao_id == dao_id) {
         setSelectedMemberDAO({ ...dao });

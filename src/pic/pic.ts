@@ -115,7 +115,7 @@ export enum ProposalType {
   WITHDRAW_FROM_STREAM = 3,
 }
 
-export type GetMemberDaos = (owner: Owner) => Promise<Array<Dao>>; // retrieves list of daos that owner is a councillor of, but does not lookup Governance data
+export type GetMemberDaos = (owner: Owner, wallet) => Promise<Array<Dao>>; // retrieves list of daos that owner is a councillor of, but does not lookup Governance data
 export type RefreshGovernance = (dao: Dao) => Promise<Dao>; // gets the latest Governance data directly from the blockchain
 export type InitializeDao = (wallet, dao: Dao) => Promise<Dao>; //create new Dao
 export type InitializeStream = (

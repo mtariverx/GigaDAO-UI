@@ -181,53 +181,39 @@ export async function refreshStake(wallet, network, stake: pic.Stake) {
 //this function get dao from chain, that is, governance in UI.
 export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
   let program = await initProgram(wallet, network);
-  try {
-    console.log("getDaoFromChain");
-    const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
+  const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
+  //consider return value's type
+  //delete await keyword
+  const councillors = daoAccount.councillors;
+  const approvalThreshold = daoAccount.approvalThreshold.toNumber();
+  const proposalSigners = daoAccount.proposalSigners;
+  const proposalIsActive = daoAccount.proposalIsActive;
+  const proposalType = daoAccount.proposalType;
+  const proposedCouncillors = daoAccount.proposedCouncillors;
+  const proposedApprovalThreshold =
+    daoAccount.proposedApprovalThreshold.toNumber();
+  const proposedDeactivationStream = daoAccount.proposedDeactivationStream;
+  const proposedWithdrawalAmount =
+    daoAccount.proposedWithdrawalAmount.toNumber();
+  const proposedWithdrawalReceiverOwner =
+    daoAccount.proposedWithdrawalReceiverOwner;
+  const proposedWithdrawalStream = daoAccount.proposedWithdrawalStream;
+  const numStreams = daoAccount.numStreams.toNumber();
 
-    //consider return value's type
-    //delete await keyword
-    const councillors = daoAccount.councillors;
-    const approvalThreshold = daoAccount.approvalThreshold.toNumber();
-    const proposalSigners = daoAccount.proposalSigners;
-    const proposalIsActive = daoAccount.proposalIsActive;
-    const proposalType = daoAccount.proposalType;
-    const proposedCouncillors = daoAccount.proposedCouncillors;
-    const proposedApprovalThreshold =
-      daoAccount.proposedApprovalThreshold.toNumber();
-    const proposedDeactivationStream = daoAccount.proposedDeactivationStream;
-    const proposedWithdrawalAmount =
-      daoAccount.proposedWithdrawalAmount.toNumber();
-    const proposedWithdrawalReceiverOwner =
-      daoAccount.proposedWithdrawalReceiverOwner;
-    const proposedWithdrawalStream = daoAccount.proposedWithdrawalStream;
-    const numStreams = daoAccount.numStreams.toNumber();
-
-    let governance: pic.Governance = {
-      councillors: councillors,
-      approval_threshold: approvalThreshold,
-      proposed_signers: proposalSigners,
-      proposal_is_active: proposalIsActive,
-      proposal_type: proposalType,
-      proposed_councillors: proposedCouncillors,
-      proposed_approval_threshold: proposedApprovalThreshold,
-      proposed_deactivation_stream: proposedDeactivationStream,
-      proposed_withdrawal_amount: proposedWithdrawalAmount,
-      proposed_withdrawal_receiver: proposedWithdrawalReceiverOwner,
-      proposed_withdrawal_stream: proposedWithdrawalStream,
-      num_streams: numStreams,
-    };
-    dao.governance = governance;
-  } catch (e) {
-    console.log(e);
-    console.log("Dao is not in blockchain=",dao.address.toString());
-    // let result_dao_delete = await mirror.deleteDao(dao);
-    // if (result_dao_delete.success) {
-    //   alert("Deleting dao in database was success!");
-    //   let result_councillors_delete = await mirror.deleteCouncillors(dao);
-    //   alert("Deleting councillors in database was success!");
-    // }
-  }
-
+  let governance: pic.Governance = {
+    councillors: councillors,
+    approval_threshold: approvalThreshold,
+    proposed_signers: proposalSigners,
+    proposal_is_active: proposalIsActive,
+    proposal_type: proposalType,
+    proposed_councillors: proposedCouncillors,
+    proposed_approval_threshold: proposedApprovalThreshold,
+    proposed_deactivation_stream: proposedDeactivationStream,
+    proposed_withdrawal_amount: proposedWithdrawalAmount,
+    proposed_withdrawal_receiver: proposedWithdrawalReceiverOwner,
+    proposed_withdrawal_stream: proposedWithdrawalStream,
+    num_streams: numStreams,
+  };
+  dao.governance = governance;
   return dao;
 }

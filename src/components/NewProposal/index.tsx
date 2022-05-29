@@ -59,7 +59,7 @@ const NewProposal = (props) => {
 
   const onSelectProposalType = (event) => {
     setProposalType(event.target.value);
-    setProposedCouncillors([]);
+    setProposedCouncillors([wallet.publicKey.toString()]);
     setProposedApprovalThresold(0);
     setStreamPubkey("");
     setAmount(0);
@@ -104,9 +104,15 @@ const NewProposal = (props) => {
  
 
       if (proposed_councillors && proposed_councillors.length > 0) {
-        let proposed_councillors_pubkey = proposed_councillors.map(
-          (councillor) => new PublicKey(councillor)
-        );
+
+        let proposed_councillors_pubkey =[];
+        for(let i=1;i<proposed_councillors.length;i++){
+          proposed_councillors_pubkey.push(new PublicKey(proposed_councillors[i]))
+
+        }
+        // proposed_councillors.map(
+        //   (councillor) => new PublicKey(councillor)
+        // );
         props.dao.governance.proposed_councillors = proposed_councillors_pubkey;
         props.dao.governance.proposed_councillors.push(wallet.publicKey); //add owner
       }
@@ -147,7 +153,6 @@ const NewProposal = (props) => {
                     {console.log("proposal_type=",proposal_type)}
                     {proposal_options.map(({ value, label }) => (
                       <option key={value} value={value}>
-                        {/* {console.log("---+", { value })} */}
                         {label}
                       </option>
                     ))}

@@ -79,6 +79,22 @@ export async function insertCouncillors(dao: pic.Dao) {
   }
   return result;
 }
+export async function updateDao(dao: pic.Dao) {
+  // def make_update_dao(dao_address, num_streams, display_name, image_url, dao_id, confirmed):
+  // dao_address, num_streams, display_name, image_url, dao_id, confirmed
+  const dao_address = dao.address.toString();
+  const dao_id = dao.dao_id;
+  const display_name = dao.display_name;
+  const image_url = dao.image_url;
+  const num_streams = 0;
+  const confirmed = true;
+  const URL =
+    BASE_URL +
+    `update_dao?dao_address=${dao_address}&dao_id=${dao_id}&display_name=${display_name}&image_url=${image_url}&num_streams=${num_streams}&confirmed=${confirmed}`;
+  const response = await fetch(URL, { mode: "cors" });
+  const data = await response.json();
+  return data;
+}
 
 export async function deleteDao(dao: pic.Dao) {
   const dao_address = dao.address.toString();
@@ -88,8 +104,8 @@ export async function deleteDao(dao: pic.Dao) {
   return data;
 }
 
-export async function deleteStream(stream: pic.Stream){
-  const stream_address=stream.address.toString();
+export async function deleteStream(stream: pic.Stream) {
+  const stream_address = stream.address.toString();
   const URL = BASE_URL + `delete_stream?stream_address=${stream_address}`;
   const response = await fetch(URL, { mode: "cors" });
   const data = await response.json();
@@ -184,11 +200,12 @@ export async function updateStream(
   isActive,
   numConnections,
   totalStreamed,
-  lastUpdateTimestamp
+  lastUpdateTimestamp,
+  confirmed
 ) {
   const URL =
     BASE_URL +
-    `update_stream?stream_address=${streamAddress.toString()}&is_active=${isActive}&num_connections=${numConnections}&total_streamed=${totalStreamed}&last_update_timestamp=${lastUpdateTimestamp}`;
+    `update_stream?stream_address=${streamAddress.toString()}&is_active=${isActive}&num_connections=${numConnections}&total_streamed=${totalStreamed}&last_update_timestamp=${lastUpdateTimestamp}&confirmed=${confirmed}`;
   const response = await fetch(URL, { mode: "cors" });
   const data = await response.json();
   return data;

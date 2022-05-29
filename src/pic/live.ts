@@ -19,8 +19,10 @@ export async function showAllCallsInProgram(wallet) {
 }
 
 export async function getDaoGovernanceFromChain(wallet, dao) {
-  const _dao = chain.getDaoFromChain(wallet, NETWORK, dao);
-  return _dao;
+  try {
+    const _dao = await chain.getDaoFromChain(wallet, NETWORK, dao);
+    return _dao;
+  } catch (e) {}
 }
 
 // Mirror only calls
@@ -98,7 +100,7 @@ let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
     });
   return owner;
 };
-
+// return dao with streams
 let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
   try {
     let initializedDaos = [];
@@ -117,7 +119,7 @@ let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
     let result = await mirror.getDaoStreams(initializedDaos);
     if (result.success) {
       const streamMap: { string: Array<any> } = result.data; //{"ab":["c","d"]}
-      console.log("streamMap=",streamMap);
+      console.log("streamMap=", streamMap);
       for (const [daoAddress, streams] of Object.entries(streamMap)) {
         let matches = daos.filter(
           (dao, _) => dao.address?.toString() === daoAddress
@@ -126,7 +128,9 @@ let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
           alert(
             "Multiple matches found in DAO array, this should not happen, support has been automatically notified."
           );
-          matches.map(item=>console.log("matches=",item.address.toString()));
+          matches.map((item) =>
+            console.log("matches=", item.address.toString())
+          );
         } else {
           let dao = matches[0];
           dao.streams = [];
@@ -387,14 +391,15 @@ let updateStreamAndConnection: pic.UpdateStreamAndConnection = async (
 
     // set nft last to ensure that we got all the info we needed from the network
     finalResult.nft = nft;
-
+    const confirmed = true; //Kaiming
     mirror
       .updateStream(
         stream.address,
         stream.is_active,
         stream.num_connections,
         stream.total_earned,
-        stream.last_update_timestamp
+        stream.last_update_timestamp,
+        confirmed
       )
       .catch((err) => {
         console.log("error update stream: " + err);
@@ -489,6 +494,7 @@ let connectToStream: pic.ConnectToStream = async (
         finalResult.nft = nft;
       }
     }
+    const confirmed = true;
     chain.getStream(nft.wallet, nft.network, stream).then((newStream) => {
       mirror
         .updateStream(
@@ -496,7 +502,8 @@ let connectToStream: pic.ConnectToStream = async (
           newStream.is_active,
           newStream.num_connections,
           newStream.total_earned,
-          newStream.last_update_timestamp
+          newStream.last_update_timestamp,
+          confirmed
         )
         .catch((err) => {
           console.log("error update stream: " + err);
@@ -542,13 +549,15 @@ let claimFromStream: pic.ClaimFromStream = async (
       conn,
       stream.decimals
     );
+    const confirmed = true;
     mirror
       .updateStream(
         finalResult.stream.address,
         finalResult.stream.is_active,
         finalResult.stream.num_connections,
         finalResult.stream.total_earned,
-        finalResult.stream.last_update_timestamp
+        finalResult.stream.last_update_timestamp,
+        confirmed
       )
       .catch((err) => {
         console.log("err udpating stream: " + err);
@@ -588,7 +597,7 @@ let disconnectFromStream: pic.DisconnectFromStream = async (
 
     finalResult.nft = nft;
     finalResult.stream = stream;
-
+    const confirmed = true;
     chain.getStream(nft.wallet, nft.network, stream).then((newStream) => {
       mirror
         .updateStream(
@@ -596,7 +605,8 @@ let disconnectFromStream: pic.DisconnectFromStream = async (
           newStream.is_active,
           newStream.num_connections,
           newStream.total_earned,
-          newStream.last_update_timestamp
+          newStream.last_update_timestamp,
+          confirmed
         )
         .catch((err) => {
           console.log("err udpating stream: " + err);
@@ -643,7 +653,7 @@ let unstakeNft: pic.UnstakeNft = async (nft: pic.Nft) => {
   return finalResult;
 };
 
-let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
+let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner, wallet) => {
   //getting member daos from database if the owner address is a councillor of
   try {
     const result = await mirror.getMembers(owner.address.toString()); //get dao address lists
@@ -665,28 +675,54 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner) => {
       let dao: pic.Dao = { address: new PublicKey(dao_address) };
       return dao;
     });
+    const dao_verified = [];
 
-    const daos_with_stream = await getDaos(new_daos);
-    for (const dao of daos_with_stream) {
-      const result = await mirror.getDaoById(dao.address.toString());
-      // if (dao.streams) {
-      //   for (const stream of dao.streams) {
-      //     console.log("stream address=", stream.address.toString());
-      //   }
-      // }
+    for (const dao of new_daos) {
+      let result = await mirror.getDaoById(dao.address.toString());
       try {
-        if (result.success) {
+        // if dao in blockchain, update true in confirm in db
+        if (!result.data[0]?.confirmed) {
+          await chain.getDaoFromChain(wallet, NETWORK, dao).then((_dao) => {
+            dao.dao_id = result.data[0].dao_id;
+            dao.display_name = result.data[0].display_name;
+            dao.image_url = result.data[0].image_url;
+            dao.num_nfts = result.data[0].num_nfts;
+            mirror
+              .updateDao(dao)
+              .then((result) => {
+                console.log("Succeed in getDaoFromChain:", result);
+              })
+              .catch((err) => console.log("Error in getDaoFromChain: ", err));
+          }).catch(()=>console.log("update dao error"));
+        }
+
+        result = await mirror.getDaoById(dao.address.toString());
+        if (result.success && result.data[0]?.confirmed) {
           dao.dao_id = result.data[0].dao_id;
           dao.display_name = result.data[0].display_name;
           dao.image_url = result.data[0].image_url;
           dao.num_nfts = result.data[0].num_nfts;
+          dao_verified.push(dao);
         }
       } catch (e) {
-        console.log(e);
+        console.log("update dao: ",e);
       }
     }
-    console.log("--get memeber daos with stream--", daos_with_stream); //dao with address and streams, dao_id, display_name, num_nfts
-    return daos_with_stream;
+    const daos_with_stream = await getDaos(dao_verified); //return dao with streams
+    for (const dao of daos_with_stream) {
+      await checkIfStreamOnChain(wallet, dao)
+        .then(() => {
+          // console.log("getStream ok");
+        })
+        .catch((err) => {
+          console.log("Error in checkIfStreamOnChain: ", err);
+        });
+    }
+    const daos_with_confirmed_stream = await getConfirmedStream(
+      daos_with_stream
+    );
+    console.log("--get memeber daos with stream--", daos_with_confirmed_stream); //dao with address and streams, dao_id, display_name, num_nfts
+    return daos_with_confirmed_stream;
   } catch (e) {
     alert(e);
   }
@@ -731,30 +767,30 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
             )
         ) {
           alert("Insufficient funds");
-          let result_dao_delete = await mirror.deleteDao(dao);
-          if (result_dao_delete.success) {
-            alert("Deleting dao in database was success!");
-            let result_councillors_delete = await mirror.deleteCouncillors(dao);
-            alert("Deleting councillors in database was success!");
-          }
+          // let result_dao_delete = await mirror.deleteDao(dao);
+          // if (result_dao_delete.success) {
+          //   alert("Deleting dao in database was success!");
+          //   let result_councillors_delete = await mirror.deleteCouncillors(dao);
+          //   alert("Deleting councillors in database was success!");
+          // }
         } else {
           alert(e);
-          let result_dao_delete = await mirror.deleteDao(dao);
-          if (result_dao_delete.success) {
-            alert("Deleting dao in database was success!");
-            let result_councillors_delete = await mirror.deleteCouncillors(dao);
-            alert("Deleting councillors in database was success!");
-          }
+          // let result_dao_delete = await mirror.deleteDao(dao);
+          // if (result_dao_delete.success) {
+          //   alert("Deleting dao in database was success!");
+          //   let result_councillors_delete = await mirror.deleteCouncillors(dao);
+          //   alert("Deleting councillors in database was success!");
+          // }
         }
       }
     } else {
       alert("Error in inserting councillors");
       let result_dao_delete = await mirror.deleteDao(dao);
-      if (result_dao_delete.success) {
-        alert("Deleting dao in database was success!");
-      } else {
-        alert("Deleting dao in db was failed");
-      }
+      // if (result_dao_delete.success) {
+      //   alert("Deleting dao in database was success!");
+      // } else {
+      //   alert("Deleting dao in db was failed");
+      // }
     }
   } else {
     console.log("initializeDao failed");
@@ -792,10 +828,10 @@ let initializeStream: pic.InitializeStream = async (
           )
       ) {
         alert("Insufficient funds");
-        let result_stream_delete = await mirror.deleteStream(stream);
-        if (result_stream_delete.success) {
-          alert("Deleting stream is success");
-        }
+        // let result_stream_delete = await mirror.deleteStream(stream);
+        // if (result_stream_delete.success) {
+        //   alert("Deleting stream is success");
+        // }
       } else if (
         e.message
           .toLowerCase()
@@ -805,10 +841,10 @@ let initializeStream: pic.InitializeStream = async (
       } else {
         //TODO if transaction is failed, delete the stream in database.
         alert(e);
-        let result_stream_delete = await mirror.deleteStream(stream);
-        if (result_stream_delete.success) {
-          alert("Deleting stream is success");
-        }
+        // let result_stream_delete = await mirror.deleteStream(stream);
+        // if (result_stream_delete.success) {
+        //   alert("Deleting stream is success");
+        // }
       }
     }
   } else {
@@ -817,55 +853,156 @@ let initializeStream: pic.InitializeStream = async (
   return { dao, stream };
 };
 
-export async function checkIfStreamOnChain(wallet, daos) {
-  for (const dao of daos) {
+export async function checkIfStreamOnChain(wallet, dao) {
+  for (const stream of dao.streams) {
+    await chain
+      .getStream(wallet, NETWORK, stream)
+      .then((stream) => {
+        const confirmed = true;
+        mirror
+          .updateStream(
+            stream.address,
+            stream.is_active,
+            stream.num_connections,
+            stream.total_earned,
+            stream.last_update_timestamp,
+            confirmed
+          )
+          .then((result) => console.log());
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+}
 
-    console.log("dao address=", dao.address.toString());
-    console.log("dao id=", dao.dao_id);
-
-    if (dao.streams) {
-      for (const stream of dao.streams) {
-        console.log("stream address=", stream.address.toString());
-        try {
-          let program = await rpc.initProgram(wallet, NETWORK);
-          const streamAccount = await program.account.stream.fetch(
-            stream.address
-          );
-        } catch (e) {
-          let result_stream_delete = await mirror.deleteStream(stream);
-          if (result_stream_delete.success) {
-            alert(
-              "The stream is not in blockchain.\nDeleting stream from DB was succdeded"
-            );
-          }
-          console.log(e);
-          console.log("no stream in blockchain");
-        }
+export async function getConfirmedStream(daos) {
+  try {
+    let initializedDaos = [];
+    for (const dao of daos) {
+      if (dao.address) {
+        initializedDaos.push(dao);
+      } else {
+        dao.streams = [];
       }
     }
+
+    if (initializedDaos.length === 0) {
+      return daos;
+    }
+
+    let result = await mirror.getDaoStreams(initializedDaos);
+    if (result.success) {
+      const streamMap: { string: Array<any> } = result.data; //{"ab":["c","d"]}
+      console.log("streamMap=", streamMap);
+      for (const [daoAddress, streams] of Object.entries(streamMap)) {
+        let matches = daos.filter(
+          (dao, _) => dao.address?.toString() === daoAddress
+        );
+        if (matches.length !== 1) {
+          alert(
+            "Multiple matches found in DAO array, this should not happen, support has been automatically notified."
+          );
+          matches.map((item) =>
+            console.log("matches=", item.address.toString())
+          );
+        } else {
+          let dao = matches[0];
+          dao.streams = [];
+          for (const stream of streams) {
+            if (stream.confirmed) {
+              console.log("stream.confirmed=", stream);
+              let collections: Array<pic.Collection> = [];
+              if (stream.collections?.length > 0) {
+                for (const collection_address of stream.collections) {
+                  collections.push({
+                    address: new PublicKey(collection_address),
+                  });
+                }
+              }
+
+              console.log(
+                `got stream ${stream.name} with total_earned: ${stream.total_earned}, is_active: ${stream.is_active}`
+              );
+
+              let totalStreamed;
+              if (stream.is_active) {
+                const lastUpdateTimestamp = stream.last_update_timestamp;
+                const elapsedSeconds = Date.now() / 1000 - lastUpdateTimestamp;
+                const ratePerConnPerSec =
+                  stream.daily_stream_rate / 24 / 60 / 60;
+                const recentlyEarned =
+                  elapsedSeconds * ratePerConnPerSec * stream.num_connections;
+                totalStreamed = stream.total_earned + recentlyEarned; //NOTE: might want to add in check here for would-be-inactive stream...
+              } else {
+                totalStreamed = stream.total_earned;
+              }
+
+              let newStream: pic.Stream = {
+                address: new PublicKey(stream.address),
+                dao_address: dao.address,
+                collections: collections,
+                num_connections: stream.num_connections,
+                is_active: stream.is_active,
+                name: stream.name,
+                token_image_url: stream.token_image_url,
+                daily_stream_rate: stream.daily_stream_rate,
+                total_earned: totalStreamed,
+                total_claimed: 0,
+                current_pool_amount: 0,
+                token_ticker: stream.token_ticker,
+                last_update_timestamp: stream.last_update_timestamp,
+              };
+              dao.streams.push(newStream);
+            }
+          }
+        }
+      }
+    } else {
+      alert(
+        "Failed to retrieve latest stream data for daos, support has been automatically notified."
+      );
+    }
+  } catch (e) {
+    alert("got error: " + e);
+    console.log(e);
   }
+  return daos;
+}
+export function displayError(err){
+  
 }
 //writing calls
 export async function proposeDaoCommand(wallet, dao) {
-  await rpc.proposeDaoCommand(wallet, NETWORK, dao);
-  alert("Proposing dao command was success!");
+  await rpc
+    .proposeDaoCommand(wallet, NETWORK, dao)
+    .then(() => alert("Proposing dao command was success!"))
+    .catch((err) => alert(err));
 }
 export async function approveDaoCommand(wallet, dao) {
-  await rpc.approveDaoCommand(wallet, NETWORK, dao);
-  alert("approveDaoCommand was success!");
+  await rpc
+    .approveDaoCommand(wallet, NETWORK, dao)
+    .then(() => alert("approveDaoCommand was success!"))
+    .catch((err) => console.log(err));
 }
 
 export async function executeUpdateDaoMultisig(wallet, dao) {
-  await rpc.executeUpdateDaoMultisig(wallet, NETWORK, dao);
-  alert("ExecuteUpdateDaoMultisig was success!");
+  await rpc
+    .executeUpdateDaoMultisig(wallet, NETWORK, dao)
+    .then(() => alert("ExecuteUpdateDaoMultisig was success!"))
+    .catch((err) => console.log(err));
 }
 export async function executeDeactivateStream(wallet, dao) {
-  await rpc.executeDeactivateStream(wallet, NETWORK, dao);
-  alert("executeDeactivateStream was success!");
+  await rpc
+    .executeDeactivateStream(wallet, NETWORK, dao)
+    .then(() => alert("executeDeactivateStream was success!"))
+    .catch((err) => console.log(err));
 }
 export async function executeWithdrawFromStream(wallet, dao) {
-  await rpc.executeWithdrawFromStream(wallet, NETWORK, dao);
-  alert("executeWithdrawFromStream was success!");
+  await rpc
+    .executeWithdrawFromStream(wallet, NETWORK, dao)
+    .then(() => alert("executeWithdrawFromStream was success!"))
+    .catch((err) => console.log(err));
 }
 
 export {

@@ -29,24 +29,18 @@ let receiverTokenAccount: PublicKey = null;
 let daoAuthPda: PublicKey = null;
 
 export async function initProgram(wallet: anchor.Wallet, network: string) {
-  try {
-    // INIT Web3 Connection Objects
-    const PROGRAM_ID = "AGi7p8RritzUDX4sCYVfxApCH4By8FEpSV4ffL7bZ8Kp";
-    const programId = new anchor.web3.PublicKey(PROGRAM_ID);
-    let opts = anchor.Provider.defaultOptions();
-    let connection = new anchor.web3.Connection(
-      network,
-      opts.preflightCommitment
-    );
-    let provider = new anchor.Provider(connection, wallet, opts);
-    let idl = await anchor.Program.fetchIdl(programId, provider);
-    let program = new anchor.Program(idl, programId, provider);
-    return program;
-  } catch (e) {
-    throw e;
-    console.log("initProgram error");
-    console.log(e);
-  }
+  // INIT Web3 Connection Objects
+  const PROGRAM_ID = "AGi7p8RritzUDX4sCYVfxApCH4By8FEpSV4ffL7bZ8Kp";
+  const programId = new anchor.web3.PublicKey(PROGRAM_ID);
+  let opts = anchor.Provider.defaultOptions();
+  let connection = new anchor.web3.Connection(
+    network,
+    opts.preflightCommitment
+  );
+  let provider = new anchor.Provider(connection, wallet, opts);
+  let idl = await anchor.Program.fetchIdl(programId, provider);
+  let program = new anchor.Program(idl, programId, provider);
+  return program;
 }
 export async function approveDaoCommand(
   wallet: anchor.Wallet,
@@ -58,23 +52,19 @@ export async function approveDaoCommand(
     [Buffer.from(FEE_CONTROLLER_PDA_SEED)],
     program.programId
   );
-  try {
-    await program.rpc.approveDaoCommand({
-      accounts: {
-        signer: wallet.publicKey,
-        dao: dao.address,
-        feeReceiverAddress: FEE_RX_ADDRESS,
-        feeController: fee_controller,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-      },
-    });
-    console.log("approveDaoCommand sucess");
-  } catch (e) {
-    throw e;
-    console.log(e);
-  }
+
+  await program.rpc.approveDaoCommand({
+    accounts: {
+      signer: wallet.publicKey,
+      dao: dao.address,
+      feeReceiverAddress: FEE_RX_ADDRESS,
+      feeController: fee_controller,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    },
+  });
+  console.log("approveDaoCommand sucess");
 }
 export async function initializeDAO(
   wallet: anchor.Wallet,
@@ -98,32 +88,26 @@ export async function initializeDAO(
   let councillors = dao.governance.councillors;
   let approval_threshold = 1;
 
-  try {
-    await program.rpc.initializeDao(
-      councillors,
-      new anchor.BN(approval_threshold),
-      {
-        accounts: {
-          signer: wallet.publicKey,
-          dao: dao.dao_keypair.publicKey,
-          daoAuthPda: daoAuthPda,
-          feeReceiverAddress: FEE_RX_ADDRESS,
-          feeController: fee_controller,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          systemProgram: SystemProgram.programId,
-          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        },
-        signers: [dao.dao_keypair],
-      }
-    );
+  await program.rpc.initializeDao(
+    councillors,
+    new anchor.BN(approval_threshold),
+    {
+      accounts: {
+        signer: wallet.publicKey,
+        dao: dao.dao_keypair.publicKey,
+        daoAuthPda: daoAuthPda,
+        feeReceiverAddress: FEE_RX_ADDRESS,
+        feeController: fee_controller,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      },
+      signers: [dao.dao_keypair],
+    }
+  );
 
-    console.log("initial dao transaction is okay");
-    // return true;
-  } catch (e) {
-    throw e;
-    console.log(e);
-    // return false;
-  }
+  console.log("initial dao transaction is okay");
+  // return true;
 }
 export async function proposeDaoCommand(
   wallet: anchor.Wallet,
@@ -137,45 +121,40 @@ export async function proposeDaoCommand(
     program.programId
   );
 
-  try {
-    let proposal_type = new anchor.BN(dao.governance.proposal_type);
-    let proposed_councillors = dao.governance.proposed_councillors;
-    let proposed_approval_threshold = new anchor.BN(
-      dao.governance.proposed_approval_threshold
-    );
-    let proposed_deactivation_stream =
-      dao.governance.proposed_deactivation_stream;
-    let proposed_withdraw_amount = new anchor.BN(
-      dao.governance.proposed_withdrawal_amount
-    );
-    let proposed_withdraw_receiver_owner =
-      dao.governance.proposed_withdrawal_receiver;
-    let proposed_withdraw_stream = dao.governance.proposed_withdrawal_stream;
-    await program.rpc.proposeDaoCommand(
-      proposal_type,
-      proposed_councillors,
-      proposed_approval_threshold,
-      proposed_deactivation_stream,
-      proposed_withdraw_amount,
-      proposed_withdraw_receiver_owner,
-      proposed_withdraw_stream,
-      {
-        accounts: {
-          signer: wallet.publicKey,
-          dao: dao.address,
-          feeReceiverAddress: FEE_RX_ADDRESS,
-          feeController: fee_controller,
-          systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        },
-      }
-    );
-    console.log("proposeDaoCommand success");
-  } catch (e) {
-    throw e;
-    console.log(e);
-  }
+  let proposal_type = new anchor.BN(dao.governance.proposal_type);
+  let proposed_councillors = dao.governance.proposed_councillors;
+  let proposed_approval_threshold = new anchor.BN(
+    dao.governance.proposed_approval_threshold
+  );
+  let proposed_deactivation_stream =
+    dao.governance.proposed_deactivation_stream;
+  let proposed_withdraw_amount = new anchor.BN(
+    dao.governance.proposed_withdrawal_amount
+  );
+  let proposed_withdraw_receiver_owner =
+    dao.governance.proposed_withdrawal_receiver;
+  let proposed_withdraw_stream = dao.governance.proposed_withdrawal_stream;
+  await program.rpc.proposeDaoCommand(
+    proposal_type,
+    proposed_councillors,
+    proposed_approval_threshold,
+    proposed_deactivation_stream,
+    proposed_withdraw_amount,
+    proposed_withdraw_receiver_owner,
+    proposed_withdraw_stream,
+    {
+      accounts: {
+        signer: wallet.publicKey,
+        dao: dao.address,
+        feeReceiverAddress: FEE_RX_ADDRESS,
+        feeController: fee_controller,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      },
+    }
+  );
+  console.log("proposeDaoCommand success");
 }
 
 export async function executeUpdateDaoMultisig(
@@ -188,23 +167,19 @@ export async function executeUpdateDaoMultisig(
     [Buffer.from(FEE_CONTROLLER_PDA_SEED)],
     program.programId
   );
-  try {
-    await program.rpc.executeUpdateDaoMultisig({
-      accounts: {
-        signer: wallet.publicKey,
-        dao: dao.address,
-        feeReceiverAddress: FEE_RX_ADDRESS,
-        feeController: fee_controller,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-      },
-    });
-    console.log("executeUpdateDaoMultisig success");
-  } catch (e) {
-    throw e;
-    console.log(e);
-  }
+
+  await program.rpc.executeUpdateDaoMultisig({
+    accounts: {
+      signer: wallet.publicKey,
+      dao: dao.address,
+      feeReceiverAddress: FEE_RX_ADDRESS,
+      feeController: fee_controller,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    },
+  });
+  console.log("executeUpdateDaoMultisig success");
 }
 
 export async function executeDeactivateStream(
@@ -217,34 +192,30 @@ export async function executeDeactivateStream(
     [Buffer.from(FEE_CONTROLLER_PDA_SEED)],
     program.programId
   );
-  try {
-    [tokenPool] = await PublicKey.findProgramAddress(
-      [
-        dao.governance.proposed_deactivation_stream.toBuffer(), //kaiming not sure
-        // dao.address.toBuffer(),
-        Buffer.from(anchor.utils.bytes.utf8.encode(TOKEN_POOL_PDA_SEED)),
-      ],
-      program.programId
-    );
 
-    await program.rpc.executeDeactivateStream({
-      accounts: {
-        signer: wallet.publicKey,
-        dao: dao.address,
-        stream: dao.governance.proposed_deactivation_stream, //deactivate stream pubkey
-        tokenPool: tokenPool,
-        feeReceiverAddress: FEE_RX_ADDRESS,
-        feeController: fee_controller,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-      },
-    });
-    console.log("executeDeactivateStream success");
-  } catch (e) {
-    throw e;
-    console.log(e);
-  }
+  [tokenPool] = await PublicKey.findProgramAddress(
+    [
+      dao.governance.proposed_deactivation_stream.toBuffer(), //kaiming not sure
+      // dao.address.toBuffer(),
+      Buffer.from(anchor.utils.bytes.utf8.encode(TOKEN_POOL_PDA_SEED)),
+    ],
+    program.programId
+  );
+
+  await program.rpc.executeDeactivateStream({
+    accounts: {
+      signer: wallet.publicKey,
+      dao: dao.address,
+      stream: dao.governance.proposed_deactivation_stream, //deactivate stream pubkey
+      tokenPool: tokenPool,
+      feeReceiverAddress: FEE_RX_ADDRESS,
+      feeController: fee_controller,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    },
+  });
+  console.log("executeDeactivateStream success");
 }
 
 export async function executeWithdrawFromStream(
@@ -273,46 +244,39 @@ export async function executeWithdrawFromStream(
     ],
     program.programId
   );
-  try {
-    console.log("I'm executeWithdrawFromStream");
-    console.log("signer=", wallet.publicKey.toString());
-    console.log("dao=", dao.address.toString());
-    console.log(
-      "stream=",
-      dao.governance.proposed_withdrawal_stream.toString()
-    );
-    console.log("token pool=", tokenPool.toString());
-    console.log(
-      "receiverTokenAccount=",
-      dao.governance.proposed_withdrawal_receiver.toString()
-    );
-    console.log("daoAuthPda=", daoAuthPda.toString());
 
-    // dao.governance.proposed_withdrawal_receiver=new PublicKey("HLS5Y68QSQgJP7wUbbbbCjEnMknVZrHXYDwwVaDcsdK7");
-    // dao.governance.proposed_withdrawal_receiver=new PublicKey("5F1xSVrk8JuZj2qCqYupKjwzUFhYDJZoVZoJWR9JpxPB");
-    // // AFbX8oGjGpmVFywbVouvhQSRmiW2aR1mohfahi4Y2AdB
-    // dao.governance.proposed_withdrawal_stream=new PublicKey("69Uw1pMckp6PLoQf32Kp8RjQ3QxayzsBseUuGxyC4dsK");
-    // tokenPool=new PublicKey("HLS5Y68QSQgJP7wUbbbbCjEnMknVZrHXYDwwVaDcsdK7");
-    await program.rpc.executeWithdrawFromStream({
-      accounts: {
-        signer: wallet.publicKey,
-        dao: dao.address,
-        stream: dao.governance.proposed_withdrawal_stream,
-        tokenPool: tokenPool,
-        receiverTokenAccount: dao.governance.proposed_withdrawal_receiver, //
-        daoAuthPda: daoAuthPda,
-        feeReceiverAddress: FEE_RX_ADDRESS,
-        feeController: fee_controller,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-      },
-    });
-    console.log("executeWithdrawFromStream success");
-  } catch (e) {
-    console.log(e);
-    throw e;
-  }
+  console.log("I'm executeWithdrawFromStream");
+  console.log("signer=", wallet.publicKey.toString());
+  console.log("dao=", dao.address.toString());
+  console.log("stream=", dao.governance.proposed_withdrawal_stream.toString());
+  console.log("token pool=", tokenPool.toString());
+  console.log(
+    "receiverTokenAccount=",
+    dao.governance.proposed_withdrawal_receiver.toString()
+  );
+  console.log("daoAuthPda=", daoAuthPda.toString());
+
+  // dao.governance.proposed_withdrawal_receiver=new PublicKey("HLS5Y68QSQgJP7wUbbbbCjEnMknVZrHXYDwwVaDcsdK7");
+  // dao.governance.proposed_withdrawal_receiver=new PublicKey("5F1xSVrk8JuZj2qCqYupKjwzUFhYDJZoVZoJWR9JpxPB");
+  // // AFbX8oGjGpmVFywbVouvhQSRmiW2aR1mohfahi4Y2AdB
+  // dao.governance.proposed_withdrawal_stream=new PublicKey("69Uw1pMckp6PLoQf32Kp8RjQ3QxayzsBseUuGxyC4dsK");
+  // tokenPool=new PublicKey("HLS5Y68QSQgJP7wUbbbbCjEnMknVZrHXYDwwVaDcsdK7");
+  await program.rpc.executeWithdrawFromStream({
+    accounts: {
+      signer: wallet.publicKey,
+      dao: dao.address,
+      stream: dao.governance.proposed_withdrawal_stream,
+      tokenPool: tokenPool,
+      receiverTokenAccount: dao.governance.proposed_withdrawal_receiver, //
+      daoAuthPda: daoAuthPda,
+      feeReceiverAddress: FEE_RX_ADDRESS,
+      feeController: fee_controller,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    },
+  });
+  console.log("executeWithdrawFromStream success");
 }
 
 export async function initializeStream(
@@ -342,51 +306,39 @@ export async function initializeStream(
     ],
     program.programId
   );
-  try {
-    let tokenMint: spl_token.Mint = await spl_token.getMint(
-      program.provider.connection,
-      stream.token_mint_address
-    );
 
-    console.log("wallet key=", wallet.publicKey.toString());
-    console.log("stream address=", stream.address.toString());
-    console.log("dao address=", dao.address.toString());
-    console.log("tokenmint=", stream.token_mint_address.toString());
-    console.log("tokenPool=", tokenPool.toString());
-    console.log("stream keypair=", stream.stream_keypair.publicKey.toString());
+  let tokenMint: spl_token.Mint = await spl_token.getMint(
+    program.provider.connection,
+    stream.token_mint_address
+  );
 
-    let verified_creator_addresses = stream.collections.map(
-      (item) => item.address
-    );
+  let verified_creator_addresses = stream.collections.map(
+    (item) => item.address
+  );
 
-    let is_simulation = true;
-    await program.rpc.initializeStream(
-      verified_creator_addresses,
-      new anchor.BN(stream.daily_stream_rate),
-      is_simulation,
-      {
-        accounts: {
-          signer: wallet.publicKey,
-          stream: stream.address,
-          dao: dao.address,
-          tokenMint: stream.token_mint_address,
-          tokenPool: tokenPool, //kaiming not sure
-          daoAuthPda: daoAuthPda,
-          feeReceiverAddress: FEE_RX_ADDRESS,
-          feeController: fee_controller,
-          systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        },
-        signers: [stream.stream_keypair],
-      }
-    );
-    console.log("initialize stream was success");
-  } catch (e) {
-    console.log("initialize stream error in rpc");
-    console.log(e);
-    throw e;
-  }
+  let is_simulation = true;
+  await program.rpc.initializeStream(
+    verified_creator_addresses,
+    new anchor.BN(stream.daily_stream_rate),
+    is_simulation,
+    {
+      accounts: {
+        signer: wallet.publicKey,
+        stream: stream.address,
+        dao: dao.address,
+        tokenMint: stream.token_mint_address,
+        tokenPool: tokenPool, //kaiming not sure
+        daoAuthPda: daoAuthPda,
+        feeReceiverAddress: FEE_RX_ADDRESS,
+        feeController: fee_controller,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      },
+      signers: [stream.stream_keypair],
+    }
+  );
+  console.log("initialize stream was success");
 }
 
 export async function initializeStakeAndStake(
