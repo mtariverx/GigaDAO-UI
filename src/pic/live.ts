@@ -676,7 +676,6 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner, wallet) => {
           alert("You have multiple daos with same address");
         }
       }
-      return dao_addresses;
     }
     const new_daos: Array<pic.Dao> = dao_addresses.map((dao_address) => {
       let dao: pic.Dao = { address: new PublicKey(dao_address) };
