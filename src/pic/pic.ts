@@ -44,6 +44,7 @@ export type Dao = {
   num_nfts?: number;
   is_member?: boolean;
   dao_keypair?: Keypair;
+  confirmed?:boolean;
 };
 export type Stream = {
   address: PublicKey;
@@ -62,6 +63,7 @@ export type Stream = {
   decimals?: number;
   stream_keypair?: Keypair;
   token_mint_address?: PublicKey;
+  confirmed?:boolean;
 };
 // stream_address, dao_address, token_image_url, stream_rate_relative, is_active, num_connections,
 // total_streamed, last_update_timestamp, stream_name, token_ticker)

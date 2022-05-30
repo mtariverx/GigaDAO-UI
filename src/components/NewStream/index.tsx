@@ -178,9 +178,10 @@ const NewStream = (props) => {
               <div className="title">Stream Rate</div>
               <input
                 required
+                type="number"
                 value={stream_rate}
                 onChange={(evt) =>
-                  setStreamRate(parseInt(evt.target.value || "0"))
+                  setStreamRate(parseFloat(evt.target.value || "0"))
                 }
               />
             </div>

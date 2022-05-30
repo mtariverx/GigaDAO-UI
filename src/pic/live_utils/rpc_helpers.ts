@@ -121,6 +121,7 @@ export async function proposeDaoCommand(
     program.programId
   );
 
+  
   let proposal_type = new anchor.BN(dao.governance.proposal_type);
   let proposed_councillors = dao.governance.proposed_councillors;
   let proposed_approval_threshold = new anchor.BN(
@@ -128,12 +129,22 @@ export async function proposeDaoCommand(
   );
   let proposed_deactivation_stream =
     dao.governance.proposed_deactivation_stream;
-  let proposed_withdraw_amount = new anchor.BN(
-    dao.governance.proposed_withdrawal_amount
-  );
+
   let proposed_withdraw_receiver_owner =
     dao.governance.proposed_withdrawal_receiver;
   let proposed_withdraw_stream = dao.governance.proposed_withdrawal_stream;
+  const streamAccount = await program.account.stream.fetch(proposed_withdraw_stream);
+  const tokenMintAddress: PublicKey = streamAccount.tokenMintAddress;
+  let tokenMint: spl_token.Mint = await spl_token.getMint(
+    program.provider.connection,
+    tokenMintAddress
+  );
+  const decimals = tokenMint.decimals;
+  console.log("propose decimal=",decimals);
+  const withdraw_amount=dao.governance.proposed_withdrawal_amount*Math.pow(10, decimals);
+  let proposed_withdraw_amount = new anchor.BN(
+    withdraw_amount
+  );
   await program.rpc.proposeDaoCommand(
     proposal_type,
     proposed_councillors,
@@ -316,10 +327,14 @@ export async function initializeStream(
     (item) => item.address
   );
 
-  let is_simulation = true;
+  let is_simulation = false;
+  const decimals=tokenMint.decimals;
+  console.log("initializeStream decimal=", decimals);
+  const stream_rate=stream.daily_stream_rate*Math.pow(10, decimals);
+  console.log("initializeStream decimal=", stream_rate);
   await program.rpc.initializeStream(
     verified_creator_addresses,
-    new anchor.BN(stream.daily_stream_rate),
+    new anchor.BN(stream_rate),
     is_simulation,
     {
       accounts: {

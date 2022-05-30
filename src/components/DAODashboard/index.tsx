@@ -72,14 +72,19 @@ const DAODashboard: React.FC = (props) => {
         mdis = m_daos.map((dao) => dao.dao_id);
         setMemberDaoIds(mdis);
         setSelectDaoId(mdis[0]);
-        setSelectedMemberDAO({ ...m_daos[0] }); //only first
-        getActiveProposalInfo({ ...m_daos[0] });
+        let daos_with_stream = await livePic.getDaos([m_daos[0]]);
+        await livePic.checkIfStreamOnChain(wallet, daos_with_stream[0]);
+        let confirmedDaos = await livePic.getConfirmedStream([daos_with_stream[0]]);
+        console.log("id=",confirmedDaos[0].dao_id);
+        // console.log("m_daos[0]=", confirmedDaos);
+        setSelectedMemberDAO({ ...confirmedDaos[0] }); //only first
+        getActiveProposalInfo({ ...confirmedDaos[0] });
         console.log("select member---", selected_member_dao);
       } else {
         callDisconnectOwner(dispatch);
       }
     })();
-  }, [connected, refresh]);
+  }, [connected]);
   useEffect(() => {
     (async () => {
       if (connected) {
@@ -101,14 +106,18 @@ const DAODashboard: React.FC = (props) => {
         mdis = m_daos.map((dao) => dao.dao_id);
         setMemberDaoIds(mdis);
         setSelectDaoId(select_dao_id);
-        setSelectedMemberDAO({ ...selected_member_dao }); //only first
-        getActiveProposalInfo({ ...selected_member_dao });
+        let daos_with_stream = await livePic.getDaos([selected_member_dao]);
+        await livePic.checkIfStreamOnChain(wallet, daos_with_stream[0]);
+        let confirmedDaos = await livePic.getConfirmedStream([daos_with_stream[0]]);
+        console.log("id=",confirmedDaos[0].dao_id);
+        setSelectedMemberDAO({ ...confirmedDaos[0] }); //only first
+        getActiveProposalInfo({ ...confirmedDaos[0] });
         console.log("select member---", selected_member_dao);
       } else {
         callDisconnectOwner(dispatch);
       }
     })();
-  }, [reset]);
+  }, [reset, refresh]);
 
   useEffect(() => {
     if (selected_member_dao != undefined) {
@@ -141,12 +150,15 @@ const DAODashboard: React.FC = (props) => {
     setMemberDao(dao_id);
   };
 
-  const setMemberDao = (dao_id: string) => {
-    // console.log("member_daos =", member_daos);
+  const setMemberDao = async (dao_id: string) => {
+    
     for (const dao of member_daos) {
       if (dao.dao_id == dao_id) {
-        setSelectedMemberDAO({ ...dao });
+        let confirmedDaos = await livePic.getConfirmedStream([dao]);
+        console.log("confirmeddao=",confirmedDaos[0]);
+        setSelectedMemberDAO({ ...confirmedDaos[0] });
         setSelectDaoId(dao_id);
+
       }
     }
   };

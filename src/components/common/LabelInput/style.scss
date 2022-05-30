@@ -1,6 +1,6 @@
 @import "../../../scss/DAOVariable.scss";
 .item-wrapper {
-   margin: 5px;
+  margin: 5px;
   display: grid;
   grid-template-columns: 200px 1fr;
   align-items: center;
@@ -11,15 +11,15 @@
   }
   & > .title {
     text-align: right;
-    color:$text-color-common;// #1dd79b;
-    font-size:18px;
+    color: $text-color-common; // #1dd79b;
+    font-size: 18px;
   }
   & > .input-side-btn {
     display: grid;
     align-items: center;
     justify-items: center;
     height: 40px;
-    width :40px;
+    width: 40px;
     cursor: pointer;
     display: grid;
 
@@ -49,12 +49,24 @@
     color: $text-color-common;
     font-size: 16px;
 
-    &:focus, hover {
+    &:focus,
+    hover {
       background-color: rgb(25, 30, 30);
     }
   }
-  input.num{
-    width:4rem;
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  input.num {
+    width: 4rem;
   }
   input:focus {
     outline: none !important;
@@ -101,12 +113,12 @@
     grid-template-columns: unset;
     // grid-template-rows: 1fr 1fr;
     justify-items: left;
-    padding:0.1rem;
-    margin:0px;
-    gap:3px;
-    
-    &> .title{
-      font-size:14px;
+    padding: 0.1rem;
+    margin: 0px;
+    gap: 3px;
+
+    & > .title {
+      font-size: 14px;
     }
     &.plus-button {
       display: grid;
@@ -115,15 +127,14 @@
     }
     & > .show-collections {
       height: 5rem;
-      width:100%;
+      width: 100%;
     }
     // & > .show_num {
     //   display: grid;
     //   grid-template-columns: unset;
     // }
-    input.num{
-      width:100%;
+    input.num {
+      width: 100%;
     }
   }
-  
 }

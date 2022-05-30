@@ -193,13 +193,26 @@ export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
   const proposedApprovalThreshold =
     daoAccount.proposedApprovalThreshold.toNumber();
   const proposedDeactivationStream = daoAccount.proposedDeactivationStream;
-  const proposedWithdrawalAmount =
-    daoAccount.proposedWithdrawalAmount.toNumber();
+  // const proposedWithdrawalAmount =
+  //   daoAccount.proposedWithdrawalAmount.toNumber();
   const proposedWithdrawalReceiverOwner =
     daoAccount.proposedWithdrawalReceiverOwner;
   const proposedWithdrawalStream = daoAccount.proposedWithdrawalStream;
   const numStreams = daoAccount.numStreams.toNumber();
 
+  const streamAccount = await program.account.stream.fetch(
+    proposedWithdrawalStream
+  );
+  const tokenMintAddress: PublicKey = streamAccount.tokenMintAddress;
+  let tokenMint: spl_token.Mint = await spl_token.getMint(
+    program.provider.connection,
+    tokenMintAddress
+  );
+  const decimals = tokenMint.decimals;
+  const divFactor = Math.pow(10, decimals);
+
+  const proposedWithdrawalAmount =
+    Number(daoAccount.proposedWithdrawalAmount) / divFactor;
   let governance: pic.Governance = {
     councillors: councillors,
     approval_threshold: approvalThreshold,

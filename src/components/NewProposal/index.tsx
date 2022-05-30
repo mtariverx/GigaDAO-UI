@@ -24,9 +24,10 @@ const NewProposal = (props) => {
   ];
   const [proposed_councillors, setProposedCouncillors] = useState<string[]>([]);
   const [one_councillor, setOneCouncillor] = useState<string>();
-  const [proposed_approval_threshold, setProposedApprovalThresold] = useState<number>();
+  const [proposed_approval_threshold, setProposedApprovalThresold] =
+    useState<number>();
   const [stream_pubkey, setStreamPubkey] = useState<string>();
-  const [amount, setAmount] = useState<number>();
+  const [amount, setAmount] = useState<number>(0.0);
   const [proposed_withdrawal_receiver, setProposedWithdrawalReceiver] =
     useState<string>();
   const [proposed_withdrawal_stream, setProposedWithdrawalStream] =
@@ -47,10 +48,10 @@ const NewProposal = (props) => {
     const temp = [...proposed_councillors];
     let flag = await validateSolanaAddress(one_councillor);
     if (flag) {
-      if(!temp.includes(one_councillor)){
+      if (!temp.includes(one_councillor)) {
         temp.push(one_councillor);
         setProposedCouncillors(temp);
-      }else{
+      } else {
         alert("The councillor is duplicated");
       }
     }
@@ -71,21 +72,21 @@ const NewProposal = (props) => {
     // if(props.dao.governance==undefined){
     //   props.onClose(); //close btn
     // }
-    let governance: pic.Governance={
-      councillors:[Keypair.generate().publicKey],
-      approval_threshold:0,
+    let governance: pic.Governance = {
+      councillors: [Keypair.generate().publicKey],
+      approval_threshold: 0,
       proposed_signers: [false],
-      proposal_is_active:false,
-      proposal_type: pic.ProposalType.DEACTIVATE_STREAM, 
-      proposed_councillors:[],
-      proposed_approval_threshold:0,
-      proposed_deactivation_stream:Keypair.generate().publicKey,
-      proposed_withdrawal_amount:0,
+      proposal_is_active: false,
+      proposal_type: pic.ProposalType.DEACTIVATE_STREAM,
+      proposed_councillors: [],
+      proposed_approval_threshold: 0,
+      proposed_deactivation_stream: Keypair.generate().publicKey,
+      proposed_withdrawal_amount: 0,
       proposed_withdrawal_receiver: Keypair.generate().publicKey,
       proposed_withdrawal_stream: Keypair.generate().publicKey,
-      num_streams:0,
+      num_streams: 0,
     };
-    props.dao.governance=governance;
+    props.dao.governance = governance;
     if ((await validateSolanaAddress(stream_pubkey)) == false) {
       setStreamPubkey("");
     }
@@ -101,14 +102,12 @@ const NewProposal = (props) => {
       (proposed_withdrawal_receiver &&
         (await validateSolanaAddress(proposed_withdrawal_stream)))
     ) {
- 
-
       if (proposed_councillors && proposed_councillors.length > 0) {
-
-        let proposed_councillors_pubkey =[];
-        for(let i=1;i<proposed_councillors.length;i++){
-          proposed_councillors_pubkey.push(new PublicKey(proposed_councillors[i]))
-
+        let proposed_councillors_pubkey = [];
+        for (let i = 1; i < proposed_councillors.length; i++) {
+          proposed_councillors_pubkey.push(
+            new PublicKey(proposed_councillors[i])
+          );
         }
         // proposed_councillors.map(
         //   (councillor) => new PublicKey(councillor)
@@ -116,10 +115,11 @@ const NewProposal = (props) => {
         props.dao.governance.proposed_councillors = proposed_councillors_pubkey;
         props.dao.governance.proposed_councillors.push(wallet.publicKey); //add owner
       }
-      props.dao.governance.proposal_type=proposal_type;
+      props.dao.governance.proposal_type = proposal_type;
 
       props.dao.governance.proposal_is_active = true;
-      props.dao.governance.proposed_approval_threshold = proposed_approval_threshold;
+      props.dao.governance.proposed_approval_threshold =
+        proposed_approval_threshold;
       if (stream_pubkey)
         props.dao.governance.proposed_deactivation_stream = new PublicKey(
           stream_pubkey
@@ -150,7 +150,7 @@ const NewProposal = (props) => {
                 <div className="proposal_notation">Proposal Type</div>
                 <div className="select-proposal-type">
                   <select value={proposal_type} onChange={onSelectProposalType}>
-                    {console.log("proposal_type=",proposal_type)}
+                    {console.log("proposal_type=", proposal_type)}
                     {proposal_options.map(({ value, label }) => (
                       <option key={value} value={value}>
                         {label}
@@ -190,7 +190,9 @@ const NewProposal = (props) => {
                         key="1"
                         value={proposed_approval_threshold}
                         onChange={(evt) =>
-                          setProposedApprovalThresold(parseInt(evt.target.value || "0"))
+                          setProposedApprovalThresold(
+                            parseInt(evt.target.value || "0")
+                          )
                         }
                       />
                     </div>
@@ -214,9 +216,10 @@ const NewProposal = (props) => {
                       <input
                         required
                         key="3"
+                        type="number"
                         value={amount}
                         onChange={(evt) =>
-                          setAmount(parseInt(evt.target.value || "0"))
+                          setAmount(parseFloat(evt.target.value || "0"))
                         }
                       />
                     </div>
