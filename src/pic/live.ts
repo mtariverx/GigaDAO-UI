@@ -85,10 +85,7 @@ let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
       "Failed to get owner data from backend, support has be automatically notified.\n Please check your interent connection."
     );
   }
-  // } catch (e) {
-  //   alert("got error: " + e);
-  //   console.log(e);
-  // }
+
 
   mirror
     .forceSyncStakes(owner.address.toString())
@@ -117,10 +114,13 @@ let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
     }
 
     let result = await mirror.getDaoStreams(initializedDaos);
+    // daos.map((dao) => console.log("dao=", dao.address.toString()));
+
     if (result.success) {
       const streamMap: { string: Array<any> } = result.data; //{"ab":["c","d"]}
-      console.log("streamMap=", streamMap);
+      // console.log("streamMap=", streamMap);
       for (const [daoAddress, streams] of Object.entries(streamMap)) {
+        // console.log("daoAddress=", daoAddress);
         let matches = daos.filter(
           (dao, _) => dao.address?.toString() === daoAddress
         );
@@ -144,9 +144,9 @@ let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
               }
             }
 
-            console.log(
-              `got stream ${stream.name} with total_earned: ${stream.total_earned}, is_active: ${stream.is_active}`
-            );
+            // console.log(
+            //   `got stream ${stream.name} with total_earned: ${stream.total_earned}, is_active: ${stream.is_active}`
+            // );
 
             let totalStreamed;
             if (stream.is_active) {
@@ -185,8 +185,7 @@ let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
       );
     }
   } catch (e) {
-    alert("got error: " + e);
-    console.log(e);
+     console.log(e);
   }
   return daos;
 };
@@ -647,7 +646,6 @@ let unstakeNft: pic.UnstakeNft = async (nft: pic.Nft) => {
       console.log("error update stake: " + err);
     });
   } catch (e) {
-    alert("got error: " + e);
     console.log(e);
   }
   return finalResult;
@@ -656,7 +654,7 @@ let unstakeNft: pic.UnstakeNft = async (nft: pic.Nft) => {
 let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner, wallet) => {
   //getting member daos from database if the owner address is a councillor of
   try {
-    const result = await mirror.getMembers(owner.address.toString()); //get dao address lists
+    const result = await mirror.getMembers(owner.address.toString()); //get dao address lists from councillor tables
     //getting daos if the owner has daos
     const new_owner = await connectOwner(owner);
 
@@ -666,10 +664,19 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner, wallet) => {
         dao_addresses = dao_addresses.concat(result.data.dao_addresses);
       }
     } else {
-      console.log("Error in fetching daos from getMemberDaos");
+      console.log(
+        "Error in fetching daos from getMemberDaos from councillor table"
+      );
     }
     if (new_owner.daos) {
-      new_owner.daos.map((dao) => dao_addresses.push(dao.address.toString()));
+      for (const dao of new_owner.daos) {
+        if (!dao_addresses.includes(dao.address.toString())) {
+          dao_addresses.push(dao.address.toString());
+        } else {
+          alert("You have multiple daos with same address");
+        }
+      }
+      return dao_addresses;
     }
     const new_daos: Array<pic.Dao> = dao_addresses.map((dao_address) => {
       let dao: pic.Dao = { address: new PublicKey(dao_address) };
@@ -682,18 +689,21 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner, wallet) => {
       try {
         // if dao in blockchain, update true in confirm in db
         if (!result.data[0]?.confirmed) {
-          await chain.getDaoFromChain(wallet, NETWORK, dao).then((_dao) => {
-            dao.dao_id = result.data[0].dao_id;
-            dao.display_name = result.data[0].display_name;
-            dao.image_url = result.data[0].image_url;
-            dao.num_nfts = result.data[0].num_nfts;
-            mirror
-              .updateDao(dao)
-              .then((result) => {
-                console.log("Succeed in getDaoFromChain:", result);
-              })
-              .catch((err) => console.log("Error in getDaoFromChain: ", err));
-          }).catch(()=>console.log("update dao error"));
+          await chain
+            .getDaoFromChain(wallet, NETWORK, dao)
+            .then((_dao) => {
+              dao.dao_id = result.data[0].dao_id;
+              dao.display_name = result.data[0].display_name;
+              dao.image_url = result.data[0].image_url;
+              dao.num_nfts = result.data[0].num_nfts;
+              mirror
+                .updateDao(dao)
+                .then((result) => {
+                  console.log("Succeed in getDaoFromChain:", result);
+                })
+                .catch((err) => console.log("Error in getDaoFromChain: ", err));
+            })
+            .catch(() => console.log("update dao error"));
         }
 
         result = await mirror.getDaoById(dao.address.toString());
@@ -705,7 +715,7 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner, wallet) => {
           dao_verified.push(dao);
         }
       } catch (e) {
-        console.log("update dao: ",e);
+        console.log("update dao: ", e);
       }
     }
     const daos_with_stream = await getDaos(dao_verified); //return dao with streams
@@ -738,59 +748,23 @@ let initializeDao: pic.InitializeDao = async (wallet, dao: pic.Dao) => {
     );
 
     let result_councillors = await mirror.insertCouncillors(dao);
-    console.log("insert councillors=", result_councillors);
     let count_success = 0;
     result_councillors.map((result) => {
       if (result.success) {
         count_success += 1;
       }
     });
-    console.log("councillor success=", count_success);
 
     if (count_success == dao.governance.councillors.length) {
       alert("Inserting councillors in database was success!");
       try {
         await rpc.initializeDAO(wallet, NETWORK, dao); //calls for onchain
         alert("Initializing dao in onchain was success!");
-      } catch (e) {
-        if (
-          e.message
-            .toLowerCase()
-            .includes("Transaction was not confirmed in".toLowerCase())
-        ) {
-          alert("Transaction was not confirmed");
-        } else if (
-          e.message
-            .toLowerCase()
-            .includes(
-              "failed to send transaction: Transaction simulation failed: Error processing Instruction 0: custom program error: 0x1".toLocaleLowerCase()
-            )
-        ) {
-          alert("Insufficient funds");
-          // let result_dao_delete = await mirror.deleteDao(dao);
-          // if (result_dao_delete.success) {
-          //   alert("Deleting dao in database was success!");
-          //   let result_councillors_delete = await mirror.deleteCouncillors(dao);
-          //   alert("Deleting councillors in database was success!");
-          // }
-        } else {
-          alert(e);
-          // let result_dao_delete = await mirror.deleteDao(dao);
-          // if (result_dao_delete.success) {
-          //   alert("Deleting dao in database was success!");
-          //   let result_councillors_delete = await mirror.deleteCouncillors(dao);
-          //   alert("Deleting councillors in database was success!");
-          // }
-        }
+      } catch (err) {
+        displayError(err);
       }
     } else {
       alert("Error in inserting councillors");
-      let result_dao_delete = await mirror.deleteDao(dao);
-      // if (result_dao_delete.success) {
-      //   alert("Deleting dao in database was success!");
-      // } else {
-      //   alert("Deleting dao in db was failed");
-      // }
     }
   } else {
     console.log("initializeDao failed");
@@ -810,42 +784,10 @@ let initializeStream: pic.InitializeStream = async (
     try {
       await rpc.initializeStream(wallet, NETWORK, dao, stream);
       alert("Initializing stream in onchain was success!");
-    } catch (e) {
-      console.log("error message=", e.message);
-
+    } catch (err) {
+      console.log("error message=", err.message);
+      displayError(err)
       //TODO transaction was not confirmed in 30s
-      if (
-        e.message
-          .toLowerCase()
-          .includes("Transaction was not confirmed in".toLowerCase())
-      ) {
-        alert(e.message);
-      } else if (
-        e.message
-          .toLowerCase()
-          .includes(
-            "failed to send transaction: Transaction simulation failed: Error processing Instruction 0: custom program error: 0x1".toLocaleLowerCase()
-          )
-      ) {
-        alert("Insufficient funds");
-        // let result_stream_delete = await mirror.deleteStream(stream);
-        // if (result_stream_delete.success) {
-        //   alert("Deleting stream is success");
-        // }
-      } else if (
-        e.message
-          .toLowerCase()
-          .includes("Signature verification failed".toLowerCase())
-      ) {
-        alert("Signature verification failed");
-      } else {
-        //TODO if transaction is failed, delete the stream in database.
-        alert(e);
-        // let result_stream_delete = await mirror.deleteStream(stream);
-        // if (result_stream_delete.success) {
-        //   alert("Deleting stream is success");
-        // }
-      }
     }
   } else {
     alert("Initializing stream in database was failed!");
@@ -894,7 +836,6 @@ export async function getConfirmedStream(daos) {
     let result = await mirror.getDaoStreams(initializedDaos);
     if (result.success) {
       const streamMap: { string: Array<any> } = result.data; //{"ab":["c","d"]}
-      console.log("streamMap=", streamMap);
       for (const [daoAddress, streams] of Object.entries(streamMap)) {
         let matches = daos.filter(
           (dao, _) => dao.address?.toString() === daoAddress
@@ -911,7 +852,6 @@ export async function getConfirmedStream(daos) {
           dao.streams = [];
           for (const stream of streams) {
             if (stream.confirmed) {
-              console.log("stream.confirmed=", stream);
               let collections: Array<pic.Collection> = [];
               if (stream.collections?.length > 0) {
                 for (const collection_address of stream.collections) {
@@ -921,9 +861,9 @@ export async function getConfirmedStream(daos) {
                 }
               }
 
-              console.log(
-                `got stream ${stream.name} with total_earned: ${stream.total_earned}, is_active: ${stream.is_active}`
-              );
+              // console.log(
+              //   `got stream ${stream.name} with total_earned: ${stream.total_earned}, is_active: ${stream.is_active}`
+              // );
 
               let totalStreamed;
               if (stream.is_active) {
@@ -964,45 +904,69 @@ export async function getConfirmedStream(daos) {
       );
     }
   } catch (e) {
-    alert("got error: " + e);
     console.log(e);
   }
   return daos;
 }
-export function displayError(err){
-  
+export function displayError(err) {
+  if (
+    err.message
+      .toLowerCase()
+      .includes("Transaction was not confirmed in".toLowerCase())
+  ) {
+    alert("Transaction was not confirmed in 30s");
+  } else if (
+    err.message
+      .toLowerCase()
+      .includes(
+        "failed to send transaction: Transaction simulation failed: Error processing Instruction 0: custom program error: 0x1".toLocaleLowerCase()
+      )
+  ) {
+    alert("Insufficient funds");
+  } else if (
+    err.message
+      .toLowerCase()
+      .includes("Signature verification failed".toLowerCase())
+  ) {
+    alert("Signature verification failed");
+  } else {
+    //TODO if transaction is failed, delete the stream in database.
+    // alert(err);
+    console.log(err);
+
+  }
 }
 //writing calls
 export async function proposeDaoCommand(wallet, dao) {
   await rpc
     .proposeDaoCommand(wallet, NETWORK, dao)
     .then(() => alert("Proposing dao command was success!"))
-    .catch((err) => alert(err));
+    .catch((err) => displayError(err));
 }
 export async function approveDaoCommand(wallet, dao) {
   await rpc
     .approveDaoCommand(wallet, NETWORK, dao)
     .then(() => alert("approveDaoCommand was success!"))
-    .catch((err) => console.log(err));
+    .catch((err) => displayError(err));
 }
 
 export async function executeUpdateDaoMultisig(wallet, dao) {
   await rpc
     .executeUpdateDaoMultisig(wallet, NETWORK, dao)
     .then(() => alert("ExecuteUpdateDaoMultisig was success!"))
-    .catch((err) => console.log(err));
+    .catch((err) => displayError(err));
 }
 export async function executeDeactivateStream(wallet, dao) {
   await rpc
     .executeDeactivateStream(wallet, NETWORK, dao)
     .then(() => alert("executeDeactivateStream was success!"))
-    .catch((err) => console.log(err));
+    .catch((err) => displayError(err));
 }
 export async function executeWithdrawFromStream(wallet, dao) {
   await rpc
     .executeWithdrawFromStream(wallet, NETWORK, dao)
     .then(() => alert("executeWithdrawFromStream was success!"))
-    .catch((err) => console.log(err));
+    .catch((err) => displayError(err));
 }
 
 export {

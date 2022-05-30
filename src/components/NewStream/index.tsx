@@ -81,7 +81,7 @@ const NewStream = (props) => {
     // }
 
     if (
-      pool_name &&
+      pool_name && token_ticker && token_img_url &&
       (token_mint_address) &&
       collections.length > 0
     ) {
