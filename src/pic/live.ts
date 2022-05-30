@@ -673,7 +673,7 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner, wallet) => {
         if (!dao_addresses.includes(dao.address.toString())) {
           dao_addresses.push(dao.address.toString());
         } else {
-          alert("You have multiple daos with same address");
+          // alert("You have multiple daos with same address");
         }
       }
     }
