@@ -86,7 +86,6 @@ let connectOwner: pic.ConnectOwner = async (owner: pic.Owner) => {
     );
   }
 
-
   mirror
     .forceSyncStakes(owner.address.toString())
     .then((result) => {
@@ -185,7 +184,7 @@ let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
       );
     }
   } catch (e) {
-     console.log(e);
+    console.log(e);
   }
   return daos;
 };
@@ -785,7 +784,7 @@ let initializeStream: pic.InitializeStream = async (
       alert("Initializing stream in onchain was success!");
     } catch (err) {
       console.log("error message=", err.message);
-      displayError(err)
+      displayError(err);
       //TODO transaction was not confirmed in 30s
     }
   } else {
@@ -932,7 +931,6 @@ export function displayError(err) {
     //TODO if transaction is failed, delete the stream in database.
     // alert(err);
     console.log(err);
-
   }
 }
 //writing calls
