@@ -178,9 +178,16 @@ export async function refreshStake(wallet, network, stake: pic.Stake) {
   return { stake, numConnections };
 }
 
+export async function checkIfDaoOnChain(wallet, network, dao: pic.Dao) {
+  let program = await initProgram(wallet, network);
+  const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
+  console.log("checkIfDaoOnChain");
+}
+
 //this function get dao from chain, that is, governance in UI.
 export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
   let program = await initProgram(wallet, network);
+
   const daoAccount = await program.account.dao.fetch(dao.address); //wallet address, that is, the owner's address
   //consider return value's type
   //delete await keyword
@@ -200,19 +207,24 @@ export async function getDaoFromChain(wallet, network, dao: pic.Dao) {
   const proposedWithdrawalStream = daoAccount.proposedWithdrawalStream;
   const numStreams = daoAccount.numStreams.toNumber();
 
-  const streamAccount = await program.account.stream.fetch(
-    proposedWithdrawalStream
-  );
-  const tokenMintAddress: PublicKey = streamAccount.tokenMintAddress;
-  let tokenMint: spl_token.Mint = await spl_token.getMint(
-    program.provider.connection,
-    tokenMintAddress
-  );
-  const decimals = tokenMint.decimals;
-  const divFactor = Math.pow(10, decimals);
-
-  const proposedWithdrawalAmount =
-    Number(daoAccount.proposedWithdrawalAmount) / divFactor;
+  
+  let proposedWithdrawalAmount;
+  try {
+    const streamAccount = await program.account.stream.fetch(
+      proposedWithdrawalStream
+    );
+    const tokenMintAddress: PublicKey = streamAccount.tokenMintAddress;
+    let tokenMint: spl_token.Mint = await spl_token.getMint(
+      program.provider.connection,
+      tokenMintAddress
+    );
+    const decimals = tokenMint.decimals;
+    const divFactor = Math.pow(10, decimals);
+    proposedWithdrawalAmount =
+      Number(daoAccount.proposedWithdrawalAmount) / divFactor;
+  } catch (err) {
+    proposedWithdrawalAmount = daoAccount.proposedWithdrawalAmount;
+  }
   let governance: pic.Governance = {
     councillors: councillors,
     approval_threshold: approvalThreshold,

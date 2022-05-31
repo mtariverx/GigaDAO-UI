@@ -23,7 +23,7 @@ const NewStream = (props) => {
   const [token_mint_address, setTokenMintAddress] = useState<string>();
   const [token_ticker, setTokenTicker] = useState<string>();
   const [token_img_url, setTokenImgUrl] = useState<string>();
-  const [stream_rate, setStreamRate] = useState(0);
+  const [stream_rate, setStreamRate] = useState<number>();
   const [collections, setCollections] = useState<string[]>([]);
   const [num_connections, setNumCollections] = useState(0);
   const [collect, setCollect] = useState<string>();
@@ -135,7 +135,7 @@ const NewStream = (props) => {
           className={`tab-title ${is_stream == 2 ? "active" : ""}`}
           onClick={() => setStream(2)}
         >
-          Pools & Streams
+          Token Streams
         </div>
       </div>
       {is_stream == 1 ? (
@@ -181,7 +181,7 @@ const NewStream = (props) => {
                 type="number"
                 value={stream_rate}
                 onChange={(evt) =>
-                  setStreamRate(parseFloat(evt.target.value || "0"))
+                  setStreamRate(parseFloat(evt.target.value))
                 }
               />
             </div>
@@ -231,15 +231,15 @@ const NewStream = (props) => {
             <div className="table-content">
               <table>
                 <tr>
-                  <th>Name</th>
-                  <th>Token Pool Address</th>
-                  <th>is_active</th>
-                  <th>token_image_url</th>
-                  <th>daily_stream_rate</th>
-                  <th>total_earned</th>
-                  <th>total_claimed</th>
-                  <th>current_pool_amount</th>
-                  <th>token_tickers</th>
+                  <th>Pool Name</th>
+                  <th>Pool Address</th>
+                  <th>Active</th>
+                  <th>Token Image Url</th>
+                  <th>Stream Rate</th>
+                  <th>Total Earned</th>
+                  <th>Total Claimed</th>
+                  <th>Current Pool Amount</th>
+                  <th>Token Tickers</th>
                 </tr>
                 {selected_dao && selected_dao.streams
                   ? selected_dao.streams.map((stream) => {

@@ -15,11 +15,11 @@ const NewProposal = (props) => {
 
   const proposal_options = [
     { value: -1, label: "" },
-    { value: pic.ProposalType.UPDATE_MULTISIG, label: "UPDATE_MULTISIG" },
-    { value: pic.ProposalType.DEACTIVATE_STREAM, label: "DEACTIVATE_STREAM" },
+    { value: pic.ProposalType.UPDATE_MULTISIG, label: "Update Multi-sig" },
+    { value: pic.ProposalType.DEACTIVATE_STREAM, label: "Deactivate Stream" },
     {
       value: pic.ProposalType.WITHDRAW_FROM_STREAM,
-      label: "WITHDRAW_FROM_STREAM",
+      label: "Withdraw from Stream",
     },
   ];
   const [proposed_councillors, setProposedCouncillors] = useState<string[]>([]);
@@ -27,7 +27,7 @@ const NewProposal = (props) => {
   const [proposed_approval_threshold, setProposedApprovalThresold] =
     useState<number>();
   const [stream_pubkey, setStreamPubkey] = useState<string>();
-  const [amount, setAmount] = useState<number>(0.0);
+  const [amount, setAmount] = useState<number>();
   const [proposed_withdrawal_receiver, setProposedWithdrawalReceiver] =
     useState<string>();
   const [proposed_withdrawal_stream, setProposedWithdrawalStream] =
@@ -219,7 +219,7 @@ const NewProposal = (props) => {
                         type="number"
                         value={amount}
                         onChange={(evt) =>
-                          setAmount(parseFloat(evt.target.value || "0"))
+                          setAmount(parseFloat(evt.target.value))
                         }
                       />
                     </div>

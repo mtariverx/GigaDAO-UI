@@ -35,7 +35,7 @@ const DAODashboard: React.FC = (props) => {
   const [show_modal, setShowModal] = useState(-1);
   const [refresh, setRefresh] = useState(false);
   const [select_dao_id, setSelectDaoId] = useState<string>();
-  const [reset, setReset] = useState<boolean>(true);
+  // const [reset, setReset] = useState<boolean>(true);
   const wallet = useAnchorWallet();
 
   type counc_sign_pair = {
@@ -55,31 +55,35 @@ const DAODashboard: React.FC = (props) => {
   useEffect(() => {
     (async () => {
       if (connected) {
-        setIsConnectingToOwner(true);
-        const newOwner: pic.Owner = { address: publicKey };
-        // const newOwner: pic.Owner = { address: new PublicKey("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi") };
-        callConnectOwner(dispatch, newOwner).then(() => {
-          setIsConnectingToOwner(false);
-        });
+     
+          setIsConnectingToOwner(true);
+          const newOwner: pic.Owner = { address: publicKey };
+          // const newOwner: pic.Owner = { address: new PublicKey("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi") };
+          callConnectOwner(dispatch, newOwner).then(() => {
+            setIsConnectingToOwner(false);
+          });
 
-        let member_daos_promise = await livePic.getMemberDaos(newOwner, wallet);
-        console.log("member_daos_promise=", member_daos_promise);
+          let member_daos_promise = await livePic.getMemberDaos(
+            newOwner,
+            wallet
+          );
+          console.log("member_daos_promise=", member_daos_promise);
 
-        let mdis: Array<string> = [];
-        let m_daos: Array<pic.Dao> = [];
-        m_daos = member_daos_promise;
-        setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
-        mdis = m_daos.map((dao) => dao.dao_id);
-        setMemberDaoIds(mdis);
-        setSelectDaoId(mdis[0]);
-        let daos_with_stream = await livePic.getDaos([m_daos[0]]);
-        await livePic.checkIfStreamOnChain(wallet, daos_with_stream[0]);
-        let confirmedDaos = await livePic.getConfirmedStream([daos_with_stream[0]]);
-        console.log("id=",confirmedDaos[0].dao_id);
-        // console.log("m_daos[0]=", confirmedDaos);
-        setSelectedMemberDAO({ ...confirmedDaos[0] }); //only first
-        getActiveProposalInfo({ ...confirmedDaos[0] });
-        console.log("select member---", selected_member_dao);
+          let mdis: Array<string> = [];
+          let m_daos: Array<pic.Dao> = [];
+          m_daos = member_daos_promise;
+          setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
+          mdis = m_daos.map((dao) => dao.dao_id);
+          setMemberDaoIds(mdis);
+          setSelectDaoId(mdis[0]);
+          let [daos_with_stream] = await livePic.getDaos([{...m_daos[0]}]);
+          await livePic.checkIfStreamOnChain(wallet, {...daos_with_stream});
+          let [confirmedDaos] = await livePic.getConfirmedStream([
+            {...daos_with_stream},
+          ]);
+          setSelectedMemberDAO({ ...confirmedDaos }); //only first
+          getActiveProposalInfo({ ...confirmedDaos });
+ 
       } else {
         callDisconnectOwner(dispatch);
       }
@@ -88,57 +92,54 @@ const DAODashboard: React.FC = (props) => {
   useEffect(() => {
     (async () => {
       if (connected) {
-        console.log("reset");
-        setIsConnectingToOwner(true);
-        const newOwner: pic.Owner = { address: publicKey };
-        // const newOwner: pic.Owner = { address: new PublicKey("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi") };
-        callConnectOwner(dispatch, newOwner).then(() => {
-          setIsConnectingToOwner(false);
-        });
+      
+          console.log("reset");
+          setIsConnectingToOwner(true);
+          const newOwner: pic.Owner = { address: publicKey };
+          // const newOwner: pic.Owner = { address: new PublicKey("GrGUgPNUHKPQ8obxmmbKKJUEru1D6uWu9fYnUuWjbXyi") };
+          callConnectOwner(dispatch, newOwner).then(() => {
+            setIsConnectingToOwner(false);
+          });
 
-        let member_daos_promise = await livePic.getMemberDaos(newOwner, wallet);
-        console.log("member_daos_promise=", member_daos_promise);
+          let member_daos_promise = await livePic.getMemberDaos(
+            newOwner,
+            wallet
+          );
+          console.log("member_daos_promise=", member_daos_promise);
 
-        let mdis: Array<string> = [];
-        let m_daos: Array<pic.Dao> = [];
-        m_daos = member_daos_promise;
-        setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
-        mdis = m_daos.map((dao) => dao.dao_id);
-        setMemberDaoIds(mdis);
-        setSelectDaoId(select_dao_id);
-        let daos_with_stream = await livePic.getDaos([selected_member_dao]);
-        await livePic.checkIfStreamOnChain(wallet, daos_with_stream[0]);
-        let confirmedDaos = await livePic.getConfirmedStream([daos_with_stream[0]]);
-        console.log("id=",confirmedDaos[0].dao_id);
-        setSelectedMemberDAO({ ...confirmedDaos[0] }); //only first
-        getActiveProposalInfo({ ...confirmedDaos[0] });
-        console.log("select member---", selected_member_dao);
+          let mdis: Array<string> = [];
+          let m_daos: Array<pic.Dao> = [];
+          m_daos = member_daos_promise;
+          setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
+          mdis = m_daos.map((dao) => dao.dao_id);
+          setMemberDaoIds(mdis);
+          setSelectDaoId(select_dao_id);
+          let [daos_with_stream] = await livePic.getDaos([{...selected_member_dao}]);
+          await livePic.checkIfStreamOnChain(wallet, {...daos_with_stream});
+          let [confirmedDaos] = await livePic.getConfirmedStream([
+            {...daos_with_stream},
+          ]);
+          setSelectedMemberDAO({ ...confirmedDaos }); //only first
+          getActiveProposalInfo({ ...confirmedDaos });
+      
       } else {
         callDisconnectOwner(dispatch);
       }
     })();
-  }, [reset, refresh]);
+  }, [refresh]);
 
   useEffect(() => {
     if (selected_member_dao != undefined) {
-      getActiveProposalInfo(selected_member_dao);
+      getActiveProposalInfo({...selected_member_dao});
     }
   }, [selected_member_dao]);
   const onCloseModeal = () => {
     console.log("onCloseModal");
     setShowModal(-1);
-    setReset(!reset);
+    setRefresh(!refresh);
+    
   };
   const onClickRefresh = async () => {
-    let newOwner: pic.Owner = { address: publicKey };
-    let member_daos_promise = await livePic.getMemberDaos(newOwner, wallet);
-
-    let mdis: Array<string> = [];
-    let m_daos: Array<pic.Dao> = [];
-    m_daos = member_daos_promise;
-    setMemberDAOs(m_daos); //set daos to memberdaos but the dao has only address and streams
-    mdis = m_daos.map((dao) => dao.dao_id);
-    setMemberDaoIds(mdis);
     setRefresh(!refresh);
     console.log("refresh is clicked");
   };
@@ -151,14 +152,13 @@ const DAODashboard: React.FC = (props) => {
   };
 
   const setMemberDao = async (dao_id: string) => {
-    
     for (const dao of member_daos) {
       if (dao.dao_id == dao_id) {
-        let confirmedDaos = await livePic.getConfirmedStream([dao]);
-        console.log("confirmeddao=",confirmedDaos[0]);
-        setSelectedMemberDAO({ ...confirmedDaos[0] });
+        let [daos_with_stream] = await livePic.getDaos([{...dao}]);
+        await livePic.checkIfStreamOnChain(wallet, {...daos_with_stream});
+        let [confirmedDaos] = await livePic.getConfirmedStream([{...daos_with_stream}]);
+        setSelectedMemberDAO({ ...confirmedDaos});
         setSelectDaoId(dao_id);
-
       }
     }
   };
@@ -182,45 +182,7 @@ const DAODashboard: React.FC = (props) => {
       }
 
       console.log("===============getActiveProposalInfo======2=======", dao);
-      console.log("getActiveProposal==", dao);
-      // console.log("proposal_type==", dao.governance.proposal_type);
-      // console.log(
-      //   "councillors==",
-      //   dao.governance.councillors.map((councillor) => councillor.toString())
-      // );
-      // console.log(
-      //   "approval_threshold==",
-      //   dao.governance.approval_threshold.toString()
-      // );
-      // console.log("proposed_signers==", dao.governance.proposed_signers);
-      // console.log("proposal_is_active==", dao.governance.proposal_is_active);
-      // console.log(
-      //   "proposed_councillors==",
-      //   dao.governance.proposed_councillors.map((councillor) =>
-      //     councillor.toString()
-      //   )
-      // );
-      // console.log(
-      //   "proposed_deactivation_stream==",
-      //   dao.governance.proposed_deactivation_stream.toString()
-      // );
-      // console.log(
-      //   "proposed_withdrawal_amount==",
-      //   dao.governance.proposed_withdrawal_amount.toString()
-      // );
-      // console.log(
-      //   "proposed_withdrawal_receiver==",
-      //   dao.governance.proposed_withdrawal_receiver.toString()
-      // );
-      // console.log(
-      //   "proposed_withdrawal_stream==",
-      //   dao.governance.proposed_withdrawal_stream.toString()
-      // );
-      // console.log(
-      //   "num_streams==",
-      //   parseInt(dao.governance.num_streams.toString())
-      // );
-
+      
       if (dao.governance == undefined) {
         return dao;
       }
@@ -230,7 +192,7 @@ const DAODashboard: React.FC = (props) => {
         Object.keys(dao.governance.proposal_type)[0] == "deactivateStream"
       ) {
         tmp = [
-          ["Proposal Type:", "DEACTIVEATE_STREAM"],
+          ["Proposal Type:", "Deactivate Stream"],
           [
             "Stream Public Key:",
             getShortKey(dao.governance.proposed_deactivation_stream.toString()),
@@ -241,7 +203,7 @@ const DAODashboard: React.FC = (props) => {
         Object.keys(dao.governance.proposal_type)[0] == "withdrawFromStream"
       ) {
         tmp = [
-          ["Proposal Type: ", "WITHDRAW FROM STREAM"],
+          ["Proposal Type: ", "Withdraw from Stream"],
           ["Amount", `${dao.governance.proposed_withdrawal_amount}`],
           [
             "Withdraw Receiver: ",
@@ -257,7 +219,7 @@ const DAODashboard: React.FC = (props) => {
         Object.keys(dao.governance.proposal_type)[0] == "updateMultisig"
       ) {
         tmp = [
-          ["Proposal Type: ", "UPDATE_MULTISIG"],
+          ["Proposal Type: ", "Update Multi-sig"],
           [
             "councillors: ",
             dao.governance.proposed_councillors
