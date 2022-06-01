@@ -800,7 +800,6 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner, wallet) => {
         new_daos[index].image_url = dao_promise.value.data[0].image_url;
         new_daos[index].num_nfts = dao_promise.value.data[0].num_nfts;
         new_daos[index].confirmed = dao_promise.value.data[0].confirmed;
-
         dao_verified.push(new_daos[index]);
       } else if (
         dao_promise.status === "fulfilled" &&
@@ -824,7 +823,6 @@ let getMemberDaos: pic.GetMemberDaos = async (owner: pic.Owner, wallet) => {
           })
           .catch((err) => {
             displayError(err);
-            // console.log(err);
           });
       }
     }
@@ -901,12 +899,10 @@ export async function checkIfStreamOnChain(wallet, dao) {
 
     let results = await Promise.allSettled(promises);
     let stream_unconfirmed = [];
-    let index = -1;
     const confirmed = true;
     for (const result of results) {
-      index++;
-      let stream = dao.streams[index];
       if (result.status === "fulfilled") {
+        let stream=result.value;
         stream_unconfirmed.push(
           mirror.updateStream(
             stream.address,
@@ -914,7 +910,7 @@ export async function checkIfStreamOnChain(wallet, dao) {
             stream.num_connections,
             stream.total_earned,
             stream.last_update_timestamp,
-            confirmed
+            confirmed,
           )
         );
       }

@@ -134,7 +134,6 @@ const DAODashboard: React.FC = (props) => {
     }
   }, [selected_member_dao]);
   const onCloseModeal = () => {
-    console.log("onCloseModal");
     setShowModal(-1);
     setRefresh(!refresh);
    
@@ -142,7 +141,6 @@ const DAODashboard: React.FC = (props) => {
   };
   const onClickRefresh = async () => {
     setRefresh(!refresh);
-    console.log("refresh is clicked");
   };
 
   let dao: pic.Dao;
@@ -229,7 +227,6 @@ const DAODashboard: React.FC = (props) => {
           ],
         ];
       }
-      // setSelectedMemberDAO(dao);
       setActiveProposalInfo(tmp);
     } catch (e) {
       console.log(e);
@@ -256,6 +253,7 @@ const DAODashboard: React.FC = (props) => {
       }
     }
     livePic.approveDaoCommand(wallet, dao);
+
   };
 
   const onClickExecuteProposeBtn = () => {
@@ -436,7 +434,6 @@ const DAODashboard: React.FC = (props) => {
               </div>
 
               <div className="proposal-btn-group">
-                {/* <button className="btn">Execute</button> */}
                 <Button
                   btn_type="common"
                   btn_title="Approve"
@@ -457,7 +454,6 @@ const DAODashboard: React.FC = (props) => {
         <DAODetailModal onClick={() => setShowModal(-1)}>
           <NewDAO
             dao={selected_member_dao}
-            // onClose={() => setShowModal(-1)}
             onClose={onCloseModeal}
           />
         </DAODetailModal>
@@ -468,7 +464,6 @@ const DAODashboard: React.FC = (props) => {
         <DAODetailModal onClick={() => setShowModal(-1)}>
           <NewStream
             dao={selected_member_dao}
-            // onClose={() => setShowModal(-1)}
             onClose={onCloseModeal}
           />
         </DAODetailModal>
@@ -479,7 +474,6 @@ const DAODashboard: React.FC = (props) => {
         <DAODetailModal onClick={() => setShowModal(-1)}>
           <NewProposal
             dao={selected_member_dao}
-            // onClose={() => setShowModal(-1)}
             onClose={onCloseModeal}
           />
         </DAODetailModal>
@@ -488,7 +482,6 @@ const DAODashboard: React.FC = (props) => {
       )}
       {show_modal == 4 && connected ? (
         <DAODetailModal onClick={() => setShowModal(-1)}>
-          {/* <DAOSocial onClose={() => setShowModal(-1)} /> */}
         </DAODetailModal>
       ) : (
         ""

@@ -206,6 +206,7 @@ export async function updateStream(
   const URL =
     BASE_URL +
     `update_stream?stream_address=${streamAddress.toString()}&is_active=${isActive}&num_connections=${numConnections}&total_streamed=${totalStreamed}&last_update_timestamp=${lastUpdateTimestamp}&confirmed=${confirmed}`;
+  console.log("url=", URL);
   const response = await fetch(URL, { mode: "cors" });
   const data = await response.json();
   return data;

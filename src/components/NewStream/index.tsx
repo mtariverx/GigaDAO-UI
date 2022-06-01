@@ -16,6 +16,7 @@ import {
 } from "pic/sim_data/sample-streams";
 import { useAnchorWallet } from "providers/adapters/core/react";
 const NewStream = (props) => {
+
   const { dao } = props;
   const [is_stream, setStream] = useState(1);
   const [pool_name, setPoolName] = useState<string>();
@@ -26,6 +27,7 @@ const NewStream = (props) => {
   const [collections, setCollections] = useState<string[]>([]);
   const [num_connections, setNumCollections] = useState(0);
   const [collect, setCollect] = useState<string>();
+
   const [selected_dao, setSelectedDao] = useState<pic.Dao>();
   const [stream_compensate_arr, setStreamCompensateArr] = useState<string[]>(
     []
