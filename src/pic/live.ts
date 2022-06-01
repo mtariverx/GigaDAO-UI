@@ -283,6 +283,7 @@ let getDaos: pic.GetDaos = async (daos: Array<pic.Dao>) => {
   } catch (e) {
     displayError(e);
   }
+  console.log("all daos=",daos);
   return daos;
 };
 
@@ -922,6 +923,7 @@ export async function checkIfStreamOnChain(wallet, dao) {
     Promise.allSettled(stream_unconfirmed).then((results) =>
       results.forEach((result) => {
         if (result.status === "fulfilled" && result.value.success) {
+          console.log(result);
           console.log("updating stream in db is succeeded");
         } else {
           console.log("updating stream in db is failed");
@@ -1021,6 +1023,7 @@ export async function getConfirmedStream(daos) {
   } catch (e) {
     console.log(e);
   }
+  console.log("confirmed dao=",daos);
   return daos;
 }
 export function displayError(err) {

@@ -83,8 +83,9 @@ const NewStream = (props) => {
     if (
       pool_name && token_ticker && token_img_url &&
       (token_mint_address) &&
-      collections.length > 0
+      collections.length > 0 
     ) {
+      console.log("createNewStreamBtn is clicked");
       console.log("props.dao.dao_address=",props.dao);
       const key=Keypair.generate();
       let new_stream:pic.Stream = {

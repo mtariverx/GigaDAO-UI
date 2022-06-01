@@ -137,6 +137,7 @@ const DAODashboard: React.FC = (props) => {
     console.log("onCloseModal");
     setShowModal(-1);
     setRefresh(!refresh);
+   
     
   };
   const onClickRefresh = async () => {
@@ -204,7 +205,7 @@ const DAODashboard: React.FC = (props) => {
       ) {
         tmp = [
           ["Proposal Type: ", "Withdraw from Stream"],
-          ["Amount", `${dao.governance.proposed_withdrawal_amount}`],
+          ["Amount:", `${dao.governance.proposed_withdrawal_amount}`],
           [
             "Withdraw Receiver: ",
             getShortKey(dao.governance.proposed_withdrawal_receiver.toString()),

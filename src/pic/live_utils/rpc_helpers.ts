@@ -296,7 +296,6 @@ export async function initializeStream(
   stream: pic.Stream
 ) {
   let program = await initProgram(wallet, network);
-  console.log("program=", program);
 
   [fee_controller] = await PublicKey.findProgramAddress(
     [Buffer.from(FEE_CONTROLLER_PDA_SEED)],
