@@ -256,9 +256,6 @@ const DAODashboard: React.FC = (props) => {
       }
     }
     livePic.approveDaoCommand(wallet, dao);
-    console.log("---clickapprove---", dao);
-
-    // const _dao = await livePic.approveDaoCommand(dao);
   };
 
   const onClickExecuteProposeBtn = () => {
